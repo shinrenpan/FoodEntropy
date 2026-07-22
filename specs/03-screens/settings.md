@@ -9,10 +9,12 @@
 ## 版面（分區）
 
 ### Section 1：購買
-| 項目 | 行為 |
-|---|---|
-| 移除廣告 | 未購買 → 顯示價格 / 「購買」，點擊走 StoreKit 2 購買流程。已持有 entitlement → 顯示「已移除」並停用。 |
-| 還原購買 | 點擊執行 StoreKit restore。正常情況免用（entitlement 自動同步），保留以符合 Apple 慣例。 |
+> **v1**：UI 保留，但**購買邏輯 stub**（AdMob + IAP 延後至里程碑 2，見 `02-architecture` §7）。
+
+| 項目 | 行為（未來完整版） | v1 |
+|---|---|---|
+| 移除廣告 | 未購買 → 顯示價格 / 「購買」，點擊走 StoreKit 2。已持有 → 顯示「已移除」並停用。 | UI 在，點擊 no-op / 「即將推出」 |
+| 還原購買 | 點擊執行 StoreKit restore。 | UI 在，點擊 no-op |
 
 ### Section 2：同步與通知
 | 項目 | 行為 |

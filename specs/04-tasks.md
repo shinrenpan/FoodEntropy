@@ -42,7 +42,8 @@
 ## Phase 3 — 首頁（`03-screens/home.md`）
 
 - [ ] `HomeViewModel`（@Observable @MainActor）：State + `doAction`（onAppear / tapAdd / tapRow / swipeConsume / delete 確認流 / extend / menu 動作）。
-- [ ] `HomeView`：廣告 section（可隱藏）+ 清單 + FAB + 空狀態 hint。
+- [ ] `AdSlotView` 佔位 seam：DEBUG 顯示「Ad Placeholder」框、Release collapse（`02-architecture` §9）。`adsRemoved`(寫死 false) 為 true 時隱藏。
+- [ ] `HomeView`：`AdSlotView` + 清單 + FAB + 空狀態 hint。
 - [ ] Row：縮圖 / 名稱 / 到期資訊 / 狀態顏色（不顯示購買日）。
 - [ ] 滑動：leading=已使用、trailing=刪除（跳確認）；長按 context menu 完整 5 項。
 - [ ] 延長效期：快捷 date picker → 存 → 重排通知。
@@ -73,6 +74,7 @@
 - [ ] 通知列：顯示狀態 + 導向系統設定。
 - [ ] 隱私權政策：SFSafariViewController。
 - [ ] 版本顯示。
+- [ ] 購買區（移除廣告 / 還原購買）UI 保留但**互動 stub**（v1 不接 StoreKit，見 Phase 8）。
 
 ## Phase 7 — 通知（`02-architecture` §8）
 
@@ -81,16 +83,20 @@
 - [ ] 取消/重排：編輯延長 / 刪除 / 已使用 / 丟棄。
 - [ ] 64 則上限策略：nearest-first。
 
-## Phase 8 — IAP 移除廣告（`02-architecture` §7）
+## Phase 8 — IAP 移除廣告（`02-architecture` §7）— ⏸ 延後（里程碑 2）
+
+> v1 不做；設定 UI 已 stub（Phase 6）、`adsRemoved` 已寫死 false（Phase 3）。
 
 - [ ] StoreKit 2 產品設定（非消耗型）+ StoreKit config 檔（本地測試）。
 - [ ] entitlement 查詢（`currentEntitlements`）+ `Transaction.updates` 監聽。
 - [ ] 購買 / 還原流程 + 錯誤處理。
-- [ ] 廣告顯示與否綁定 entitlement。
+- [ ] `adsRemoved` 改由 entitlement 驅動（取代寫死值）。
 
-## Phase 9 — 廣告 + ATT（`Spec` Production §2、`01-navigation` §2）
+## Phase 9 — 廣告 + ATT（`Spec` Production §2、`01-navigation` §2）— ⏸ 延後（里程碑 2）
 
-- [ ] AdMob 首頁頂部單一 banner section（標「廣告」、明顯區隔）。
+> v1 以 `AdSlotView` 佔位（Phase 3）。以下為接 AdMob 時的工作。
+
+- [ ] 換掉 `AdSlotView` 內部實作為 AdMob 首頁頂部單一 banner（標「廣告」、明顯區隔）。
 - [ ] ATT 同意流程；拒絕 → 非個人化廣告 fallback。
 - [ ] 空清單仍顯示廣告 + hint（`01-navigation` §2）。
 

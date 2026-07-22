@@ -145,6 +145,12 @@ daysUntil = Calendar.dateComponents([.day], from: 今天起始, to: 到期日起
 
 ## 7. IAP 移除廣告
 
+> **v1 延後（里程碑 2）**：AdMob 未接前「移除廣告」無實際效果，故**購買邏輯延後**。v1 僅：
+> - 保留設定的「移除廣告 / 還原購買」**UI**（互動 stub，不真的走 StoreKit）。
+> - 保留 `adsRemoved` state（v1 寫死 `false`），供 `AdSlotView` 的「持有即隱藏」邏輯先接好。
+>
+> 以下為未來接上時的完整設計：
+
 - **StoreKit 2**，一次性（非消耗型）購買。
 - **購買狀態來源：`Transaction.currentEntitlements`**，不自存旗標。App 啟動 / 進前景時查詢是否持有「移除廣告」entitlement。
   - 換裝置只要同一 Apple ID，StoreKit 自動認得，無需手動 Restore 即可還原。
@@ -180,6 +186,13 @@ daysUntil = Calendar.dateComponents([.day], from: 今天起始, to: 到期日起
 - **補排時機**：App **啟動 / 進前景時**做一次對帳——移除已離開 active 者的殘留排程、補排下一批最近到期者。量大時再評估改「每天彙整一則」。
 
 ## 9. 廣告與 ATT（App Tracking Transparency）
+
+> **v1 延後（里程碑 2）**：不接 AdMob SDK。改以 **`AdSlotView` 佔位 seam**：
+> - **DEBUG**：顯示灰底「Ad Placeholder」框（開發時看得到保留版面）。
+> - **Release**：collapse 不佔空間。
+> - 未來接 AdMob 時只換 `AdSlotView` 內部實作，首頁與 IAP 隱藏邏輯不動。
+>
+> 以下為未來接上時的完整設計：
 
 - **AdMob**：首頁頂部單一 banner section（`01-navigation` §2），持有「移除廣告」entitlement 時隱藏。
 - **ATT 觸發時機**：**App 冷啟動、首次進入首頁、且廣告即將載入前**才請求 ATT 授權（`ATTrackingManager`）。不在 App 一開就跳（無情境、易被拒）。
