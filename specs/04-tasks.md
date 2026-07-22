@@ -39,10 +39,12 @@
 
 ## Phase 2 — 導航基礎（`01-navigation` §7、`mvvmc-navigation` / `mvvmc-hostcontroller`）
 
-- [ ] `AppRouter`（stateless）：push Form(add/edit)、present 快捷 date picker、開 SFSafariViewController、開系統設定。
-- [ ] TabView 三分頁裝配（首頁 / 分析 / 設定），各含 NavigationStack。
-- [ ] SceneDelegate 導航裝配。
-- [ ] HostController 橋接（SwiftUI ↔ UIKit）依 skill。
+- [x] `AppRouter`（stateless 中樞）：`to` / `back` / `backTo` / `backToRoot` / `sheet` / `deeplink` / `tab` + 自訂轉場（modal/fade）+ 側滑限定 `.push`。Swift 6：associated object key 改 `nonisolated(unsafe)`。
+- [x] `Deeplink`（集中式路由）：scheme `foodentropy`，v1 僅 `.home`（通知點擊 → 首頁 Tab）。
+- [x] `SceneDelegate` 導航裝配：UITabBarController 三分頁（各含 NavigationController）、`window.backgroundColor`、三進入點（前景/冷啟動 URL、通知點擊）、前景通知橫幅。
+- [x] HostController 橋接模式確立（`mvvmc-hostcontroller`）。各 Feature 的 HostController 於 Phase 3/5/6 建立並換入 SceneDelegate（目前為佔位 View）。
+
+> 驗證：build + 既有 9 測試通過。AppRouter 的 push/sheet 實際導航於 Phase 3 首頁接上 Form 時驗證。
 
 ## Phase 3 — 首頁（`03-screens/home.md`）
 
