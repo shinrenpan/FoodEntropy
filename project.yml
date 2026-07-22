@@ -1,0 +1,66 @@
+name: FoodEntropy
+
+options:
+  bundleIdPrefix: com.shinrenpan
+  deploymentTarget:
+    iOS: "26.0"
+  developmentLanguage: zh-Hant
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"                 # Swift 6 語言模式（strict concurrency 內建）
+    SWIFT_STRICT_CONCURRENCY: complete   # 明示 strict（00-constitution）
+    TARGETED_DEVICE_FAMILY: "1"          # iPhone only
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""                 # 先空，需真機 / iCloud / IAP 時再填
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  FoodEntropy:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.shinrenpan.FoodEntropy
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Sources/App/Info.plist
+    info:
+      path: Sources/App/Info.plist
+      properties:
+        CFBundleDisplayName: 食熵
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        # 相機 / 相簿權限（食材 Form 拍照選圖用）；ATT 字串待里程碑 2 接廣告時再加
+        NSCameraUsageDescription: 需要相機權限，用來拍攝食材照片。
+        NSPhotoLibraryUsageDescription: 需要相簿權限，用來選擇食材照片。
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default Configuration
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+        # Deeplink / Push 路由用（mvvmc-navigation）
+        CFBundleURLTypes:
+          - CFBundleURLName: com.shinrenpan.FoodEntropy
+            CFBundleURLSchemes:
+              - foodentropy
+
+  FoodEntropyTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/FoodEntropyTests
+    dependencies:
+      - target: FoodEntropy
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.shinrenpan.FoodEntropyTests
+        GENERATE_INFOPLIST_FILE: YES

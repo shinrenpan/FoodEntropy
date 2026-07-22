@@ -10,14 +10,17 @@
 
 ## Phase 0 — 專案骨架
 
-- [x] `git init` + `.gitignore`（Xcode / SPM / XcodeGen）。
-- [ ] `brew install xcodegen`。
-- [ ] 撰寫 `project.yml`：SwiftUI App target、**iOS 26+**、**iPhone only**、**直向鎖定**、Bundle ID / Team、Swift Concurrency **strict**、String Catalog。
-- [ ] 以 `xcodegen generate` 產生 `.xcodeproj`（不進版控）。
-- [ ] 開啟 Capabilities（於 `project.yml` 宣告）：iCloud（CloudKit）、Push（背景同步）、In-App Purchase。
-- [ ] 建立 iCloud container（私有資料庫）。
-- [ ] 導入 Google AdMob SDK（SPM，於 `project.yml` 宣告 package）。
-- [ ] 專案目錄結構依 MVVMC 分層建立。
+- [x] `git init` + `.gitignore`（Xcode / SPM / XcodeGen；忽略 `.xcodeproj` 與生成的 `Info.plist`）。
+- [x] `brew install xcodegen`（2.46.0）。
+- [x] 撰寫 `project.yml`：UIKit lifecycle（AppDelegate + SceneDelegate，MVVMC 需求）、**iOS 26**、**iPhone only**（`TARGETED_DEVICE_FAMILY=1`）、**直向鎖定**、Bundle ID `com.shinrenpan.FoodEntropy`、**Swift 6 strict concurrency**、相機/相簿權限字串、`foodentropy` URL scheme。
+- [x] 以 `xcodegen generate` 產生 `.xcodeproj`（不進版控）。
+- [x] 專案目錄結構依 MVVMC 分層建立（`App` / `Core/{Persistence,Domain,Notification,Navigation,Extensions}` / `Features` / `Resources`）。
+- [x] 三 Tab 骨架可 build + 跑（SceneDelegate → UITabBarController，佔位 View）；單元測試 target（Swift Testing）通過。
+- [ ] ⏸ Capabilities（iCloud / Push / IAP）：待填 `DEVELOPMENT_TEAM` 後於 `project.yml` 宣告（需 Apple 開發者帳號）。
+- [ ] ⏸ 建立 iCloud container：同上，待 Team。
+- [ ] ⏸ AdMob SDK：延後至里程碑 2（Phase 9）。
+
+> Team 未填時：模擬器可 build/run；真機 / iCloud / Push / IAP 需先填 `DEVELOPMENT_TEAM`。
 
 ## Phase 1 — 資料層（`02-architecture` §1–§3 §5）
 
