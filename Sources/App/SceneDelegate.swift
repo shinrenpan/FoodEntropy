@@ -49,27 +49,46 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // MARK: - 導航裝配（Phase 2）
 
-    // 三 Tab 外殼；各分頁內容於 Phase 3 / 5 / 6 以正式 Feature HostController 替換。
+    // 三 Tab 裝配。首頁為正式 HostController；分析 / 設定於 Phase 5 / 6 替換。
     private func makeRootTabBarController() -> UITabBarController {
+        let manager = makeManager()
+
+        let home = HomeHostController(viewModel: HomeViewModel(manager: manager))
+        home.navigationItem.title = "首頁"
+
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
-            makeTab(title: "首頁", systemImage: "list.bullet", root: Phase0PlaceholderView(title: "首頁")),
-            makeTab(title: "分析", systemImage: "chart.bar", root: Phase0PlaceholderView(title: "分析")),
-            makeTab(title: "設定", systemImage: "gearshape", root: Phase0PlaceholderView(title: "設定")),
+            wrapInTab(home, title: "首頁", systemImage: "list.bullet"),
+            makePlaceholderTab(title: "分析", systemImage: "chart.bar"),
+            makePlaceholderTab(title: "設定", systemImage: "gearshape"),
         ]
         return tabBarController
     }
 
-    private func makeTab(
+    // Composition root：依 iCloud 開關偏好建立 SwiftDataManager（02-architecture §6）。
+    private func makeManager() -> SwiftDataManager {
+        let cloudKitEnabled = UserDefaults.standard.bool(forKey: "iCloudSyncEnabled")
+        do {
+            return try SwiftDataManager(cloudKitEnabled: cloudKitEnabled)
+        } catch {
+            fatalError("無法建立 SwiftDataManager：\(error)")
+        }
+    }
+
+    private func wrapInTab(
+        _ root: UIViewController,
         title: String,
-        systemImage: String,
-        root: some View
+        systemImage: String
     ) -> UINavigationController {
-        let host = UIHostingController(rootView: root)
-        host.navigationItem.title = title
-        let nav = UINavigationController(rootViewController: host)
+        let nav = UINavigationController(rootViewController: root)
         nav.tabBarItem = UITabBarItem(title: title, image: UIImage(systemName: systemImage), selectedImage: nil)
         return nav
+    }
+
+    private func makePlaceholderTab(title: String, systemImage: String) -> UINavigationController {
+        let host = UIHostingController(rootView: Phase0PlaceholderView(title: title))
+        host.navigationItem.title = title
+        return wrapInTab(host, title: title, systemImage: systemImage)
     }
 }
 

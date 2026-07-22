@@ -48,14 +48,18 @@
 
 ## Phase 3 — 首頁（`03-screens/home.md`）
 
-- [ ] `HomeViewModel`（@Observable @MainActor）：State + `doAction`（onAppear / tapAdd / tapRow / swipeConsume / delete 確認流 / extend / menu 動作）。
-- [ ] `AdSlotView` 佔位 seam：DEBUG 顯示「Ad Placeholder」框、Release collapse（`02-architecture` §9）。`adsRemoved`(寫死 false) 為 true 時隱藏。
-- [ ] `HomeView`：`AdSlotView` + 清單 + FAB + 空狀態 hint。
-- [ ] Row：縮圖 / 名稱 / 到期資訊 / 狀態顏色（不顯示購買日）。
-- [ ] 滑動：leading=已使用、trailing=刪除（跳確認）；長按 context menu 完整 5 項。
-- [ ] 延長效期：快捷 date picker → 存 → 重排通知。
-- [ ] onAppear 重撈刷新。
-- [ ] ViewModel 測試（`mvvmc-testing`：`doAction(.apiResponse...)` 注入）。
+- [x] `HomeViewModel`（@Observable @MainActor）：State + `doAction`（onAppear / add / row / consume / waste / delete 確認流 / extend / edit）。以 `dataResponse(.foodsLoaded)` 為注入點。
+- [x] `AdSlotView` 佔位 seam：DEBUG 顯示「Ad Placeholder」框、Release collapse。`adsRemoved`(寫死 false) 為 true 時隱藏。
+- [x] `HomeView`（L1/L2/L3）：`AdSlotView` + 清單 + FAB + 空狀態 hint。
+- [x] `FoodRow`：縮圖 / 名稱 / 到期資訊 / 狀態顏色（不顯示購買日）。
+- [x] 滑動：leading=已使用、trailing=刪除（跳 alert 確認）；長按 context menu 完整 5 項。
+- [x] 延長效期：快捷 date picker（SwiftUI sheet）→ 存。（通知重排留 Phase 7）
+- [x] onAppear 重撈刷新。
+- [x] `HomeHostController`（純 Router，push Form add/edit）；SceneDelegate 換入首頁正式 HostController。
+- [x] ViewModel 測試（inMemory manager 驅動，9 個）。
+- [x] 實機模擬器驗證：空狀態 UI 正常、深色模式、正式 store 可建立。
+
+> 註：刪除確認 `.alert`、延長 `.sheet` 為無 VM 的輕量 UI affordance，不走 AppRouter（Router 專責畫面切換）。Form 目前為 Phase 4 佔位。
 
 ## Phase 4 — 食材 Form（`03-screens/form.md`）
 
