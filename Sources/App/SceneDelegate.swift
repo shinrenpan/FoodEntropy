@@ -56,12 +56,21 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let home = HomeHostController(manager: manager)
         home.navigationItem.title = "首頁"
 
+        let analytics = AnalyticsHostController(manager: manager)
+        analytics.navigationItem.title = "分析"
+
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
             wrapInTab(home, title: "首頁", systemImage: "list.bullet"),
-            makePlaceholderTab(title: "分析", systemImage: "chart.bar"),
+            wrapInTab(analytics, title: "分析", systemImage: "chart.bar"),
             makePlaceholderTab(title: "設定", systemImage: "gearshape"),
         ]
+        #if DEBUG
+        // 開發用：以 INITIAL_TAB=<index> 啟動時定位初始分頁。
+        if let raw = ProcessInfo.processInfo.environment["INITIAL_TAB"], let index = Int(raw) {
+            tabBarController.selectedIndex = index
+        }
+        #endif
         return tabBarController
     }
 

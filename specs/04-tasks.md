@@ -75,9 +75,12 @@
 
 ## Phase 5 — 分析（`03-screens/analytics.md`）
 
-- [ ] `AnalyticsViewModel`：三桶 State、onAppear 分桶。
-- [ ] `AnalyticsView`：急→緩三 Section（空桶顯示 0）、唯讀 row。
-- [ ] ViewModel 測試。
+- [x] `AnalyticsViewModel`：三桶 State（expired/nearExpiry/fresh）、onAppear 分桶（`dataResponse` 注入）。
+- [x] `AnalyticsView`：急→緩三 Section（header 桶名+數量、空桶顯示 0 項）、唯讀 row。
+- [x] `AnalyticsHostController`（無 Router 最簡版）；SceneDelegate 換入分析。
+- [x] 共用組件重構：`FoodRow` 提拔為 `FoodRowView`（首頁 + 分析共用）。
+- [x] ViewModel 測試（3 個）。
+- [x] 模擬器實跑驗證分桶/數量/唯讀（DEBUG `INITIAL_TAB` env hook）。
 
 ## Phase 6 — 設定（`03-screens/settings.md`）
 
