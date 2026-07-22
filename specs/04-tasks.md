@@ -10,12 +10,14 @@
 
 ## Phase 0 — 專案骨架
 
-- [ ] 建立 Xcode 專案（SwiftUI App、最低 iOS 版本待定）、設定 Bundle ID / Team。
-- [ ] 開啟 Capabilities：iCloud（CloudKit）、Push（背景同步用）、In-App Purchase。
+- [x] `git init` + `.gitignore`（Xcode / SPM / XcodeGen）。
+- [ ] `brew install xcodegen`。
+- [ ] 撰寫 `project.yml`：SwiftUI App target、**iOS 26+**、**iPhone only**、**直向鎖定**、Bundle ID / Team、Swift Concurrency **strict**、String Catalog。
+- [ ] 以 `xcodegen generate` 產生 `.xcodeproj`（不進版控）。
+- [ ] 開啟 Capabilities（於 `project.yml` 宣告）：iCloud（CloudKit）、Push（背景同步）、In-App Purchase。
 - [ ] 建立 iCloud container（私有資料庫）。
-- [ ] 導入 Google AdMob SDK（SPM）。
+- [ ] 導入 Google AdMob SDK（SPM，於 `project.yml` 宣告 package）。
 - [ ] 專案目錄結構依 MVVMC 分層建立。
-- [ ] `git init` + `.gitignore`（Xcode / SPM）。
 
 ## Phase 1 — 資料層（`02-architecture` §1–§3 §5）
 

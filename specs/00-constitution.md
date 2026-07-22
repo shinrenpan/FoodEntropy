@@ -30,6 +30,8 @@
 | UI | SwiftUI（透過 HostController 橋接 UIKit Router） |
 | 資料 | SwiftData（本地）+ CloudKit（opt-in 同步） |
 | 分層 | `@Model`(持久化 DTO) → Manager(`toDomain()`) → ViewModel → State → View（見 `02-architecture` §1） |
+| 專案生成 | **XcodeGen**（`project.yml` 宣告，`.xcodeproj` 不進版控、由 yml 生成） |
+| 相依管理 | **Swift Package Manager**（AdMob 等） |
 
 ### 遵循的既有規範（skills）
 - `mvvmc-model` / `mvvmc-viewmodel` / `mvvmc-view` / `mvvmc-hostcontroller` / `mvvmc-navigation` / `mvvmc-testing`
