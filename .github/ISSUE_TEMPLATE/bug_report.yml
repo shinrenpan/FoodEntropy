@@ -1,0 +1,83 @@
+name: 🐛 Bug 回報
+description: 回報 App 的問題或非預期行為
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝回報！請盡量填寫重現步驟，方便快速定位問題。
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 問題描述
+      description: 簡述發生了什麼問題。
+      placeholder: 例：儲存食材後，清單沒有立即更新。
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重現步驟
+      description: 一步一步怎麼操作會出現這個問題。
+      placeholder: |
+        1. 點右下角 FAB
+        2. 輸入名稱「牛奶」
+        3. 按儲存
+        4. 觀察清單…
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 預期行為
+      placeholder: 儲存後清單應立即出現該筆食材。
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 實際行為
+      placeholder: 清單沒有變化，要切換 Tab 才更新。
+    validations:
+      required: true
+
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: 相關階段
+      options:
+        - 里程碑 1（首頁 / Form / 分析）
+        - 里程碑 2（設定 / 通知 / iCloud / IAP）
+        - 其他 / 不確定
+    validations:
+      required: true
+
+  - type: input
+    id: spec
+    attributes:
+      label: 相關規格（選填）
+      description: 若知道對應哪份 spec，貼路徑方便追溯。
+      placeholder: 例：specs/03-screens/form.md §驗證
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境
+      description: iOS 版本 / 裝置或模擬器 / App 版本或 commit。
+      value: |
+        - iOS：26.x
+        - 裝置：iPhone 17 模擬器
+        - 版本：v0.1.0
+    validations:
+      required: false
+
+  - type: textarea
+    id: media
+    attributes:
+      label: 截圖 / 錄影（選填）
+      description: 可直接拖曳圖片或影片到這裡。

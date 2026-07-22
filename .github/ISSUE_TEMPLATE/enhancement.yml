@@ -1,0 +1,74 @@
+name: 💡 改進建議 / UI・UX
+description: 提出 UI / UX 改善、體驗優化或新功能想法
+title: "[改進] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        不是壞掉、但可以更好的地方都歡迎提。實作與否會再依規格與優先序評估。
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 建議類型
+      options:
+        - UI / 視覺（版面、顏色、間距、字級）
+        - UX / 操作流程（步驟、手勢、回饋）
+        - 文案 / 用詞
+        - 新功能
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: 目前的狀況
+      description: 現在是怎麼呈現 / 操作的？（可附截圖）
+      placeholder: 例：延長效期的 date picker 佔半個畫面，選完還要多按一次儲存。
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建議怎麼改
+      placeholder: 例：選完日期直接生效關閉，省掉儲存按鈕。
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: 理由 / 想解決的問題
+      description: 為什麼這樣比較好？（順手、清楚、少一步、符合 iOS 慣例…）
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 相關畫面
+      options:
+        - 首頁（清單 / 操作 / FAB）
+        - 食材 Form（新增 / 編輯）
+        - 分析
+        - 設定
+        - 全域（導航 / 主題 / 通用）
+        - 不確定
+    validations:
+      required: true
+
+  - type: input
+    id: spec
+    attributes:
+      label: 相關規格（選填）
+      description: 若涉及某份 spec，貼路徑方便一起討論是否調整。
+      placeholder: 例：specs/01-navigation.md §2
+
+  - type: textarea
+    id: media
+    attributes:
+      label: 截圖 / 參考（選填）
+      description: 截圖、其他 App 的參考做法都可以貼。
