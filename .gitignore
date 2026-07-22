@@ -1,0 +1,46 @@
+# Claude Code (local, machine-specific settings — never commit)
+.claude/settings.local.json
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+## User settings
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad/
+
+## Build products
+build/
+DerivedData/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Xcode workspace / project cruft
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+# Keep Package.resolved for app targets (reproducible deps); ignore only if it churns:
+# *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
+# CocoaPods / Carthage (not used, but ignore if ever added)
+Pods/
+Carthage/Build/
+
+# Fastlane / provisioning (if added later)
+fastlane/report.xml
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Misc
+*.log
+*~
