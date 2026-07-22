@@ -53,7 +53,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func makeRootTabBarController() -> UITabBarController {
         let manager = makeManager()
 
-        let home = HomeHostController(viewModel: HomeViewModel(manager: manager))
+        let home = HomeHostController(manager: manager)
         home.navigationItem.title = "首頁"
 
         let tabBarController = UITabBarController()
@@ -69,7 +69,22 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func makeManager() -> SwiftDataManager {
         let cloudKitEnabled = UserDefaults.standard.bool(forKey: "iCloudSyncEnabled")
         do {
-            return try SwiftDataManager(cloudKitEnabled: cloudKitEnabled)
+            let manager = try SwiftDataManager(cloudKitEnabled: cloudKitEnabled)
+            #if DEBUG
+            // 開發用：以 SEED_MOCKS=1 啟動時，清單為空則塞入 mock 食材。
+            if ProcessInfo.processInfo.environment["SEED_MOCKS"] == "1",
+               manager.fetchActiveFoods().isEmpty {
+                for mock in FoodItem.mocks {
+                    manager.create(
+                        name: mock.name,
+                        purchaseDate: mock.purchaseDate,
+                        expiryDate: mock.expiryDate,
+                        imageData: mock.imageData
+                    )
+                }
+            }
+            #endif
+            return manager
         } catch {
             fatalError("無法建立 SwiftDataManager：\(error)")
         }

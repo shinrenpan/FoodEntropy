@@ -5,9 +5,11 @@ import UIKit
 final class HomeHostController: UIHostingController<HomeView> {
 
     private let viewModel: HomeViewModel
+    private let manager: SwiftDataManager
 
-    init(viewModel: HomeViewModel) {
-        self.viewModel = viewModel
+    init(manager: SwiftDataManager) {
+        self.manager = manager
+        self.viewModel = HomeViewModel(manager: manager)
         super.init(rootView: HomeView(viewModel: viewModel))
     }
 
@@ -28,9 +30,9 @@ private extension HomeHostController {
     func handleRouter(_ router: HomeViewModel.Router) {
         switch router {
         case .toAdd:
-            AppRouter.shared.to(FoodFormHostController(mode: .add), from: self)
+            AppRouter.shared.to(FoodFormHostController(mode: .add, manager: manager), from: self)
         case let .toEdit(item):
-            AppRouter.shared.to(FoodFormHostController(mode: .edit(item)), from: self)
+            AppRouter.shared.to(FoodFormHostController(mode: .edit(item), manager: manager), from: self)
         }
     }
 }

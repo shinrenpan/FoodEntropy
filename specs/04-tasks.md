@@ -63,13 +63,15 @@
 
 ## Phase 4 — 食材 Form（`03-screens/form.md`）
 
-- [ ] `FoodFormViewModel`：Mode(add/edit)、State（含 `isSaveEnabled`）、dirty 快照比對、`doAction`。
-- [ ] `FoodFormView`：名稱 TextField、購買日 / 到期日 DatePicker（到期日下限=購買日）、圖片區塊。
-- [ ] 圖片來源 action sheet：拍照 / 相簿 / 移除 / 取消 → 壓縮存 Data。
-- [ ] 儲存驗證（名稱去空白非空 → Save 才可按）。
-- [ ] 返回放棄確認（有變更才跳）。
-- [ ] 儲存流程：首次成功儲存請求通知權限 → manager 寫入 → 排程/重排通知 → pop。
-- [ ] ViewModel 測試。
+- [x] `FoodFormViewModel`：Mode(add/edit)、State（含 `isSaveEnabled`）、dirty 快照比對、`doAction`、`navigationTitle`。
+- [x] `FoodFormView`：名稱 TextField、購買日 / 到期日 DatePicker（到期日下限=購買日、購買日頂推到期日）、圖片區塊。
+- [x] 圖片來源 confirmationDialog：拍照（`CameraPicker`）/ 相簿（`PhotosPicker`）/ 移除 / 取消 → `ImageCompressor` 壓縮存 Data。
+- [x] 儲存驗證（名稱去空白非空 → Save 才可按）。
+- [x] 返回放棄確認（有變更才跳；`navigationBarBackButtonHidden` + 取消鈕）。
+- [x] 儲存流程：manager 寫入 → onRoute(.close) pop（首頁 onAppear 自動刷新）。**通知權限/排程留 Phase 7**。
+- [x] `FoodFormHostController`（純 Router，onRoute → AppRouter.back）；`HomeHostController` 改收 manager 並傳遞。
+- [x] ViewModel 測試（12 個）。
+- [x] 模擬器實跑：seed mock 驗證清單/FoodRow 狀態色與排序正確（DEBUG `SEED_MOCKS` env hook）。
 
 ## Phase 5 — 分析（`03-screens/analytics.md`）
 
