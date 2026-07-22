@@ -24,16 +24,18 @@
 
 ## Phase 1 — 資料層（`02-architecture` §1–§3 §5）
 
-- [ ] `FoodItemEntity` `@Model`：CloudKit-safe（全欄位有預設值、無 `.unique`）、`@Attribute(.externalStorage) imageData`。
-- [ ] Domain：`FoodItem`、`RecordStatus`(active/consumed/wasted)、`ExpiryStatus`(fresh/nearExpiry/expired)。
-- [ ] `FoodItemEntity.toDomain()`（含 `statusRaw` → `RecordStatus`）。
-- [ ] `ExpiryStatus` 計算（daysUntil 演算法，§5）+ 單元測試（邊界 −1 / 0 / 3 / 4）。
-- [ ] 圖片壓縮工具：JPEG 0.7、長邊 1024px → `Data`（§3）。
-- [ ] `SwiftDataManager`（@MainActor）：
-  - [ ] 依 UserDefaults「iCloud 開關」建立掛/不掛 `cloudKitDatabase` 的 ModelContainer（同一 store URL）。
-  - [ ] CRUD：`create` / `update` / `delete`(hard) / `markConsumed` / `markWasted` / `fetchActiveFoods`（排序：expiryDate↑, createdAt↑）。
-  - [ ] 邊界只回傳 Domain，不外洩 `@Model`。
-- [ ] Mock：`FoodItem.mock` / `.mocks`（`#if DEBUG`，`mvvmc-model` 規範）。
+- [x] `FoodItemEntity` `@Model`：CloudKit-safe（全欄位有預設值、無 `.unique`）、`@Attribute(.externalStorage) imageData`。
+- [x] Domain：`FoodItem`、`RecordStatus`(active/consumed/wasted)、`ExpiryStatus`(fresh/nearExpiry/expired)。
+- [x] `FoodItemEntity.toDomain()`（含 `statusRaw` → `RecordStatus`）。
+- [x] `ExpiryStatus` 計算（daysUntil 演算法，§5）+ 單元測試（邊界 −2/−1/0/1/3/4 皆綠）。
+- [x] 圖片壓縮工具 `ImageCompressor`：JPEG 0.7、長邊 1024px → `Data`（§3）。
+- [x] `SwiftDataManager`（@MainActor）：
+  - [x] 依 `cloudKitEnabled` 建立掛/不掛 `cloudKitDatabase` 的 ModelContainer（另支援 inMemory 測試）。UserDefaults 偏好接線於 Phase 2 App 啟動裝配。
+  - [x] CRUD：`create` / `update` / `delete`(hard) / `markConsumed` / `markWasted` / `fetchActiveFoods`（排序：expiryDate↑, createdAt↑）。
+  - [x] 邊界只回傳 Domain，不外洩 `@Model`。
+- [x] Mock：`FoodItem.mock` / `.mocks`（`#if DEBUG`，`mvvmc-model` 規範）。
+
+> 驗證：9 個單元測試（ExpiryStatus 邊界 + SwiftDataManager CRUD）全綠。
 
 ## Phase 2 — 導航基礎（`01-navigation` §7、`mvvmc-navigation` / `mvvmc-hostcontroller`）
 
