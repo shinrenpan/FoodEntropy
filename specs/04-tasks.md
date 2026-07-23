@@ -143,7 +143,7 @@
 - [ ] 開/關同步重啟生效驗證（同一 store URL）。
 - [ ] 關→開：既有本機資料自動上傳；圖片（externalStorage）同步驗證。
 - [ ] 多裝置同 Apple ID 同步實測。
-- [ ] **上架前將 CloudKit schema 從 Development 部署到 Production**（CloudKit Dashboard），否則正式版無法同步。
+- [x] **CloudKit schema 已從 Development 部署到 Production**（CloudKit Console → Deploy Schema Changes）：`CD_FoodItemEntity`（14 欄）+ 21 indexes + 3 security roles，全新增/角色調整無破壞性變更。正式版可同步。
 - [ ] 確認 `VersionedSchema` 接法就位（`02-architecture` §10），未來欄位只加不改。
 
 ## Phase 11 — 合規與韌性（`Spec` Production §3 §4 §5）
