@@ -54,10 +54,15 @@ final class NotificationService {
         center.removeAllPendingNotificationRequests()
 
         let calendar = Calendar.current
-        let now = Date.now
+        // 正式版篩掉「09:00 已過」者；DEBUG 用 distantPast 不篩（因 trigger 改 10 秒，任何食材皆可測）。
+        #if DEBUG
+        let cutoff = Date.distantPast
+        #else
+        let cutoff = Date.now
+        #endif
         let requests = activeFoods
             .compactMap { food -> (FoodItem, Date)? in
-                guard let fire = fireDate(for: food.expiryDate, calendar: calendar), fire > now else { return nil }
+                guard let fire = fireDate(for: food.expiryDate, calendar: calendar), fire > cutoff else { return nil }
                 return (food, fire)
             }
             .sorted { $0.1 < $1.1 }
@@ -85,8 +90,13 @@ final class NotificationService {
         content.sound = .default
         content.userInfo = ["deeplink": "foodentropy://home"]   // 點擊 → 首頁（SceneDelegate 已處理）
 
+        #if DEBUG
+        // 開發用：改為 10 秒後觸發，走正常排程路徑但縮短時間方便驗證（正式為到期當天 09:00）。
+        let trigger: UNNotificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
+        #else
         let triggerComps = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
+        let trigger: UNNotificationTrigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
+        #endif
         return UNNotificationRequest(identifier: food.id.uuidString, content: content, trigger: trigger)
     }
 }

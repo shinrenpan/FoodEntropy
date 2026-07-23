@@ -38,10 +38,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // 進前景時對帳通知排程（處理跨日、64 則上限、外部變動）。
     func sceneDidBecomeActive(_ scene: UIScene) {
-        reconcileNotifications()
-    }
-
-    private func reconcileNotifications() {
         guard let manager else { return }
         Task { await NotificationService.shared.reconcile(activeFoods: manager.fetchActiveFoods()) }
     }
