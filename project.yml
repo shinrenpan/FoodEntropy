@@ -32,6 +32,11 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Sources/App/Info.plist
         SWIFT_EMIT_LOC_STRINGS: YES          # 讓 build 自動抽取字串到 String Catalog
+      configs:
+        Debug:
+          APS_ENVIRONMENT: development        # CloudKit push（entitlements 以 $(APS_ENVIRONMENT) 引用）
+        Release:
+          APS_ENVIRONMENT: production         # 上架用；避免硬寫 development 被審核擋
     entitlements:
       path: Sources/App/FoodEntropy.entitlements
       properties:
@@ -39,6 +44,7 @@ targets:
           - iCloud.com.shinrenpan.FoodEntropy
         com.apple.developer.icloud-services:
           - CloudKit
+        aps-environment: $(APS_ENVIRONMENT)   # CloudKit 靜默推播（Debug=development / Release=production）
     info:
       path: Sources/App/Info.plist
       properties:
@@ -48,6 +54,8 @@ targets:
         CFBundleLocalizations:                # v1 支援語言（繁中 + 英文）
           - zh-Hant
           - en
+        UIBackgroundModes:                    # CloudKit 靜默推播需要
+          - remote-notification
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
