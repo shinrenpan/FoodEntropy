@@ -15,7 +15,7 @@ settings:
     TARGETED_DEVICE_FAMILY: "1"          # iPhone only
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
-    DEVELOPMENT_TEAM: ""                 # 先空，需真機 / iCloud / IAP 時再填
+    DEVELOPMENT_TEAM: "VZWPMD258L"       # Apple Developer Team ID（非機密）
     CODE_SIGN_STYLE: Automatic
 
 targets:

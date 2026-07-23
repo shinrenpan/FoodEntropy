@@ -1,3 +1,11 @@
+# Secrets — NEVER commit
+*.p8                      # App Store Connect API private key
+AuthKey_*.p8
+fastlane/.env
+*.mobileprovision
+*.p12
+*.cer
+
 # Claude Code (local, machine-specific settings — never commit)
 .claude/settings.local.json
 
