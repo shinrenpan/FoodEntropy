@@ -10,8 +10,10 @@ extension AnalyticsViewModel {
         var fresh: [FoodItem] = []        // 保存期限內
 
         // 歷史統計（已處理）
-        var consumedCount: Int = 0        // 吃掉
-        var wastedCount: Int = 0          // 丟棄
+        var consumedCount: Int = 0        // 吃掉（近 30 天視窗）
+        var wastedCount: Int = 0          // 丟棄（近 30 天視窗）
+        var hasHistory: Bool = false      // 是否有「任何」已處理紀錄（all-time，決定清除鈕是否露出）
+        var showClearHistoryConfirm: Bool = false
 
         var activeTotal: Int { expired.count + nearExpiry.count + fresh.count }
         var resolvedTotal: Int { consumedCount + wastedCount }

@@ -33,14 +33,6 @@ struct SettingsView: View {
         } message: {
             Text("廣告與購買功能上線後開放。")
         }
-        .alert("清除歷史統計？", isPresented: $bVM.state.showClearHistoryConfirm) {
-            Button("清除", role: .destructive) {
-                Task { await viewModel.doAction(.view(.clearHistoryConfirmed)) }
-            }
-            Button("取消", role: .cancel) {}
-        } message: {
-            Text("將刪除所有「已使用 / 丟棄」紀錄，此操作無法復原。")
-        }
     }
 
     // MARK: - L1 協調
@@ -67,8 +59,6 @@ struct SettingsView: View {
         switch action {
         case .privacyPolicyDidTap:
             Task { await viewModel.doAction(.view(.privacyPolicyDidTap)) }
-        case .clearHistoryDidTap:
-            Task { await viewModel.doAction(.view(.clearHistoryDidTap)) }
         }
     }
 }
@@ -139,7 +129,6 @@ private extension SettingsView {
     struct AboutSection: View {
         enum Action: Sendable {
             case privacyPolicyDidTap
-            case clearHistoryDidTap
         }
 
         let versionText: String
@@ -155,12 +144,6 @@ private extension SettingsView {
                         .foregroundStyle(.secondary)
                 }
             }
-
-            Section {
-                Button("清除歷史統計", role: .destructive) { send(.clearHistoryDidTap) }
-            } footer: {
-                Text("清除所有「已使用 / 丟棄」紀錄，浪費統計將歸零。此操作無法復原。")
-            }
         }
     }
 }
@@ -169,6 +152,6 @@ private extension SettingsView {
 
 #if DEBUG
 #Preview {
-    SettingsView(viewModel: SettingsViewModel(manager: try! SwiftDataManager(inMemory: true)))
+    SettingsView(viewModel: SettingsViewModel())
 }
 #endif

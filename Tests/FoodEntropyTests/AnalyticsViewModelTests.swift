@@ -57,6 +57,33 @@ struct AnalyticsViewModelTests {
     }
 
     @Test
+    func `有已處理紀錄時 hasHistory 為 true`() async throws {
+        let (vm, manager) = try makeVM()
+        let a = manager.create(name: "吃了", purchaseDate: d0, expiryDate: d0)
+        manager.markConsumed(id: a.id)
+        await vm.doAction(.view(.onAppear))
+        #expect(vm.state.hasHistory == true)
+    }
+
+    @Test
+    func `清除歷史統計刪除已處理紀錄並歸零`() async throws {
+        let (vm, manager) = try makeVM()
+        let a = manager.create(name: "吃了", purchaseDate: d0, expiryDate: d0)
+        manager.markConsumed(id: a.id)
+        await vm.doAction(.view(.onAppear))
+        #expect(vm.state.hasHistory == true)
+
+        await vm.doAction(.view(.clearHistoryDidTap))
+        #expect(vm.state.showClearHistoryConfirm == true)
+
+        await vm.doAction(.view(.clearHistoryConfirmed))
+        #expect(vm.state.showClearHistoryConfirm == false)
+        #expect(vm.state.hasHistory == false)
+        #expect(vm.state.consumedCount == 0)
+        #expect(manager.fetchResolvedFoods().isEmpty)
+    }
+
+    @Test
     func `onAppear 從 manager 載入現況與統計`() async throws {
         let (vm, manager) = try makeVM()
         let now = Date.now

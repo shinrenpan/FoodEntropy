@@ -28,7 +28,8 @@
 - 資料來源：`SwiftDataManager.fetchResolvedFoods()`（consumed + wasted），VM 依 `resolvedAt` 只計**近 30 天**（滾動視窗，舊資料自然不影響；`wasteWindowDays` 常數）。
 - **浪費率 hero 數字** = 丟棄 /（吃掉 + 丟棄），≥30% 標紅；配綠/紅比例條 + 「吃掉 N · 丟棄 N」。
 - 無已處理紀錄時顯示「尚無已處理紀錄」。
-- **資料保存**：標記已使用 / 丟棄時**剝離圖片**（`imageData=nil`，省本機/iCloud 空間）；紀錄可於設定「清除歷史統計」全數刪除。
+- **資料保存**：標記已使用 / 丟棄時**剝離圖片**（`imageData=nil`，省本機/iCloud 空間）。
+- **清除歷史**：本區 header 右側「清除」鈕（**就近原則**，控制與其影響的統計同區；`hasHistory` 為 all-time 判斷，只要有任何已處理紀錄即露出，避開 30 天視窗顯示空、但仍有舊資料可清的邊界）；點擊 → 確認 alert → `deleteResolvedFoods()` 全數刪除 → 重撈歸零。
 
 ### 3. 分桶明細（唯讀清單，同 v1）
 
@@ -73,8 +74,10 @@ extension AnalyticsViewModel {
 ## Action（草案）
 
 ```swift
-enum Action {
-  case onAppear   // fetch active → 分桶 → 更新 State
+enum ViewAction {
+  case onAppear             // fetch active + resolved → 分桶 / 統計 → 更新 State
+  case clearHistoryDidTap   // → 顯示確認 alert
+  case clearHistoryConfirmed // → deleteResolvedFoods() → reload
 }
 ```
 

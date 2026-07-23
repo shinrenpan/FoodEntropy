@@ -73,7 +73,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let analytics = AnalyticsHostController(manager: manager)
         analytics.navigationItem.title = analyticsTitle
 
-        let settings = SettingsHostController(manager: manager)
+        let settings = SettingsHostController()
         settings.navigationItem.title = settingsTitle
 
         let tabBarController = UITabBarController()

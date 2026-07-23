@@ -5,6 +5,8 @@ struct AnalyticsView: View {
     let viewModel: AnalyticsViewModel
 
     var body: some View {
+        @Bindable var bVM = viewModel
+
         List {
             StatusChartSection(
                 expired: viewModel.state.expired.count,
@@ -15,7 +17,9 @@ struct AnalyticsView: View {
             WasteStatsSection(
                 consumed: viewModel.state.consumedCount,
                 wasted: viewModel.state.wastedCount,
-                wasteRate: viewModel.state.wasteRate
+                wasteRate: viewModel.state.wasteRate,
+                hasHistory: viewModel.state.hasHistory,
+                onClear: { Task { await viewModel.doAction(.view(.clearHistoryDidTap)) } }
             )
 
             BucketSection(title: "已過期未處理", items: viewModel.state.expired)
@@ -25,6 +29,14 @@ struct AnalyticsView: View {
         .listStyle(.insetGrouped)
         .onAppear {
             Task { await viewModel.doAction(.view(.onAppear)) }
+        }
+        .alert("清除歷史統計？", isPresented: $bVM.state.showClearHistoryConfirm) {
+            Button("清除", role: .destructive) {
+                Task { await viewModel.doAction(.view(.clearHistoryConfirmed)) }
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("將刪除所有「已使用 / 丟棄」紀錄，浪費統計將歸零。此操作無法復原。")
         }
     }
 }
@@ -117,6 +129,8 @@ private extension AnalyticsView {
         let consumed: Int
         let wasted: Int
         let wasteRate: Double?
+        let hasHistory: Bool
+        let onClear: () -> Void
 
         var body: some View {
             Section {
@@ -149,7 +163,15 @@ private extension AnalyticsView {
                         .foregroundStyle(.secondary)
                 }
             } header: {
-                Text("浪費統計")
+                HStack {
+                    Text("浪費統計")
+                    Spacer()
+                    if hasHistory {
+                        Button("清除", role: .destructive, action: onClear)
+                            .font(.caption)
+                            .textCase(nil)   // 覆寫 section header 的自動大寫
+                    }
+                }
             } footer: {
                 Text("近 30 天內標記「已使用」與「丟棄」的統計。")
             }
@@ -210,6 +232,7 @@ private extension AnalyticsView {
     vm.state.fresh = [FoodItem.mocks[3]]
     vm.state.consumedCount = 12
     vm.state.wastedCount = 3
+    vm.state.hasHistory = true
     return AnalyticsView(viewModel: vm)
 }
 

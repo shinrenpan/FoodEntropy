@@ -54,9 +54,21 @@
     "%lld 項": {
       "localizations": {
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld items"
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld item"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld items"
+                }
+              }
+            }
           }
         }
       }
@@ -354,9 +366,21 @@
     "已過期 %lld 天": {
       "localizations": {
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Expired %lld days ago"
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Expired %lld day ago"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Expired %lld days ago"
+                }
+              }
+            }
           }
         }
       }
@@ -804,9 +828,21 @@
     "還有 %lld 天": {
       "localizations": {
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld days left"
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day left"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days left"
+                }
+              }
+            }
           }
         }
       }
@@ -887,6 +923,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expired"
+          }
+        }
+      }
+    },
+    "將刪除所有「已使用 / 丟棄」紀錄，浪費統計將歸零。此操作無法復原。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This will delete all Used / Discarded records; waste stats will reset. This cannot be undone."
           }
         }
       }

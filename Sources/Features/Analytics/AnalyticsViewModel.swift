@@ -32,15 +32,29 @@ final class AnalyticsViewModel {
 extension AnalyticsViewModel {
     enum ViewAction: Sendable {
         case onAppear
+        case clearHistoryDidTap      // 清除歷史統計 → 顯示確認
+        case clearHistoryConfirmed
     }
 
     private func handleViewAction(_ action: ViewAction) async {
         switch action {
         case .onAppear:
-            let active = manager.fetchActiveFoods()
-            let resolved = manager.fetchResolvedFoods()
-            await doAction(.dataResponse(.loaded(active: active, resolved: resolved)))
+            await reload()
+
+        case .clearHistoryDidTap:
+            state.showClearHistoryConfirm = true
+
+        case .clearHistoryConfirmed:
+            manager.deleteResolvedFoods()
+            state.showClearHistoryConfirm = false
+            await reload()   // 清完重撈，統計歸零、清除鈕收起
         }
+    }
+
+    private func reload() async {
+        let active = manager.fetchActiveFoods()
+        let resolved = manager.fetchResolvedFoods()
+        await doAction(.dataResponse(.loaded(active: active, resolved: resolved)))
     }
 }
 
@@ -63,6 +77,8 @@ extension AnalyticsViewModel {
             let windowed = resolved.filter { ($0.resolvedAt ?? .distantPast) >= cutoff }
             state.consumedCount = windowed.filter { $0.status == .consumed }.count
             state.wastedCount = windowed.filter { $0.status == .wasted }.count
+            // all-time：只要有任何已處理紀錄就露出清除鈕（含 30 天視窗外的舊資料）
+            state.hasHistory = !resolved.isEmpty
         }
     }
 }
