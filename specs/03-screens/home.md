@@ -51,12 +51,14 @@ App 主畫面，管理食材：瀏覽、新增、滑動 / 長按操作。
 |---|---|---|
 | 向右滑（leading） | 標記已使用 | 直接執行 → `consumed`，移出清單 |
 | 向左滑（trailing） | 刪除 | **跳確認** → hard delete |
-| 長按 → context menu | 延長 / 已使用 / 丟棄 / 刪除 / 編輯 | 完整清單 |
+| 長按 → context menu | 延長效期 / 標記已使用 / 標記丟棄 | 不重複滑動 / 點擊已有的操作 |
 | 單點整列 | 編輯 | push `FoodFormView(.edit)` |
 
+- **發現性（issue #2）**：長按選單只放**滑動與點擊之外**的操作（延長、丟棄），避免重複；並在清單非空時於 Section footer 顯示 hint：「點項目可編輯；長按可延長效期或標記丟棄」。
 - **延長效期**：彈出快捷 date picker（僅選新到期日），選完即存、不離開首頁；存後重排通知（`02-architecture` §8）。
 - **確認規則**：僅**刪除**跳確認（不可復原）；已使用 / 丟棄 / 延長不跳確認。
 - 已使用 / 丟棄 → 設 `statusRaw` + `resolvedAt`，取消該食材通知。
+- **swipe 刪除實作注意**：刪除鈕不可用 `role: .destructive`（會在點擊時自動移除 row），改 `.tint(.red)`；真正刪除由確認後的 `deleteConfirmed` 執行（issue #1）。
 
 ---
 

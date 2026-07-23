@@ -35,7 +35,6 @@ extension HomeViewModel {
         case onAppear
         case addDidTap
         case rowDidTap(FoodItem)
-        case editDidTap(FoodItem)
         case consumeDidTap(FoodItem)
         case wasteDidTap(FoodItem)
         case deleteDidTap(FoodItem)        // 顯示刪除確認
@@ -54,7 +53,7 @@ extension HomeViewModel {
         case .addDidTap:
             onRoute?(.toAdd)
 
-        case let .rowDidTap(item), let .editDidTap(item):
+        case let .rowDidTap(item):
             onRoute?(.toEdit(item))
 
         case let .consumeDidTap(item):

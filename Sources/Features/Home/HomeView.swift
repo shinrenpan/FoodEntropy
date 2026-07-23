@@ -44,8 +44,6 @@ struct HomeView: View {
         switch action {
         case let .rowDidTap(item):
             Task { await viewModel.doAction(.view(.rowDidTap(item))) }
-        case let .editDidTap(item):
-            Task { await viewModel.doAction(.view(.editDidTap(item))) }
         case let .consumeDidTap(item):
             Task { await viewModel.doAction(.view(.consumeDidTap(item))) }
         case let .wasteDidTap(item):
@@ -96,7 +94,6 @@ private extension HomeView {
     struct FoodListSection: View {
         enum Action: Sendable {
             case rowDidTap(FoodItem)
-            case editDidTap(FoodItem)
             case consumeDidTap(FoodItem)
             case wasteDidTap(FoodItem)
             case deleteDidTap(FoodItem)
@@ -123,6 +120,8 @@ private extension HomeView {
                         ForEach(items) { item in
                             row(item)
                         }
+                    } footer: {
+                        Text("提示：點項目可編輯；長按可延長效期或標記丟棄。")
                     }
                 }
             }
@@ -148,12 +147,11 @@ private extension HomeView {
                     }
                     .tint(.red)
                 }
+                // 編輯 → 點 row；刪除 → 左滑。長按只放「不在滑動 / 點擊上」的動作。
                 .contextMenu {
                     Button { send(.extendDidTap(item)) } label: { Label("延長效期", systemImage: "calendar") }
                     Button { send(.consumeDidTap(item)) } label: { Label("標記已使用", systemImage: "checkmark.circle") }
                     Button { send(.wasteDidTap(item)) } label: { Label("標記丟棄", systemImage: "trash.slash") }
-                    Button { send(.editDidTap(item)) } label: { Label("編輯", systemImage: "pencil") }
-                    Button(role: .destructive) { send(.deleteDidTap(item)) } label: { Label("刪除", systemImage: "trash") }
                 }
         }
 
