@@ -7,8 +7,8 @@ final class SettingsHostController: UIHostingController<SettingsView> {
 
     private let viewModel: SettingsViewModel
 
-    init(viewModel: SettingsViewModel = .init()) {
-        self.viewModel = viewModel
+    init(manager: SwiftDataManager) {
+        self.viewModel = SettingsViewModel(manager: manager)
         super.init(rootView: SettingsView(viewModel: viewModel))
     }
 

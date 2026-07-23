@@ -60,4 +60,27 @@ struct SwiftDataManagerTests {
         m.delete(id: item.id)
         #expect(m.fetchActiveFoods().isEmpty)
     }
+
+    @Test("標記已使用時剝離圖片")
+    func resolveStripsImage() throws {
+        let m = try makeManager()
+        let item = m.create(name: "有圖", purchaseDate: d0, expiryDate: d0, imageData: Data([0x01, 0x02]))
+        m.markConsumed(id: item.id)
+        let resolved = m.fetchResolvedFoods()
+        #expect(resolved.count == 1)
+        #expect(resolved.first?.imageData == nil)
+    }
+
+    @Test("deleteResolvedFoods 清空已處理、不動 active")
+    func deleteResolvedClearsHistory() throws {
+        let m = try makeManager()
+        let keep = m.create(name: "現存", purchaseDate: d0, expiryDate: d0)
+        let a = m.create(name: "吃了", purchaseDate: d0, expiryDate: d0)
+        let b = m.create(name: "丟了", purchaseDate: d0, expiryDate: d0)
+        m.markConsumed(id: a.id)
+        m.markWasted(id: b.id)
+        m.deleteResolvedFoods()
+        #expect(m.fetchResolvedFoods().isEmpty)
+        #expect(m.fetchActiveFoods().map(\.id) == [keep.id])   // active 不受影響
+    }
 }

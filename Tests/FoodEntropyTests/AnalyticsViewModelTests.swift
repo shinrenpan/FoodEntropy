@@ -72,7 +72,8 @@ struct AnalyticsViewModelTests {
     // MARK: - helper
 
     private func makeResolved(_ status: RecordStatus) -> FoodItem {
+        // resolvedAt 用近期（30 天視窗內）才會被統計計入
         FoodItem(id: UUID(), name: "x", purchaseDate: d0, expiryDate: d0,
-                 status: status, resolvedAt: d0, imageData: nil, createdAt: d0)
+                 status: status, resolvedAt: .now, imageData: nil, createdAt: d0)
     }
 }

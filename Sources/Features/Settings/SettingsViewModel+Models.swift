@@ -9,5 +9,6 @@ extension SettingsViewModel {
         var versionText: String = ""
         var showRestartNotice: Bool = false        // iCloud 切換後提示
         var showComingSoon: Bool = false           // 移除廣告 / 還原購買 stub 提示
+        var showClearHistoryConfirm: Bool = false  // 清除歷史統計確認
     }
 }

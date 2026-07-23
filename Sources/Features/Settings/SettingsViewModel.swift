@@ -16,12 +16,20 @@ final class SettingsViewModel {
     private let notifications: NotificationService
 
     @ObservationIgnored
+    private let manager: SwiftDataManager
+
+    @ObservationIgnored
     var onRoute: (@MainActor (Router) -> Void)?
 
     // 隱私權政策頁（GitHub Pages，中英雙語）；同一 URL 亦填入 App Store Connect。
     static let privacyPolicyURL = URL(string: "https://shinrenpan.github.io/FoodEntropy/privacy")!
 
-    init(defaults: UserDefaults = .standard, notifications: NotificationService = .shared) {
+    init(
+        manager: SwiftDataManager,
+        defaults: UserDefaults = .standard,
+        notifications: NotificationService = .shared
+    ) {
+        self.manager = manager
         self.defaults = defaults
         self.notifications = notifications
     }
@@ -43,6 +51,8 @@ extension SettingsViewModel {
         case iCloudSyncToggled(Bool)
         case notificationDidTap
         case privacyPolicyDidTap
+        case clearHistoryDidTap    // 清除歷史統計 → 顯示確認
+        case clearHistoryConfirmed
     }
 
     private func handleViewAction(_ action: ViewAction) async {
@@ -54,6 +64,13 @@ extension SettingsViewModel {
 
         case .removeAdsDidTap, .restoreDidTap:
             state.showComingSoon = true   // 廣告 / IAP 上線後開放
+
+        case .clearHistoryDidTap:
+            state.showClearHistoryConfirm = true
+
+        case .clearHistoryConfirmed:
+            manager.deleteResolvedFoods()
+            state.showClearHistoryConfirm = false
 
         case let .iCloudSyncToggled(isOn):
             defaults.set(isOn, forKey: AppPreferenceKey.iCloudSyncEnabled)

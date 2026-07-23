@@ -24,10 +24,11 @@
 - 右側 legend：色點 + 桶名 + 數量（**不靠顏色單獨辨識**，符合無障礙；色彩沿用 `expiryColor`）。
 - 無 active 時顯示「目前沒有食材」。
 
-### 2. 浪費統計（歷史）
-- 資料來源：`SwiftDataManager.fetchResolvedFoods()`（consumed + wasted）。
+### 2. 浪費統計（近 30 天滾動視窗）
+- 資料來源：`SwiftDataManager.fetchResolvedFoods()`（consumed + wasted），VM 依 `resolvedAt` 只計**近 30 天**（滾動視窗，舊資料自然不影響；`wasteWindowDays` 常數）。
 - **浪費率 hero 數字** = 丟棄 /（吃掉 + 丟棄），≥30% 標紅；配綠/紅比例條 + 「吃掉 N · 丟棄 N」。
 - 無已處理紀錄時顯示「尚無已處理紀錄」。
+- **資料保存**：標記已使用 / 丟棄時**剝離圖片**（`imageData=nil`，省本機/iCloud 空間）；紀錄可於設定「清除歷史統計」全數刪除。
 
 ### 3. 分桶明細（唯讀清單，同 v1）
 

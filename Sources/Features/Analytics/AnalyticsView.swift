@@ -151,7 +151,7 @@ private extension AnalyticsView {
             } header: {
                 Text("浪費統計")
             } footer: {
-                Text("已標記「已使用」與「丟棄」的累計統計。")
+                Text("近 30 天內標記「已使用」與「丟棄」的統計。")
             }
         }
 

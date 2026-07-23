@@ -115,6 +115,20 @@ final class SwiftDataManager {
         guard let entity = entity(for: id) else { return }
         entity.statusRaw = status.rawValue
         entity.resolvedAt = .now
+        entity.imageData = nil   // 已離開清單，圖片不再需要 → 剝離以省本機 / iCloud 空間
+        save()
+    }
+
+    /// 清除所有已處理（consumed / wasted）紀錄。供設定「清除歷史統計」。
+    func deleteResolvedFoods() {
+        let activeRaw = RecordStatus.active.rawValue
+        let descriptor = FetchDescriptor<FoodItemEntity>(
+            predicate: #Predicate { $0.statusRaw != activeRaw }
+        )
+        let entities = (try? context.fetch(descriptor)) ?? []
+        for entity in entities {
+            context.delete(entity)
+        }
         save()
     }
 

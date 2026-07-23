@@ -8,6 +8,8 @@ final class AnalyticsViewModel {
         case dataResponse(DataResponse)
     }
 
+    static let wasteWindowDays = 30   // 浪費率統計視窗
+
     var state: State = .init()
 
     @ObservationIgnored
@@ -56,9 +58,11 @@ extension AnalyticsViewModel {
             state.expired = active.filter { $0.expiryStatus() == .expired }
             state.nearExpiry = active.filter { $0.expiryStatus() == .nearExpiry }
             state.fresh = active.filter { $0.expiryStatus() == .fresh }
-            // 歷史統計：吃掉 / 丟棄計數。
-            state.consumedCount = resolved.filter { $0.status == .consumed }.count
-            state.wastedCount = resolved.filter { $0.status == .wasted }.count
+            // 歷史統計：只計「近 30 天」內處理的（滾動視窗，舊資料自然不影響）。
+            let cutoff = Calendar.current.date(byAdding: .day, value: -Self.wasteWindowDays, to: .now) ?? .distantPast
+            let windowed = resolved.filter { ($0.resolvedAt ?? .distantPast) >= cutoff }
+            state.consumedCount = windowed.filter { $0.status == .consumed }.count
+            state.wastedCount = windowed.filter { $0.status == .wasted }.count
         }
     }
 }
