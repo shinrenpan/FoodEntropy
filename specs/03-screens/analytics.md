@@ -15,7 +15,21 @@
 
 ---
 
-## 版面
+## 版面（v2，issue #4）
+
+由上而下：**現況圖表 → 浪費統計 → 分桶明細**。技術用 Swift Charts（原生）。
+
+### 1. 現況（Swift Charts donut）
+- 甜甜圈圖顯示 active 三桶（已過期🔴 / 3天內🟡 / 期限內🟢）佔比，中心顯示總數。
+- 右側 legend：色點 + 桶名 + 數量（**不靠顏色單獨辨識**，符合無障礙；色彩沿用 `expiryColor`）。
+- 無 active 時顯示「目前沒有食材」。
+
+### 2. 浪費統計（歷史）
+- 資料來源：`SwiftDataManager.fetchResolvedFoods()`（consumed + wasted）。
+- **浪費率 hero 數字** = 丟棄 /（吃掉 + 丟棄），≥30% 標紅；配綠/紅比例條 + 「吃掉 N · 丟棄 N」。
+- 無已處理紀錄時顯示「尚無已處理紀錄」。
+
+### 3. 分桶明細（唯讀清單，同 v1）
 
 依 **急 → 緩** 排列三個 Section，各 Section header 顯示「桶名 + 數量」：
 

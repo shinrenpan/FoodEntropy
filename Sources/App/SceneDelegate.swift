@@ -108,6 +108,13 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                         imageData: mock.imageData
                     )
                 }
+                // 給分析頁一些已處理紀錄（4 吃掉、1 丟棄 → 浪費率 20%）
+                for name in ["已吃-優格", "已吃-吐司", "已吃-香蕉", "已吃-起司"] {
+                    let f = manager.create(name: name, purchaseDate: .now, expiryDate: .now)
+                    manager.markConsumed(id: f.id)
+                }
+                let wastedFood = manager.create(name: "丟棄-菠菜", purchaseDate: .now, expiryDate: .now)
+                manager.markWasted(id: wastedFood.id)
             }
             #endif
             return manager

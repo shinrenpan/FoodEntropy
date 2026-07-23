@@ -48,6 +48,17 @@ final class SwiftDataManager {
         return entities.map { $0.toDomain() }
     }
 
+    /// 已處理（consumed / wasted）食材，依 resolvedAt 由新到舊。供分析頁浪費統計用。
+    func fetchResolvedFoods() -> [FoodItem] {
+        let activeRaw = RecordStatus.active.rawValue
+        let descriptor = FetchDescriptor<FoodItemEntity>(
+            predicate: #Predicate { $0.statusRaw != activeRaw },
+            sortBy: [SortDescriptor(\.resolvedAt, order: .reverse)]
+        )
+        let entities = (try? context.fetch(descriptor)) ?? []
+        return entities.map { $0.toDomain() }
+    }
+
     // MARK: - Create
 
     @discardableResult
