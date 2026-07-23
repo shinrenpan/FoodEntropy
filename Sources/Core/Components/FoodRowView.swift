@@ -54,10 +54,10 @@ struct FoodRowView: View {
     }
 }
 
-// V 層顏色對映（Domain 不回傳 UI 型別）
+// V 層顏色對映（Domain 不回傳 UI 型別）。紅綠燈語意：綠=期限內 / 橙=快到 / 紅=過期。
 func expiryColor(_ status: ExpiryStatus) -> Color {
     switch status {
-    case .fresh: .secondary
+    case .fresh: .green
     case .nearExpiry: .orange
     case .expired: .red
     }

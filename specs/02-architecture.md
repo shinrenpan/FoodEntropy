@@ -117,7 +117,7 @@ daysUntil = Calendar.dateComponents([.day], from: 今天起始, to: 到期日起
 |---|---|---|
 | `< 0` | `expired` 已過期 | 🔴 紅 |
 | `0 ≤ daysUntil ≤ 3` | `nearExpiry` 3 天內（含到期當天、含第 3 天） | 🟡 黃 |
-| `> 3` | `fresh` 期限內 | 正常 |
+| `> 3` | `fresh` 期限內 | 🟢 綠 |
 
 - **到期當天（daysUntil=0）= `nearExpiry`（黃），不算 expired**——多數食材當天仍可用，且通知也在當天。
 - 過了到期日**隔天**（daysUntil<0）才轉 `expired`。
