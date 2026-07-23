@@ -63,20 +63,24 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // 三 Tab 裝配。
     private func makeRootTabBarController(manager: SwiftDataManager) -> UITabBarController {
+        let homeTitle = String(localized: "首頁")
+        let analyticsTitle = String(localized: "分析")
+        let settingsTitle = String(localized: "設定")
+
         let home = HomeHostController(manager: manager)
-        home.navigationItem.title = "首頁"
+        home.navigationItem.title = homeTitle
 
         let analytics = AnalyticsHostController(manager: manager)
-        analytics.navigationItem.title = "分析"
+        analytics.navigationItem.title = analyticsTitle
 
         let settings = SettingsHostController()
-        settings.navigationItem.title = "設定"
+        settings.navigationItem.title = settingsTitle
 
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
-            wrapInTab(home, title: "首頁", systemImage: "list.bullet"),
-            wrapInTab(analytics, title: "分析", systemImage: "chart.bar"),
-            wrapInTab(settings, title: "設定", systemImage: "gearshape"),
+            wrapInTab(home, title: homeTitle, systemImage: "list.bullet"),
+            wrapInTab(analytics, title: analyticsTitle, systemImage: "chart.bar"),
+            wrapInTab(settings, title: settingsTitle, systemImage: "gearshape"),
         ]
         #if DEBUG
         // 開發用：以 INITIAL_TAB=<index> 啟動時定位初始分頁。

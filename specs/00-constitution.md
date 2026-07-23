@@ -43,7 +43,8 @@
 
 | 項目 | 決定 | 備註 |
 |---|---|---|
-| 在地化 | **String Catalog 架構，首版只填繁中（zh-Hant）** | 架構先做好，未來加語言不需重構；不硬編字串 |
+| 在地化 | **String Catalog；v1 語言：繁中（zh-Hant，base）+ 英文（en）** | v1 全球發行（除歐盟），故英文納入；其他語言列 backlog。不硬編字串 |
+| 發行區域 | **全球，排除歐盟（EU）** | 避開 GDPR / DSA 額外合規重擔；隱私政策維持簡潔 |
 | Swift Concurrency | **strict mode** | 依 `swift-concurrency` skill；正確判斷離開主 actor 的工具 |
 
 ---

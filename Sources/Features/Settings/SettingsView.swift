@@ -119,9 +119,9 @@ private extension SettingsView {
 
         private var notificationStatusText: String {
             switch notificationStatus {
-            case .authorized: "已開啟"
-            case .denied: "已關閉"
-            case .notDetermined: "未設定"
+            case .authorized: String(localized: "已開啟")
+            case .denied: String(localized: "已關閉")
+            case .notDetermined: String(localized: "未設定")
             }
         }
     }

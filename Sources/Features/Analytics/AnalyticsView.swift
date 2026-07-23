@@ -20,7 +20,7 @@ struct AnalyticsView: View {
 
 private extension AnalyticsView {
     struct BucketSection: View {
-        let title: String
+        let title: LocalizedStringKey
         let items: [FoodItem]
 
         var body: some View {

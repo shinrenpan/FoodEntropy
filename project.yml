@@ -31,12 +31,16 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Sources/App/Info.plist
+        SWIFT_EMIT_LOC_STRINGS: YES          # 讓 build 自動抽取字串到 String Catalog
     info:
       path: Sources/App/Info.plist
       properties:
         CFBundleDisplayName: 食熵
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleLocalizations:                # v1 支援語言（繁中 + 英文）
+          - zh-Hant
+          - en
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
