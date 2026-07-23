@@ -125,7 +125,7 @@
 
 - [x] entitlements（iCloud container + CloudKit）寫入 `project.yml`（生成 `FoodEntropy.entitlements`，不進版控）。App ID 已開 iCloud 能力、ASC App 已建。
 - [x] Bundle ID / iCloud 能力於 App Store Connect 就緒（Team `VZWPMD258L`）。
-- [ ] 真機測試（模擬器不支援 CloudKit）：Xcode 自動簽署建立容器 → 開同步 → 重啟 → 新增資料。
+- [x] 真機測試 PASS：Xcode 自動簽署建立容器 → 開同步 → 重啟 → 新增資料 → CloudKit Console（Private DB / coredata zone）確認 `CD_FoodItemEntity` 記錄上雲。
 - [ ] 開/關同步重啟生效驗證（同一 store URL）。
 - [ ] 關→開：既有本機資料自動上傳；圖片（externalStorage）同步驗證。
 - [ ] 多裝置同 Apple ID 同步實測。
