@@ -71,6 +71,38 @@ struct SwiftDataManagerTests {
         #expect(resolved.first?.imageData == nil)
     }
 
+    // MARK: - 優雅降級 factory
+
+    private enum StubError: Error { case boom }
+
+    @Test("firstSuccess 跳過失敗、回傳第一個成功者")
+    func firstSuccessSkipsFailures() throws {
+        let m = SwiftDataManager.firstSuccess([
+            { throw StubError.boom },
+            { throw StubError.boom },
+            { try SwiftDataManager(inMemory: true) },
+        ])
+        #expect(m != nil)
+    }
+
+    @Test("firstSuccess 全失敗回 nil")
+    func firstSuccessAllFail() {
+        let m = SwiftDataManager.firstSuccess([
+            { throw StubError.boom },
+            { throw StubError.boom },
+        ])
+        #expect(m == nil)
+    }
+
+    @Test("makeResilient 正常情境回傳可用 manager")
+    func makeResilientReturnsUsable() {
+        // 走真實磁碟 store（可能有殘留資料）→ 用「包含」斷言，並清掉自己建的那筆避免污染。
+        let m = SwiftDataManager.makeResilient(cloudKitEnabled: false)
+        let item = m.create(name: "測試", purchaseDate: d0, expiryDate: d0)
+        #expect(m.fetchActiveFoods().contains { $0.id == item.id })
+        m.delete(id: item.id)
+    }
+
     @Test("deleteResolvedFoods 清空已處理、不動 active")
     func deleteResolvedClearsHistory() throws {
         let m = try makeManager()

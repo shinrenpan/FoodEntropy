@@ -94,33 +94,30 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Composition root：依 iCloud 開關偏好建立 SwiftDataManager（02-architecture §6）。
     private func makeManager() -> SwiftDataManager {
         let cloudKitEnabled = UserDefaults.standard.bool(forKey: AppPreferenceKey.iCloudSyncEnabled)
-        do {
-            let manager = try SwiftDataManager(cloudKitEnabled: cloudKitEnabled)
-            #if DEBUG
-            // 開發用：以 SEED_MOCKS=1 啟動時，清單為空則塞入 mock 食材。
-            if ProcessInfo.processInfo.environment["SEED_MOCKS"] == "1",
-               manager.fetchActiveFoods().isEmpty {
-                for mock in FoodItem.mocks {
-                    manager.create(
-                        name: mock.name,
-                        purchaseDate: mock.purchaseDate,
-                        expiryDate: mock.expiryDate,
-                        imageData: mock.imageData
-                    )
-                }
-                // 給分析頁一些已處理紀錄（4 吃掉、1 丟棄 → 浪費率 20%）
-                for name in ["已吃-優格", "已吃-吐司", "已吃-香蕉", "已吃-起司"] {
-                    let f = manager.create(name: name, purchaseDate: .now, expiryDate: .now)
-                    manager.markConsumed(id: f.id)
-                }
-                let wastedFood = manager.create(name: "丟棄-菠菜", purchaseDate: .now, expiryDate: .now)
-                manager.markWasted(id: wastedFood.id)
+        // 三層優雅降級（含 CloudKit → 純本機 → 記憶體），避免 store 建立失敗導致 launch crash loop。
+        let manager = SwiftDataManager.makeResilient(cloudKitEnabled: cloudKitEnabled)
+        #if DEBUG
+        // 開發用：以 SEED_MOCKS=1 啟動時，清單為空則塞入 mock 食材。
+        if ProcessInfo.processInfo.environment["SEED_MOCKS"] == "1",
+           manager.fetchActiveFoods().isEmpty {
+            for mock in FoodItem.mocks {
+                manager.create(
+                    name: mock.name,
+                    purchaseDate: mock.purchaseDate,
+                    expiryDate: mock.expiryDate,
+                    imageData: mock.imageData
+                )
             }
-            #endif
-            return manager
-        } catch {
-            fatalError("無法建立 SwiftDataManager：\(error)")
+            // 給分析頁一些已處理紀錄（4 吃掉、1 丟棄 → 浪費率 20%）
+            for name in ["已吃-優格", "已吃-吐司", "已吃-香蕉", "已吃-起司"] {
+                let f = manager.create(name: name, purchaseDate: .now, expiryDate: .now)
+                manager.markConsumed(id: f.id)
+            }
+            let wastedFood = manager.create(name: "丟棄-菠菜", purchaseDate: .now, expiryDate: .now)
+            manager.markWasted(id: wastedFood.id)
         }
+        #endif
+        return manager
     }
 
     private func wrapInTab(

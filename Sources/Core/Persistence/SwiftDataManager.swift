@@ -32,6 +32,35 @@ final class SwiftDataManager {
         container = try ModelContainer(for: FoodItemEntity.self, configurations: configuration)
     }
 
+    // MARK: - Resilient factory
+
+    /// 依序嘗試建立，第一個成功者勝出；全失敗回 nil。純函式，供測試注入失敗閉包。
+    static func firstSuccess(_ attempts: [() throws -> SwiftDataManager]) -> SwiftDataManager? {
+        for attempt in attempts {
+            if let manager = try? attempt() { return manager }
+        }
+        return nil
+    }
+
+    /// 三層優雅降級：正常（可能含 CloudKit）→ local-only → in-memory。
+    /// 把 `ModelContainer` 建立失敗（遷移/ CloudKit / 磁碟）從「launch crash loop」
+    /// 降成「最差也開得起來」：CloudKit 出錯退純本機，本機也壞退記憶體（該次不落地但不崩）。
+    static func makeResilient(cloudKitEnabled: Bool) -> SwiftDataManager {
+        var attempts: [() throws -> SwiftDataManager] = [
+            { try SwiftDataManager(cloudKitEnabled: cloudKitEnabled) },
+        ]
+        if cloudKitEnabled {
+            // 第一層失敗多半是 CloudKit 惹禍 → 退成純本機儲存（資料仍在本機）。
+            attempts.append { try SwiftDataManager(cloudKitEnabled: false) }
+        }
+        // 最後防線：連本機儲存都建不起來（磁碟滿/損毀）→ 記憶體版，保證能啟動。
+        attempts.append { try SwiftDataManager(inMemory: true) }
+
+        if let manager = firstSuccess(attempts) { return manager }
+        // in-memory 幾乎不可能失敗；真到這裡代表環境徹底異常，無從復原。
+        fatalError("SwiftDataManager 三層降級全數失敗")
+    }
+
     // MARK: - Read
 
     /// 現存（active）食材，依到期日升冪、次序 createdAt 升冪（03-screens/home.md）。
