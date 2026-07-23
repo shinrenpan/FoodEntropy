@@ -18,12 +18,20 @@ settings:
     DEVELOPMENT_TEAM: "VZWPMD258L"       # Apple Developer Team ID（非機密）
     CODE_SIGN_STYLE: Automatic
 
+packages:
+  GoogleMobileAds:                       # 唯一第三方（00-constitution）；classic SDK，iOS 尚無 Next-Gen
+    url: https://github.com/googleads/swift-package-manager-google-mobile-ads.git
+    from: "13.0.0"
+
 targets:
   FoodEntropy:
     type: application
     platform: iOS
     sources:
       - path: Sources
+    dependencies:
+      - package: GoogleMobileAds
+        product: GoogleMobileAds
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.shinrenpan.FoodEntropy
@@ -59,9 +67,15 @@ targets:
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
-        # 相機 / 相簿權限（食材 Form 拍照選圖用）；ATT 字串待里程碑 2 接廣告時再加
+        # 相機 / 相簿權限（食材 Form 拍照選圖用）
         NSCameraUsageDescription: 需要相機權限，用來拍攝食材照片。
         NSPhotoLibraryUsageDescription: 需要相簿權限，用來選擇食材照片。
+        # AdMob：非個人化廣告、不跳 ATT（不追蹤、不用 IDFA），故不需 NSUserTrackingUsageDescription。
+        # ⚠️ 上架前把下面測試 App ID 換成 AdMob 後台的正式 App ID（ca-app-pub-XXXX~YYYY）。
+        GADApplicationIdentifier: ca-app-pub-3940256099942544~1458002511   # Google 官方測試 App ID
+        # SKAdNetwork 安裝歸因用；此處先放 Google 主要 ID，上架前建議補齊 Google 公布的完整清單。
+        SKAdNetworkItems:
+          - SKAdNetworkIdentifier: cstr6suwn9.skadnetwork
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
           UISceneConfigurations:

@@ -1,3 +1,4 @@
+import GoogleMobileAds
 import UIKit
 
 @main
@@ -6,7 +7,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        true
+        MobileAds.shared.start()   // 初始化 AdMob（非個人化，不跳 ATT）
+        return true
     }
 
     func application(

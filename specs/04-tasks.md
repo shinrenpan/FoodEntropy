@@ -113,13 +113,21 @@
 - [ ] 購買 / 還原流程 + 錯誤處理。
 - [ ] `adsRemoved` 改由 entitlement 驅動（取代寫死值）。
 
-## Phase 9 — 廣告 + ATT（`Spec` Production §2、`01-navigation` §2）— ⏸ 延後（里程碑 2）
+## Phase 9 — 廣告（`Spec` Production §2、`01-navigation` §2）— ✅ v1.0.0 納入
 
-> v1 以 `AdSlotView` 佔位（Phase 3）。以下為接 AdMob 時的工作。
+> **決策**：iOS 目前無 Next-Gen SDK，採 classic Google Mobile Ads SDK（SPM，解析為 13.7.0）。
+> **非個人化廣告、不跳 ATT**（不追蹤、不存取 IDFA，故不需 `NSUserTrackingUsageDescription`）。
+> 全球上架、排除歐盟（UMP/GDPR 負擔最小）。
 
-- [ ] 換掉 `AdSlotView` 內部實作為 AdMob 首頁頂部單一 banner（標「廣告」、明顯區隔）。
-- [ ] ATT 同意流程；拒絕 → 非個人化廣告 fallback。
-- [ ] 空清單仍顯示廣告 + hint（`01-navigation` §2）。
+- [x] SPM 引入 `GoogleMobileAds`（`project.yml` packages；連帶 UMP transitive dep）。
+- [x] `MobileAds.shared.start()` 於 `AppDelegate` 初始化。
+- [x] `AdConfig`：廣告單元 ID 集中（DEBUG/Release 皆用測試 ID，Release 留 ⚠️ 待換 seam）+ 非個人化 `Request`（`npa=1`）。
+- [x] `BannerAdView`（`UIViewRepresentable` 包 `BannerView`，`AdSizeBanner` 320x50）；`AdSlotView` 換成真 banner、右上標「廣告」。
+- [x] `Info.plist`：`GADApplicationIdentifier`（測試 App ID，⚠️ 待換）+ `SKAdNetworkItems`（先放 Google 主 ID，上架前補齊）。
+- [x] 模擬器驗證：首頁頂部顯示測試橫幅（Test mode），清單空/非空皆顯示。
+- [ ] **上架前**：AdMob 後台建 App + banner 廣告單元 → 把測試 App ID / 單元 ID 換成正式（`Info.plist` + `AdConfig` Release 分支）。
+- [ ] **上架前**：補齊 Google 公布的完整 `SKAdNetworkItems` 清單。
+- [ ] adsRemoved 由 IAP entitlement 驅動（Phase 8，里程碑 2）。
 
 ## Phase 10 — iCloud 同步驗證（`02-architecture` §6）
 
