@@ -125,7 +125,7 @@
 - [x] `BannerAdView`（`UIViewRepresentable` 包 `BannerView`，`AdSizeBanner` 320x50）；`AdSlotView` 換成真 banner、右上標「廣告」。
 - [x] `Info.plist`：`GADApplicationIdentifier`（測試 App ID，⚠️ 待換）+ `SKAdNetworkItems`（先放 Google 主 ID，上架前補齊）。
 - [x] 模擬器驗證：首頁頂部顯示測試橫幅（Test mode），清單空/非空皆顯示。
-- [ ] **上架前**：AdMob 後台建 App + banner 廣告單元 → 把測試 App ID / 單元 ID 換成正式（`Info.plist` + `AdConfig` Release 分支）。
+- [x] AdMob 後台建 App（食熵 iOS）+ banner 廣告單元（Home Banner）→ 正式 App ID 填入 `Info.plist`、正式單元 ID 填入 `AdConfig` Release 分支（DEBUG 仍用測試單元）。
 - [ ] **上架前**：補齊 Google 公布的完整 `SKAdNetworkItems` 清單。
 - [ ] adsRemoved 由 IAP entitlement 驅動（Phase 8，里程碑 2）。
 

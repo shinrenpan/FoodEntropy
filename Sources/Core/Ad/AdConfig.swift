@@ -5,14 +5,13 @@ import GoogleMobileAds
 enum AdConfig {
     /// 首頁頂部 banner 廣告單元 ID。
     ///
-    /// 開發階段一律用 **Google 官方測試單元**（用正式 ID 自我測試會違反政策、可能被停用）。
-    /// ⚠️ 上架前：把 Release 分支換成 AdMob 後台建立的正式 banner 單元 ID（ca-app-pub-XXXX/ZZZZ），
-    ///    並同步把 `project.yml` 的 `GADApplicationIdentifier` 換成正式 App ID。
+    /// 開發階段一律用 **Google 官方測試單元**（用正式 ID 自我測試會違反政策、可能被停用）；
+    /// Release 用 AdMob 後台的正式 banner 單元，才會計入實際收益。
     static var homeBannerUnitID: String {
         #if DEBUG
         "ca-app-pub-3940256099942544/2934735716"   // Google 官方測試 banner
         #else
-        "ca-app-pub-3940256099942544/2934735716"   // ⚠️ 待換：正式 banner 單元 ID
+        "ca-app-pub-9003896396180654/6477237411"   // 正式 banner 單元（食熵 Home Banner）
         #endif
     }
 

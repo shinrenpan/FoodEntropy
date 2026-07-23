@@ -71,8 +71,8 @@ targets:
         NSCameraUsageDescription: 需要相機權限，用來拍攝食材照片。
         NSPhotoLibraryUsageDescription: 需要相簿權限，用來選擇食材照片。
         # AdMob：非個人化廣告、不跳 ATT（不追蹤、不用 IDFA），故不需 NSUserTrackingUsageDescription。
-        # ⚠️ 上架前把下面測試 App ID 換成 AdMob 後台的正式 App ID（ca-app-pub-XXXX~YYYY）。
-        GADApplicationIdentifier: ca-app-pub-3940256099942544~1458002511   # Google 官方測試 App ID
+        # 正式 App ID（AdMob 後台的食熵 iOS App）；App ID 兩環境共用，測試/正式差異在「廣告單元 ID」（見 AdConfig）。
+        GADApplicationIdentifier: ca-app-pub-9003896396180654~4290057776
         # SKAdNetwork 安裝歸因用；此處先放 Google 主要 ID，上架前建議補齊 Google 公布的完整清單。
         SKAdNetworkItems:
           - SKAdNetworkIdentifier: cstr6suwn9.skadnetwork
