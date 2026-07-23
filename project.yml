@@ -32,6 +32,13 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Sources/App/Info.plist
         SWIFT_EMIT_LOC_STRINGS: YES          # 讓 build 自動抽取字串到 String Catalog
+    entitlements:
+      path: Sources/App/FoodEntropy.entitlements
+      properties:
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.com.shinrenpan.FoodEntropy
+        com.apple.developer.icloud-services:
+          - CloudKit
     info:
       path: Sources/App/Info.plist
       properties:
