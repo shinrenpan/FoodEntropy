@@ -158,8 +158,10 @@
 
 ## Phase 12 — 上架素材（`Spec` 待確認事項）
 
-- [ ] App 圖示、截圖、描述文案、關鍵字。
-- [ ] App Store Connect 送審設定。
+- [x] **文案（中英）經 ASC API 寫入**：App 名稱 / 副標（appInfoLocalizations）、描述 / 關鍵字 / 宣傳文字 / 支援 URL（appStoreVersionLocalizations），zh-Hant + en-US。
+- [x] **截圖（6.9"，1320×2868）經 ASC API 上傳**：首頁 / 分析 / 設定 3 張，中英各一組（`APP_IPHONE_67` 展示位）。DEBUG `SCREENSHOT_MODE=1` hook 隱藏廣告取乾淨畫面。
+- [ ] App 圖示（確認 AppIcon 資產齊全）。
+- [ ] App Store Connect 送審（地區已排除全歐洲；1.0.0 + IAP READY_TO_SUBMIT 一起提交）。
 
 ---
 

@@ -24,9 +24,19 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let manager = makeManager()
         self.manager = manager
 
-        let store = StoreManager()
-        self.store = store
+        let store: StoreManager
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["SCREENSHOT_MODE"] == "1" {
+            store = StoreManager(adsRemoved: true)   // 上架截圖用：隱藏廣告，畫面乾淨
+        } else {
+            store = StoreManager()
+            Task { await store.start() }
+        }
+        #else
+        store = StoreManager()
         Task { await store.start() }   // 載入商品 + 對帳 entitlement + 監聽交易更新
+        #endif
+        self.store = store
 
         let window = UIWindow(windowScene: windowScene)
         window.backgroundColor = .systemBackground   // 防止自訂轉場期間露出黑底
