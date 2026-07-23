@@ -96,10 +96,13 @@
 
 ## Phase 7 — 通知（`02-architecture` §8）
 
-- [ ] 通知服務：情境式請求權限（首次儲存）。
-- [ ] 排程：到期日 09:00、以食材 id 為 identifier、過去時間不排。
-- [ ] 取消/重排：編輯延長 / 刪除 / 已使用 / 丟棄。
-- [ ] 64 則上限策略：nearest-first。
+- [x] `NotificationService`（@MainActor，`active` 旗標供測試 no-op）：權限請求 + reconcile 排程。
+- [x] 情境式請求權限：`FoodFormViewModel` 首次儲存呼叫 `requestAuthorizationIfNeeded`（notDetermined 才跳）。設定「通知」列共用。
+- [x] 排程：到期日 09:00、食材 id 為 identifier、過去時間不排；`content.userInfo` 帶 `deeplink` 供點擊回首頁。
+- [x] 取消/重排：以 **reconcile 策略**——每次新增/編輯/延長/刪除/已使用/丟棄後，用當前 active 清單重建排程，天然涵蓋取消與重排。
+- [x] 64 則上限：reconcile 取「未過 09:00」者、依到期日升冪、取最近 60 筆（nearest-first）。
+- [x] 補排時機：`SceneDelegate.sceneDidBecomeActive` 對帳（處理跨日 / 上限 / 外部變動）。
+- [x] 測試：VM 注入 `NotificationService(active: false)` 保持乾淨；37 測試全綠。
 
 ## Phase 8 — IAP 移除廣告（`02-architecture` §7）— ⏸ 延後（里程碑 2）
 

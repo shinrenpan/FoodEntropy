@@ -8,6 +8,11 @@ struct FoodFormViewModelTests {
         try SwiftDataManager(inMemory: true)
     }
 
+    // 注入 no-op NotificationService，避免測試打到系統通知。
+    private func makeVM(_ mode: FoodFormMode, _ manager: SwiftDataManager) -> FoodFormViewModel {
+        FoodFormViewModel(mode: mode, manager: manager, notifications: NotificationService(active: false))
+    }
+
     private let d0 = Date(timeIntervalSince1970: 1_700_000_000)
     private func day(_ n: Int, from base: Date) -> Date {
         base.addingTimeInterval(86_400 * Double(n))
@@ -19,7 +24,7 @@ struct FoodFormViewModelTests {
     func `edit 模式帶入既有食材值`() async throws {
         let manager = try makeManager()
         let item = manager.create(name: "牛奶", purchaseDate: d0, expiryDate: day(3, from: d0))
-        let vm = FoodFormViewModel(mode: .edit(item), manager: manager)
+        let vm = makeVM(.edit(item), manager)
         #expect(vm.state.name == "牛奶")
         #expect(vm.state.purchaseDate == d0)
         #expect(vm.state.expiryDate == day(3, from: d0))
@@ -28,7 +33,7 @@ struct FoodFormViewModelTests {
 
     @Test
     func `add 模式標題為新增食材`() async throws {
-        let vm = try FoodFormViewModel(mode: .add, manager: makeManager())
+        let vm = try makeVM(.add, makeManager())
         #expect(vm.navigationTitle == "新增食材")
     }
 
@@ -36,7 +41,7 @@ struct FoodFormViewModelTests {
 
     @Test
     func `名稱去空白後為空則不可儲存`() async throws {
-        let vm = try FoodFormViewModel(mode: .add, manager: makeManager())
+        let vm = try makeVM(.add, makeManager())
         vm.state.name = "   "
         #expect(vm.state.isSaveEnabled == false)
         vm.state.name = "牛奶"
@@ -49,7 +54,7 @@ struct FoodFormViewModelTests {
     func `購買日改到晚於到期日時頂推到期日`() async throws {
         let manager = try makeManager()
         let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
-        let vm = FoodFormViewModel(mode: .edit(item), manager: manager)
+        let vm = makeVM(.edit(item), manager)
         await vm.doAction(.view(.purchaseDateChanged(day(5, from: d0))))
         #expect(vm.state.purchaseDate == day(5, from: d0))
         #expect(vm.state.expiryDate == day(5, from: d0))   // 被頂推
@@ -59,7 +64,7 @@ struct FoodFormViewModelTests {
     func `購買日仍早於到期日時不動到期日`() async throws {
         let manager = try makeManager()
         let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
-        let vm = FoodFormViewModel(mode: .edit(item), manager: manager)
+        let vm = makeVM(.edit(item), manager)
         await vm.doAction(.view(.purchaseDateChanged(day(1, from: d0))))
         #expect(vm.state.expiryDate == day(3, from: d0))   // 不變
     }
@@ -69,7 +74,7 @@ struct FoodFormViewModelTests {
     @Test
     func `add 儲存後 manager 新增一筆`() async throws {
         let manager = try makeManager()
-        let vm = FoodFormViewModel(mode: .add, manager: manager)
+        let vm = makeVM(.add, manager)
         vm.state.name = "  牛奶  "   // 去空白後存
         vm.state.purchaseDate = d0
         vm.state.expiryDate = day(3, from: d0)
@@ -83,7 +88,7 @@ struct FoodFormViewModelTests {
     func `edit 儲存後 manager 更新既有筆`() async throws {
         let manager = try makeManager()
         let item = manager.create(name: "舊", purchaseDate: d0, expiryDate: day(3, from: d0))
-        let vm = FoodFormViewModel(mode: .edit(item), manager: manager)
+        let vm = makeVM(.edit(item), manager)
         vm.state.name = "新"
         await vm.doAction(.view(.saveDidTap))
         let items = manager.fetchActiveFoods()
@@ -94,7 +99,7 @@ struct FoodFormViewModelTests {
     @Test
     func `名稱為空時儲存不寫入`() async throws {
         let manager = try makeManager()
-        let vm = FoodFormViewModel(mode: .add, manager: manager)
+        let vm = makeVM(.add, manager)
         vm.state.name = "   "
         await vm.doAction(.view(.saveDidTap))
         #expect(manager.fetchActiveFoods().isEmpty)
@@ -106,7 +111,7 @@ struct FoodFormViewModelTests {
     func `未變更時返回不跳確認`() async throws {
         let manager = try makeManager()
         let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
-        let vm = FoodFormViewModel(mode: .edit(item), manager: manager)
+        let vm = makeVM(.edit(item), manager)
         await vm.doAction(.view(.dismissDidTap))
         #expect(vm.state.showDiscardConfirm == false)
     }
@@ -115,7 +120,7 @@ struct FoodFormViewModelTests {
     func `有變更時返回跳確認`() async throws {
         let manager = try makeManager()
         let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
-        let vm = FoodFormViewModel(mode: .edit(item), manager: manager)
+        let vm = makeVM(.edit(item), manager)
         vm.state.name = "改了"
         await vm.doAction(.view(.dismissDidTap))
         #expect(vm.state.showDiscardConfirm == true)
@@ -123,7 +128,7 @@ struct FoodFormViewModelTests {
 
     @Test
     func `取消放棄關閉確認`() async throws {
-        let vm = try FoodFormViewModel(mode: .add, manager: makeManager())
+        let vm = try makeVM(.add, makeManager())
         vm.state.showDiscardConfirm = true
         await vm.doAction(.view(.discardCancelled))
         #expect(vm.state.showDiscardConfirm == false)
@@ -133,7 +138,7 @@ struct FoodFormViewModelTests {
 
     @Test
     func `imagePicked 設定 removeImage 清除`() async throws {
-        let vm = try FoodFormViewModel(mode: .add, manager: makeManager())
+        let vm = try makeVM(.add, makeManager())
         let data = Data([0x01, 0x02])
         await vm.doAction(.view(.imagePicked(data)))
         #expect(vm.state.imageData == data)

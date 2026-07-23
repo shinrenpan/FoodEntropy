@@ -8,6 +8,9 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     private static let homeTabIndex = 0
 
+    // 持有 manager 供前景時對帳通知排程。
+    private var manager: SwiftDataManager?
+
     func scene(
         _ scene: UIScene,
         willConnectTo session: UISceneSession,
@@ -15,9 +18,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = scene as? UIWindowScene else { return }
 
+        let manager = makeManager()
+        self.manager = manager
+
         let window = UIWindow(windowScene: windowScene)
         window.backgroundColor = .systemBackground   // 防止自訂轉場期間露出黑底
-        window.rootViewController = makeRootTabBarController()
+        window.rootViewController = makeRootTabBarController(manager: manager)
         window.makeKeyAndVisible()
         self.window = window
 
@@ -28,6 +34,16 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
            let deeplink = Deeplink(url: url) {
             handle(deeplink)
         }
+    }
+
+    // 進前景時對帳通知排程（處理跨日、64 則上限、外部變動）。
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        reconcileNotifications()
+    }
+
+    private func reconcileNotifications() {
+        guard let manager else { return }
+        Task { await NotificationService.shared.reconcile(activeFoods: manager.fetchActiveFoods()) }
     }
 
     // 進入點 1：前景 / 背景 URL Scheme
@@ -49,10 +65,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // MARK: - 導航裝配（Phase 2）
 
-    // 三 Tab 裝配。首頁為正式 HostController；分析 / 設定於 Phase 5 / 6 替換。
-    private func makeRootTabBarController() -> UITabBarController {
-        let manager = makeManager()
-
+    // 三 Tab 裝配。
+    private func makeRootTabBarController(manager: SwiftDataManager) -> UITabBarController {
         let home = HomeHostController(manager: manager)
         home.navigationItem.title = "首頁"
 

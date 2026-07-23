@@ -6,7 +6,8 @@ import Testing
 struct HomeViewModelTests {
     private func makeVM() throws -> (HomeViewModel, SwiftDataManager) {
         let manager = try SwiftDataManager(inMemory: true)
-        return (HomeViewModel(manager: manager), manager)
+        let vm = HomeViewModel(manager: manager, notifications: NotificationService(active: false))
+        return (vm, manager)
     }
 
     private let d0 = Date(timeIntervalSince1970: 1_700_000_000)

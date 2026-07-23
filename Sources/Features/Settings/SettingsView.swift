@@ -91,7 +91,7 @@ private extension SettingsView {
         }
 
         let iCloudOn: Bool
-        let notificationStatus: SettingsViewModel.State.NotificationStatus
+        let notificationStatus: NotificationAuthStatus
         let send: (Action) -> Void
 
         var body: some View {

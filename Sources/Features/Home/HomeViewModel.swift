@@ -14,10 +14,14 @@ final class HomeViewModel {
     private let manager: SwiftDataManager
 
     @ObservationIgnored
+    private let notifications: NotificationService
+
+    @ObservationIgnored
     var onRoute: (@MainActor (Router) -> Void)?
 
-    init(manager: SwiftDataManager) {
+    init(manager: SwiftDataManager, notifications: NotificationService = .shared) {
         self.manager = manager
+        self.notifications = notifications
     }
 
     func doAction(_ action: Action) async {
@@ -58,13 +62,11 @@ extension HomeViewModel {
 
         case let .consumeDidTap(item):
             manager.markConsumed(id: item.id)
-            // TODO: Phase 7 — 取消該食材通知排程
-            await reload()
+            await reloadAndReschedule()
 
         case let .wasteDidTap(item):
             manager.markWasted(id: item.id)
-            // TODO: Phase 7 — 取消該食材通知排程
-            await reload()
+            await reloadAndReschedule()
 
         case let .deleteDidTap(item):
             state.pendingDeleteItem = item
@@ -72,10 +74,9 @@ extension HomeViewModel {
         case .deleteConfirmed:
             if let item = state.pendingDeleteItem {
                 manager.delete(id: item.id)
-                // TODO: Phase 7 — 取消該食材通知排程
             }
             state.pendingDeleteItem = nil
-            await reload()
+            await reloadAndReschedule()
 
         case .deleteCancelled:
             state.pendingDeleteItem = nil
@@ -92,10 +93,9 @@ extension HomeViewModel {
                     expiryDate: newExpiry,
                     imageData: item.imageData
                 )
-                // TODO: Phase 7 — 依新到期日重排通知
             }
             state.extendingItem = nil
-            await reload()
+            await reloadAndReschedule()
 
         case .extendCancelled:
             state.extendingItem = nil
@@ -105,6 +105,12 @@ extension HomeViewModel {
     private func reload() async {
         let foods = manager.fetchActiveFoods()
         await doAction(.dataResponse(.foodsLoaded(foods)))
+    }
+
+    // 資料變動後：重載清單 + 以當前 active 重建通知排程。
+    private func reloadAndReschedule() async {
+        await reload()
+        await notifications.reconcile(activeFoods: state.items)
     }
 }
 

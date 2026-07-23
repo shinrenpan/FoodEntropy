@@ -1,5 +1,4 @@
 import Foundation
-import UserNotifications
 
 @Observable
 @MainActor
@@ -14,13 +13,17 @@ final class SettingsViewModel {
     private let defaults: UserDefaults
 
     @ObservationIgnored
+    private let notifications: NotificationService
+
+    @ObservationIgnored
     var onRoute: (@MainActor (Router) -> Void)?
 
     // TODO: Phase 11 — 換成正式託管的隱私權政策頁面 URL。
     static let privacyPolicyURL = URL(string: "https://shinrenpan.github.io/FoodEntropy/privacy")!
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, notifications: NotificationService = .shared) {
         self.defaults = defaults
+        self.notifications = notifications
     }
 
     func doAction(_ action: Action) async {
@@ -47,7 +50,7 @@ extension SettingsViewModel {
         case .onAppear:
             state.iCloudSyncEnabled = defaults.bool(forKey: AppPreferenceKey.iCloudSyncEnabled)
             state.versionText = Self.appVersionText
-            state.notificationStatus = await Self.currentNotificationStatus()
+            state.notificationStatus = await notifications.authorizationStatus()
 
         case .removeAdsDidTap, .restoreDidTap:
             state.showComingSoon = true   // 廣告 / IAP 上線後開放
@@ -61,7 +64,7 @@ extension SettingsViewModel {
             switch state.notificationStatus {
             case .notDetermined:
                 // 還沒問過 → 直接請求權限（跳系統彈窗），而非導向系統設定。
-                await requestNotificationPermission()
+                state.notificationStatus = await notifications.requestAuthorizationIfNeeded()
             case .denied, .authorized:
                 // 已決定 → 只能到系統設定調整。
                 onRoute?(.openNotificationSettings)
@@ -89,21 +92,5 @@ private extension SettingsViewModel {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
         return "\(version) (\(build))"
-    }
-
-    // TODO: Phase 7 — 抽成共用 NotificationService（首次儲存也會用到）。
-    func requestNotificationPermission() async {
-        _ = try? await UNUserNotificationCenter.current()
-            .requestAuthorization(options: [.alert, .sound, .badge])
-        state.notificationStatus = await Self.currentNotificationStatus()
-    }
-
-    static func currentNotificationStatus() async -> State.NotificationStatus {
-        let settings = await UNUserNotificationCenter.current().notificationSettings()
-        switch settings.authorizationStatus {
-        case .authorized, .provisional, .ephemeral: return .authorized
-        case .denied: return .denied
-        default: return .notDetermined
-        }
     }
 }

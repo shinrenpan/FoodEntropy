@@ -16,14 +16,18 @@ final class FoodFormViewModel {
     private let manager: SwiftDataManager
 
     @ObservationIgnored
+    private let notifications: NotificationService
+
+    @ObservationIgnored
     private let original: Snapshot
 
     @ObservationIgnored
     var onRoute: (@MainActor (Router) -> Void)?
 
-    init(mode: FoodFormMode, manager: SwiftDataManager) {
+    init(mode: FoodFormMode, manager: SwiftDataManager, notifications: NotificationService = .shared) {
         self.mode = mode
         self.manager = manager
+        self.notifications = notifications
 
         var initial = State()
         switch mode {
@@ -83,7 +87,7 @@ extension FoodFormViewModel {
 
         case .saveDidTap:
             guard state.isSaveEnabled else { return }
-            save()
+            await save()
             onRoute?(.close)
 
         case .dismissDidTap:
@@ -101,7 +105,7 @@ extension FoodFormViewModel {
         }
     }
 
-    private func save() {
+    private func save() async {
         let name = state.name.trimmingCharacters(in: .whitespacesAndNewlines)
         switch mode {
         case .add:
@@ -120,7 +124,9 @@ extension FoodFormViewModel {
                 imageData: state.imageData
             )
         }
-        // TODO: Phase 7 — 首次成功儲存請求通知權限；依到期日排程 / 重排通知
+        // 首次儲存請求權限（notDetermined 才跳彈窗）→ 以當前 active 重建排程。
+        await notifications.requestAuthorizationIfNeeded()
+        await notifications.reconcile(activeFoods: manager.fetchActiveFoods())
     }
 
     private var isDirty: Bool {
