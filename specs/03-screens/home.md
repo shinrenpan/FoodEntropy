@@ -19,8 +19,7 @@ App 主畫面，管理食材：瀏覽、新增、滑動 / 長按操作。
 ## 版面（由上而下）
 
 1. **廣告 section = `AdSlotView`**（固定最上方，單一則）
-   - **v1**：佔位 seam——DEBUG 顯示「Ad Placeholder」框、Release collapse（`02-architecture` §9）。
-   - 未來接 AdMob 後：與食材 row 視覺明顯區隔、標示「廣告」。
+   - **v1.0.0**：AdMob 非個人化 banner（`BannerAdView`，`AdSizeBanner` 320x50），與食材 row 視覺明顯區隔、右上標「廣告」（`02-architecture` §9）。
    - **`adsRemoved` 為 true 時隱藏**（v1 寫死 false；未來由 IAP entitlement 驅動，見 `02-architecture` §7）。
 2. **食材清單**（rows）
 3. **FAB**（浮於清單下方）→ 點擊 push `FoodFormView(.add)`

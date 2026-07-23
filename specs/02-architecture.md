@@ -145,9 +145,9 @@ daysUntil = Calendar.dateComponents([.day], from: 今天起始, to: 到期日起
 
 ## 7. IAP 移除廣告
 
-> **v1 延後（里程碑 2）**：AdMob 未接前「移除廣告」無實際效果，故**購買邏輯延後**。v1 僅：
+> **v1.0.0 廣告已接（§9），但 IAP 購買邏輯仍延後（里程碑 2）**。v1 僅：
 > - 保留設定的「移除廣告 / 還原購買」**UI**（互動 stub，不真的走 StoreKit）。
-> - 保留 `adsRemoved` state（v1 寫死 `false`），供 `AdSlotView` 的「持有即隱藏」邏輯先接好。
+> - 保留 `adsRemoved` state（v1 寫死 `false`），`AdSlotView` 的「持有即隱藏」邏輯已接好，待 IAP 上線後由 entitlement 驅動即可生效。
 >
 > 以下為未來接上時的完整設計：
 
@@ -185,19 +185,21 @@ daysUntil = Calendar.dateComponents([.day], from: 今天起始, to: 到期日起
 - iOS 待發通知上限 **64 則 / App**。v1 採每項一則，若待排程數逼近上限，**以最接近到期者優先**排程（nearest-first）。
 - **補排時機**：App **啟動 / 進前景時**做一次對帳——移除已離開 active 者的殘留排程、補排下一批最近到期者。量大時再評估改「每天彙整一則」。
 
-## 9. 廣告與 ATT（App Tracking Transparency）
+## 9. 廣告（AdMob，v1.0.0 納入）
 
-> **v1 延後（里程碑 2）**：不接 AdMob SDK。改以 **`AdSlotView` 佔位 seam**：
-> - **DEBUG**：顯示灰底「Ad Placeholder」框（開發時看得到保留版面）。
-> - **Release**：collapse 不佔空間。
-> - 未來接 AdMob 時只換 `AdSlotView` 內部實作，首頁與 IAP 隱藏邏輯不動。
->
-> 以下為未來接上時的完整設計：
+> **決策（v1.0.0）**：iOS 目前無 Next-Gen SDK，採 **classic Google Mobile Ads SDK**（SPM，解析為 13.7.0）。
+> **非個人化廣告、不跳 ATT**——不追蹤、不存取 IDFA，故**不請求 ATT、不需 `NSUserTrackingUsageDescription`**。
+> 全球上架、排除歐盟（UMP/GDPR 負擔最小）。
 
-- **AdMob**：首頁頂部單一 banner section（`01-navigation` §2），持有「移除廣告」entitlement 時隱藏。
-- **ATT 觸發時機**：**App 冷啟動、首次進入首頁、且廣告即將載入前**才請求 ATT 授權（`ATTrackingManager`）。不在 App 一開就跳（無情境、易被拒）。
-- **拒絕個人化追蹤** → 改請求**非個人化廣告**（AdMob `npa=1`），合規但收益較低。
-- ATT 與通知權限為**兩次不同的系統彈窗**，避免同時連續轟炸使用者；ATT 綁廣告載入、通知綁首次儲存，時機自然錯開。
+- **實作分層**：
+  - `AppDelegate` → `MobileAds.shared.start()` 初始化。
+  - `AdConfig`：廣告單元 ID 集中（開發用 Google 測試 ID，Release 留 ⚠️ 待換 seam）+ 非個人化 `Request`（`Extras` 帶 `npa=1`）。
+  - `BannerAdView`：`UIViewRepresentable` 包 `BannerView`（`AdSizeBanner` 320x50），rootVC 取自 key window。
+  - `AdSlotView`：首頁頂部單一 banner，右上標「廣告」；由呼叫端依 `adsRemoved` 決定是否放入（`01-navigation` §2）。
+- **為何不跳 ATT**：ATT 只在「要追蹤（存取 IDFA 做跨 App 個人化）」時才必要且必須；非個人化廣告不碰 IDFA，硬跳 ATT 反而可能因「無意義權限請求」被審核退。詳見 Apple Guideline 5.1.2。
+- **收益取捨**：非個人化單價較低，但對此類低流量工具 App 差異有限，換來最少摩擦與最乾淨的隱私標籤。
+- **UMP**：GoogleUserMessagingPlatform 為 AdMob transitive 相依；排除歐盟後同意流程負擔最小，v1 不主動接 UMP 彈窗。
+- **上架前待辦**：AdMob 後台建正式 App + banner 單元 → 換掉 `GADApplicationIdentifier` 與 `AdConfig` 的測試 ID；補齊完整 `SKAdNetworkItems`（見 `04-tasks` Phase 9）。
 
 ## 10. Schema 遷移
 
