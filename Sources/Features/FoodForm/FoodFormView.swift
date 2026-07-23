@@ -35,6 +35,17 @@ struct FoodFormView: View {
                 ImageRow(imageData: viewModel.state.imageData) {
                     showImageDialog = true
                 }
+                // 掛在觸發列上（而非 Form 根層），確保 dialog 錨點正確、不會跑到畫面頂部。
+                .confirmationDialog("食材照片", isPresented: $showImageDialog, titleVisibility: .visible) {
+                    Button("拍照") { showCamera = true }
+                    Button("從相簿選") { showLibrary = true }
+                    if viewModel.state.imageData != nil {
+                        Button("移除照片", role: .destructive) {
+                            Task { await viewModel.doAction(.view(.removeImage)) }
+                        }
+                    }
+                    Button("取消", role: .cancel) {}
+                }
             }
         }
         .navigationTitle(viewModel.navigationTitle)
@@ -52,16 +63,6 @@ struct FoodFormView: View {
                 }
                 .disabled(!viewModel.state.isSaveEnabled)
             }
-        }
-        .confirmationDialog("食材照片", isPresented: $showImageDialog, titleVisibility: .visible) {
-            Button("拍照") { showCamera = true }
-            Button("從相簿選") { showLibrary = true }
-            if viewModel.state.imageData != nil {
-                Button("移除照片", role: .destructive) {
-                    Task { await viewModel.doAction(.view(.removeImage)) }
-                }
-            }
-            Button("取消", role: .cancel) {}
         }
         .photosPicker(isPresented: $showLibrary, selection: $librarySelection, matching: .images)
         .onChange(of: librarySelection) { _, newValue in
