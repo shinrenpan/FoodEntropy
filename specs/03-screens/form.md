@@ -4,7 +4,7 @@
 > 上游：`../01-navigation.md`（§4）、`../02-architecture.md`
 > 對應：`FoodFormView` + `FoodFormViewModel`（@Observable @MainActor）
 
-新增與編輯共用同一畫面，透過 Router **push** 進入。
+新增與編輯共用同一畫面，透過 Router **push** 進入。push 時 **隱藏 tabbar**（`hidesBottomBarWhenPushed = true`）：填寫為聚焦任務，避免中途誤切 Tab、鍵盤彈出時版面更寬。
 
 ---
 

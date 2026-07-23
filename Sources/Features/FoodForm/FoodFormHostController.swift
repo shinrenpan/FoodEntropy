@@ -9,6 +9,7 @@ final class FoodFormHostController: UIHostingController<FoodFormView> {
     init(mode: FoodFormMode, manager: SwiftDataManager) {
         self.viewModel = FoodFormViewModel(mode: mode, manager: manager)
         super.init(rootView: FoodFormView(viewModel: viewModel))
+        hidesBottomBarWhenPushed = true   // 藏 tabbar，聚焦填寫任務
     }
 
     @available(*, unavailable)
