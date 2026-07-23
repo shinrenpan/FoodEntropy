@@ -59,11 +59,14 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let analytics = AnalyticsHostController(manager: manager)
         analytics.navigationItem.title = "分析"
 
+        let settings = SettingsHostController()
+        settings.navigationItem.title = "設定"
+
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
             wrapInTab(home, title: "首頁", systemImage: "list.bullet"),
             wrapInTab(analytics, title: "分析", systemImage: "chart.bar"),
-            makePlaceholderTab(title: "設定", systemImage: "gearshape"),
+            wrapInTab(settings, title: "設定", systemImage: "gearshape"),
         ]
         #if DEBUG
         // 開發用：以 INITIAL_TAB=<index> 啟動時定位初始分頁。
@@ -76,7 +79,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // Composition root：依 iCloud 開關偏好建立 SwiftDataManager（02-architecture §6）。
     private func makeManager() -> SwiftDataManager {
-        let cloudKitEnabled = UserDefaults.standard.bool(forKey: "iCloudSyncEnabled")
+        let cloudKitEnabled = UserDefaults.standard.bool(forKey: AppPreferenceKey.iCloudSyncEnabled)
         do {
             let manager = try SwiftDataManager(cloudKitEnabled: cloudKitEnabled)
             #if DEBUG
@@ -107,12 +110,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let nav = UINavigationController(rootViewController: root)
         nav.tabBarItem = UITabBarItem(title: title, image: UIImage(systemName: systemImage), selectedImage: nil)
         return nav
-    }
-
-    private func makePlaceholderTab(title: String, systemImage: String) -> UINavigationController {
-        let host = UIHostingController(rootView: Phase0PlaceholderView(title: title))
-        host.navigationItem.title = title
-        return wrapInTab(host, title: title, systemImage: systemImage)
     }
 }
 

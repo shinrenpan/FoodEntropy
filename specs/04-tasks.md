@@ -84,13 +84,15 @@
 
 ## Phase 6 — 設定（`03-screens/settings.md`）
 
-- [ ] `SettingsViewModel`：State + `doAction`。
-- [ ] Section 購買 / 同步與通知 / 關於。
-- [ ] iCloud 開關 → 存偏好 + 「下次啟動生效」提示。
-- [ ] 通知列：顯示狀態 + 導向系統設定。
-- [ ] 隱私權政策：SFSafariViewController。
-- [ ] 版本顯示。
-- [ ] 購買區（移除廣告 / 還原購買）UI 保留但**互動 stub**（v1 不接 StoreKit，見 Phase 8）。
+- [x] `SettingsViewModel`：State + `doAction`（注入 UserDefaults 供測試）。
+- [x] Section 購買 / 同步與通知 / 關於（3 個 L2 section）。
+- [x] iCloud 開關 → 存偏好（`AppPreferenceKey`）+ 「下次啟動生效」提示。
+- [x] 通知列：顯示狀態（已開啟/已關閉/未設定）+ 導向系統設定。
+- [x] 隱私權政策：SFSafariViewController（經 AppRouter.sheet）。URL 為 Phase 11 待換的 placeholder。
+- [x] 版本顯示（修正 Info.plist 引用 `MARKETING_VERSION` → 顯示 0.1.0）。
+- [x] 購買區 UI 保留但互動 stub → 「即將推出」提示（IAP 延後，Phase 8）。
+- [x] SceneDelegate 換入設定；移除 Phase 0 佔位（`Phase0PlaceholderView`、`makePlaceholderTab`）。
+- [x] 4 個 SettingsViewModel 測試；模擬器截圖驗證。
 
 ## Phase 7 — 通知（`02-architecture` §8）
 
