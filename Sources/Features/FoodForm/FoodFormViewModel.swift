@@ -124,9 +124,9 @@ extension FoodFormViewModel {
                 imageData: state.imageData
             )
         }
-        // 首次儲存請求權限（notDetermined 才跳彈窗）→ 以當前 active 重建排程。
+        // 首次儲存請求權限（notDetermined 才跳彈窗）→ 以當前 active 重建排程（DEBUG 用 10 秒立即驗證）。
         await notifications.requestAuthorizationIfNeeded()
-        await notifications.reconcile(activeFoods: manager.fetchActiveFoods())
+        await notifications.reconcile(activeFoods: manager.fetchActiveFoods(), immediateTestFire: true)
     }
 
     private var isDirty: Bool {

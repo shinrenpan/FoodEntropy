@@ -49,15 +49,18 @@ final class NotificationService {
 
     // 以當前 active 食材重建待發通知：清空 → 取「未過 09:00」者、依到期日升冪、
     // 取最近 maxScheduled 筆重新排程。任何新增 / 編輯 / 移除後呼叫即保持一致。
-    func reconcile(activeFoods: [FoodItem]) async {
+    /// - Parameter immediateTestFire: DEBUG 專用。true（僅資料變動時）→ 改用 10 秒 trigger 且不篩過期，
+    ///   方便立即驗證；false（前景對帳）→ 走正式的 09:00 排程，避免「只是開 App」就被通知轟。Release 一律正式行為。
+    func reconcile(activeFoods: [FoodItem], immediateTestFire: Bool = false) async {
         guard active else { return }
         center.removeAllPendingNotificationRequests()
 
         let calendar = Calendar.current
-        // 正式版篩掉「09:00 已過」者；DEBUG 用 distantPast 不篩（因 trigger 改 10 秒，任何食材皆可測）。
         #if DEBUG
-        let cutoff = Date.distantPast
+        let shortTrigger = immediateTestFire
+        let cutoff = immediateTestFire ? Date.distantPast : Date.now
         #else
+        let shortTrigger = false
         let cutoff = Date.now
         #endif
         let requests = activeFoods
@@ -67,7 +70,7 @@ final class NotificationService {
             }
             .sorted { $0.1 < $1.1 }
             .prefix(Self.maxScheduled)
-            .map { makeRequest(for: $0.0, fireDate: $0.1, calendar: calendar) }
+            .map { makeRequest(for: $0.0, fireDate: $0.1, calendar: calendar, shortTrigger: shortTrigger) }
 
         for request in requests {
             try? await center.add(request)
@@ -83,20 +86,22 @@ final class NotificationService {
         return calendar.date(from: comps)
     }
 
-    private func makeRequest(for food: FoodItem, fireDate: Date, calendar: Calendar) -> UNNotificationRequest {
+    private func makeRequest(for food: FoodItem, fireDate: Date, calendar: Calendar, shortTrigger: Bool) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
         content.title = String(localized: "食材到期提醒")
         content.body = String(localized: "「\(food.name)」今天到期，記得處理。")
         content.sound = .default
         content.userInfo = ["deeplink": "foodentropy://home"]   // 點擊 → 首頁（SceneDelegate 已處理）
 
-        #if DEBUG
-        // 開發用：改為 10 秒後觸發，走正常排程路徑但縮短時間方便驗證（正式為到期當天 09:00）。
-        let trigger: UNNotificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
-        #else
-        let triggerComps = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
-        let trigger: UNNotificationTrigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
-        #endif
+        let trigger: UNNotificationTrigger
+        if shortTrigger {
+            // DEBUG 資料變動時：10 秒後觸發，方便立即驗證。
+            trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
+        } else {
+            // 正式：到期當天 09:00。
+            let triggerComps = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
+            trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: false)
+        }
         return UNNotificationRequest(identifier: food.id.uuidString, content: content, trigger: trigger)
     }
 }

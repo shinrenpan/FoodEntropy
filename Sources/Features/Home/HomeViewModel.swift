@@ -107,10 +107,10 @@ extension HomeViewModel {
         await doAction(.dataResponse(.foodsLoaded(foods)))
     }
 
-    // 資料變動後：重載清單 + 以當前 active 重建通知排程。
+    // 資料變動後：重載清單 + 以當前 active 重建通知排程（DEBUG 用 10 秒立即驗證）。
     private func reloadAndReschedule() async {
         await reload()
-        await notifications.reconcile(activeFoods: state.items)
+        await notifications.reconcile(activeFoods: state.items, immediateTestFire: true)
     }
 }
 
