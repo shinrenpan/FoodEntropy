@@ -125,7 +125,10 @@
 
 - [x] entitlements（iCloud container + CloudKit）寫入 `project.yml`（生成 `FoodEntropy.entitlements`，不進版控）。App ID 已開 iCloud 能力、ASC App 已建。
 - [x] Bundle ID / iCloud 能力於 App Store Connect 就緒（Team `VZWPMD258L`）。
-- [x] 真機測試 PASS：Xcode 自動簽署建立容器 → 開同步 → 重啟 → 新增資料 → CloudKit Console（Private DB / coredata zone）確認 `CD_FoodItemEntity` 記錄上雲。
+- [x] 真機測試 PASS（上雲）：開同步 → 重啟 → 新增資料 → CloudKit Console（Private DB / coredata zone）確認 `CD_FoodItemEntity` 上雲。
+- [x] 真機測試 PASS（下雲）：刪除重裝 → 開同步 → 資料自動下載回來。
+- [x] CloudKit 推播設定（`remote-notification` 背景模式 + `aps-environment` 分 config）消除警告。
+- [x] ⚠️ 已知陷阱：**Xcode Build & Run（附 debugger）會卡住 CloudKit 背景同步**（`BGSystemTaskScheduler Code=3`），需**脫離 debugger、直接開 App** 才會同步。測試時務必留意。
 - [ ] 開/關同步重啟生效驗證（同一 store URL）。
 - [ ] 關→開：既有本機資料自動上傳；圖片（externalStorage）同步驗證。
 - [ ] 多裝置同 Apple ID 同步實測。
