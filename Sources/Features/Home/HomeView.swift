@@ -139,10 +139,14 @@ private extension HomeView {
                     }
                     .tint(.green)
                 }
+                // 刻意不用 role: .destructive：destructive 會讓 SwiftUI 一點擊就自動移除 row，
+                // 但本操作需先跳確認 alert（真正刪除由 deleteConfirmed 觸發 manager.delete + reload）。
+                // 改用 .tint(.red) 保留紅色。allowsFullSwipe 維持 true 與 leading 一致。見 issue #1。
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button(role: .destructive) { send(.deleteDidTap(item)) } label: {
+                    Button { send(.deleteDidTap(item)) } label: {
                         Label("刪除", systemImage: "trash")
                     }
+                    .tint(.red)
                 }
                 .contextMenu {
                     Button { send(.extendDidTap(item)) } label: { Label("延長效期", systemImage: "calendar") }
