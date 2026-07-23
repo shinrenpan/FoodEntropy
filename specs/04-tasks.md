@@ -113,7 +113,7 @@
 - [x] `adsRemoved` 由 entitlement 驅動：`StoreManager` 為單一真相，`HomeViewModel.reload` 帶入、`AdSlotView` 依此隱藏。
 - [x] 設定頁購買 / 還原 UI（價格、進行中停用、已購買態、失敗 alert）。
 - [x] 測試：VM 注入 `StoreManager(adsRemoved:)` 驗證反映與 guard（48 測試全綠）。
-- [ ] **上架前**：App Store Connect 建立非消耗型 IAP 產品 `com.shinrenpan.FoodEntropy.removeads`（含在地化名稱/價格），並與 App 版本一起送審。
+- [x] App Store Connect 建立非消耗型 IAP 產品 `com.shinrenpan.FoodEntropy.removeads`（**經 ASC API**）：中英在地化、$1.99（USA base 自動換算）、審核截圖、全 175 區可用 → 狀態 **READY_TO_SUBMIT**，隨 App 版本送審。
 - [ ] 沙盒 / TestFlight 實測購買與還原（Xcode Run 用本機 .storekit 先驗流程）。
 
 ## Phase 9 — 廣告（`Spec` Production §2、`01-navigation` §2）— ✅ v1.0.0 納入
