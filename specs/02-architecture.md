@@ -145,17 +145,14 @@ daysUntil = Calendar.dateComponents([.day], from: 今天起始, to: 到期日起
 
 ## 7. IAP 移除廣告
 
-> **v1.0.0 廣告已接（§9），但 IAP 購買邏輯仍延後（里程碑 2）**。v1 僅：
-> - 保留設定的「移除廣告 / 還原購買」**UI**（互動 stub，不真的走 StoreKit）。
-> - 保留 `adsRemoved` state（v1 寫死 `false`），`AdSlotView` 的「持有即隱藏」邏輯已接好，待 IAP 上線後由 entitlement 驅動即可生效。
->
-> 以下為未來接上時的完整設計：
+> **v1.0.0 已實作**（廣告接入後移除廣告才有意義，提前納入）。實作層：`StoreManager`（Core）→ 注入 Home / Settings ViewModel。
+> 產品 ID：`com.shinrenpan.FoodEntropy.removeads`（非消耗型）。本機測試用 `FoodEntropy.storekit`（掛 scheme，不進 bundle）。
 
 - **StoreKit 2**，一次性（非消耗型）購買。
-- **購買狀態來源：`Transaction.currentEntitlements`**，不自存旗標。App 啟動 / 進前景時查詢是否持有「移除廣告」entitlement。
+- **購買狀態來源：`Transaction.currentEntitlements`**，不自存旗標。App 啟動時 `StoreManager.start()` 對帳是否持有「移除廣告」entitlement。
   - 換裝置只要同一 Apple ID，StoreKit 自動認得，無需手動 Restore 即可還原。
-- 設定仍保留「**還原購買（Restore）**」按鈕（Apple 審核慣例），正常情況免手動。
-- 持有 entitlement → 首頁廣告 section 隱藏（呼應 `01-navigation`）。
+- 設定保留「**還原購買（Restore）**」按鈕（Apple 審核慣例），正常情況免手動。
+- **`adsRemoved` 單一真相在 `StoreManager`**：`HomeViewModel.reload` 帶入 state、`AdSlotView` 依此隱藏；`SettingsViewModel` 顯示價格 / 已購買態。
 - 監聽 `Transaction.updates` 以即時反映購買 / 退款。
 
 ## 8. 通知（Local Notification）

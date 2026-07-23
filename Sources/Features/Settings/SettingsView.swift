@@ -7,7 +7,12 @@ struct SettingsView: View {
         @Bindable var bVM = viewModel
 
         List {
-            PurchaseSection(send: handlePurchaseAction)
+            PurchaseSection(
+                adsRemoved: viewModel.state.adsRemoved,
+                priceText: viewModel.state.removeAdsPriceText,
+                inFlight: viewModel.state.purchaseInFlight,
+                send: handlePurchaseAction
+            )
 
             SyncSection(
                 iCloudOn: viewModel.state.iCloudSyncEnabled,
@@ -28,10 +33,10 @@ struct SettingsView: View {
         } message: {
             Text("iCloud 同步將於下次開啟 App 後生效。")
         }
-        .alert("即將推出", isPresented: $bVM.state.showComingSoon) {
+        .alert("購買失敗", isPresented: $bVM.state.showPurchaseError) {
             Button("好") {}
         } message: {
-            Text("廣告與購買功能上線後開放。")
+            Text("購買未能完成，請稍後再試。")
         }
     }
 
@@ -72,14 +77,42 @@ private extension SettingsView {
             case restoreDidTap
         }
 
+        let adsRemoved: Bool
+        let priceText: String
+        let inFlight: Bool
         let send: (Action) -> Void
 
         var body: some View {
             Section {
-                Button("移除廣告") { send(.removeAdsDidTap) }
-                Button("還原購買") { send(.restoreDidTap) }
+                if adsRemoved {
+                    HStack {
+                        Text("移除廣告")
+                        Spacer()
+                        Label("已購買", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .labelStyle(.titleAndIcon)
+                    }
+                } else {
+                    Button {
+                        send(.removeAdsDidTap)
+                    } label: {
+                        HStack {
+                            Text("移除廣告")
+                            Spacer()
+                            if inFlight {
+                                ProgressView()
+                            } else if !priceText.isEmpty {
+                                Text(priceText).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .disabled(inFlight)
+
+                    Button("還原購買") { send(.restoreDidTap) }
+                        .disabled(inFlight)
+                }
             } footer: {
-                Text("廣告功能上線後開放。")
+                Text(adsRemoved ? "感謝支持，首頁廣告已移除。" : "一次性購買，永久移除首頁橫幅廣告。")
             }
         }
     }
@@ -152,6 +185,6 @@ private extension SettingsView {
 
 #if DEBUG
 #Preview {
-    SettingsView(viewModel: SettingsViewModel())
+    SettingsView(viewModel: SettingsViewModel(store: StoreManager()))
 }
 #endif

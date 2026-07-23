@@ -8,6 +8,11 @@ extension SettingsViewModel {
         var notificationStatus: NotificationAuthStatus = .notDetermined
         var versionText: String = ""
         var showRestartNotice: Bool = false        // iCloud 切換後提示
-        var showComingSoon: Bool = false           // 移除廣告 / 還原購買 stub 提示
+
+        // IAP 移除廣告
+        var adsRemoved: Bool = false               // 是否已購買移除廣告
+        var removeAdsPriceText: String = ""        // 商品價格（StoreKit displayPrice，載入後才有）
+        var purchaseInFlight: Bool = false         // 購買 / 還原進行中（停用按鈕）
+        var showPurchaseError: Bool = false        // 購買失敗提示
     }
 }

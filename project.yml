@@ -99,3 +99,22 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.shinrenpan.FoodEntropyTests
         GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  FoodEntropy:
+    build:
+      targets:
+        FoodEntropy: all
+    run:
+      config: Debug
+      storeKitConfiguration: FoodEntropy.storekit   # 本機沙盒測試 IAP（不進 app bundle）
+    test:
+      config: Debug
+      targets:
+        - FoodEntropyTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

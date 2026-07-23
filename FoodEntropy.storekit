@@ -1,0 +1,30 @@
+{
+  "identifier" : "F00DE47C",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "10000001",
+      "localizations" : [
+        {
+          "description" : "永久移除首頁橫幅廣告，並支持開發者。",
+          "displayName" : "移除廣告",
+          "locale" : "zh_TW"
+        }
+      ],
+      "productID" : "com.shinrenpan.FoodEntropy.removeads",
+      "referenceName" : "Remove Ads",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6793926521",
+    "_developerTeamID" : "VZWPMD258L"
+  },
+  "subscriptionGroups" : [],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

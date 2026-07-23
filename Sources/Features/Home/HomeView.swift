@@ -246,10 +246,10 @@ private extension HomeView {
             imageData: mock.imageData
         )
     }
-    return HomeView(viewModel: HomeViewModel(manager: manager))
+    return HomeView(viewModel: HomeViewModel(manager: manager, store: StoreManager()))
 }
 
 #Preview("空狀態") {
-    HomeView(viewModel: HomeViewModel(manager: try! SwiftDataManager(inMemory: true)))
+    HomeView(viewModel: HomeViewModel(manager: try! SwiftDataManager(inMemory: true), store: StoreManager()))
 }
 #endif

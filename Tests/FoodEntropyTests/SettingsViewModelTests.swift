@@ -4,9 +4,17 @@ import Testing
 
 @MainActor
 struct SettingsViewModelTests {
-    private func makeVM() -> (SettingsViewModel, UserDefaults) {
+    private func makeVM(adsRemoved: Bool = false) -> (SettingsViewModel, UserDefaults) {
         let defaults = UserDefaults(suiteName: "test.\(UUID().uuidString)")!
-        return (SettingsViewModel(defaults: defaults), defaults)
+        let vm = SettingsViewModel(store: StoreManager(adsRemoved: adsRemoved), defaults: defaults)
+        return (vm, defaults)
+    }
+
+    @Test
+    func `onAppear 反映已購買移除廣告`() async {
+        let (vm, _) = makeVM(adsRemoved: true)
+        await vm.doAction(.view(.onAppear))
+        #expect(vm.state.adsRemoved == true)
     }
 
     @Test
@@ -28,16 +36,11 @@ struct SettingsViewModelTests {
     }
 
     @Test
-    func `移除廣告顯示即將推出`() async {
-        let (vm, _) = makeVM()
-        await vm.doAction(.view(.removeAdsDidTap))
-        #expect(vm.state.showComingSoon == true)
-    }
-
-    @Test
-    func `還原購買顯示即將推出`() async {
-        let (vm, _) = makeVM()
-        await vm.doAction(.view(.restoreDidTap))
-        #expect(vm.state.showComingSoon == true)
+    func `已購買移除廣告時再點購買不重複觸發`() async {
+        let (vm, _) = makeVM(adsRemoved: true)
+        await vm.doAction(.view(.onAppear))
+        await vm.doAction(.view(.removeAdsDidTap))   // 已持有 → guard 擋下
+        #expect(vm.state.adsRemoved == true)
+        #expect(vm.state.purchaseInFlight == false)
     }
 }

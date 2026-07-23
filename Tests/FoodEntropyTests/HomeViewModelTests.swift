@@ -4,13 +4,31 @@ import Testing
 
 @MainActor
 struct HomeViewModelTests {
-    private func makeVM() throws -> (HomeViewModel, SwiftDataManager) {
+    private func makeVM(adsRemoved: Bool = false) throws -> (HomeViewModel, SwiftDataManager) {
         let manager = try SwiftDataManager(inMemory: true)
-        let vm = HomeViewModel(manager: manager, notifications: NotificationService(active: false))
+        let vm = HomeViewModel(
+            manager: manager,
+            store: StoreManager(adsRemoved: adsRemoved),
+            notifications: NotificationService(active: false)
+        )
         return (vm, manager)
     }
 
     private let d0 = Date(timeIntervalSince1970: 1_700_000_000)
+
+    @Test
+    func `onAppear 時持有移除廣告則 adsRemoved 為 true`() async throws {
+        let (vm, _) = try makeVM(adsRemoved: true)
+        await vm.doAction(.view(.onAppear))
+        #expect(vm.state.adsRemoved == true)
+    }
+
+    @Test
+    func `未購買移除廣告時 adsRemoved 為 false`() async throws {
+        let (vm, _) = try makeVM(adsRemoved: false)
+        await vm.doAction(.view(.onAppear))
+        #expect(vm.state.adsRemoved == false)
+    }
 
     @Test
     func `dataResponse foodsLoaded 更新 items`() async throws {

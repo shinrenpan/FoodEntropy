@@ -7,9 +7,9 @@ final class HomeHostController: UIHostingController<HomeView> {
     private let viewModel: HomeViewModel
     private let manager: SwiftDataManager
 
-    init(manager: SwiftDataManager) {
+    init(manager: SwiftDataManager, store: StoreManager) {
         self.manager = manager
-        self.viewModel = HomeViewModel(manager: manager)
+        self.viewModel = HomeViewModel(manager: manager, store: store)
         super.init(rootView: HomeView(viewModel: viewModel))
     }
 

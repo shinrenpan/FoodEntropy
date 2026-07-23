@@ -104,14 +104,17 @@
 - [x] 補排時機：`SceneDelegate.sceneDidBecomeActive` 對帳（處理跨日 / 上限 / 外部變動）。
 - [x] 測試：VM 注入 `NotificationService(active: false)` 保持乾淨；37 測試全綠。
 
-## Phase 8 — IAP 移除廣告（`02-architecture` §7）— ⏸ 延後（里程碑 2）
+## Phase 8 — IAP 移除廣告（`02-architecture` §7）— ✅ v1.0.0 納入
 
-> v1 不做；設定 UI 已 stub（Phase 6）、`adsRemoved` 已寫死 false（Phase 3）。
+> 廣告接入後「移除廣告」有實際意義，提前納入 1.0.0。
 
-- [ ] StoreKit 2 產品設定（非消耗型）+ StoreKit config 檔（本地測試）。
-- [ ] entitlement 查詢（`currentEntitlements`）+ `Transaction.updates` 監聽。
-- [ ] 購買 / 還原流程 + 錯誤處理。
-- [ ] `adsRemoved` 改由 entitlement 驅動（取代寫死值）。
+- [x] `StoreManager`（@MainActor）：`Product.products` 載入、`currentEntitlements` 對帳、`Transaction.updates` 監聽、`purchaseRemoveAds` / `restore`。
+- [x] `FoodEntropy.storekit` 本機測試設定檔（掛在 scheme `run.storeKitConfiguration`，不進 app bundle）。
+- [x] `adsRemoved` 由 entitlement 驅動：`StoreManager` 為單一真相，`HomeViewModel.reload` 帶入、`AdSlotView` 依此隱藏。
+- [x] 設定頁購買 / 還原 UI（價格、進行中停用、已購買態、失敗 alert）。
+- [x] 測試：VM 注入 `StoreManager(adsRemoved:)` 驗證反映與 guard（48 測試全綠）。
+- [ ] **上架前**：App Store Connect 建立非消耗型 IAP 產品 `com.shinrenpan.FoodEntropy.removeads`（含在地化名稱/價格），並與 App 版本一起送審。
+- [ ] 沙盒 / TestFlight 實測購買與還原（Xcode Run 用本機 .storekit 先驗流程）。
 
 ## Phase 9 — 廣告（`Spec` Production §2、`01-navigation` §2）— ✅ v1.0.0 納入
 

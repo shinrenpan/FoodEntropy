@@ -16,12 +16,20 @@ final class SettingsViewModel {
     private let notifications: NotificationService
 
     @ObservationIgnored
+    private let store: StoreManager
+
+    @ObservationIgnored
     var onRoute: (@MainActor (Router) -> Void)?
 
     // 隱私權政策頁（GitHub Pages，中英雙語）；同一 URL 亦填入 App Store Connect。
     static let privacyPolicyURL = URL(string: "https://shinrenpan.github.io/FoodEntropy/privacy")!
 
-    init(defaults: UserDefaults = .standard, notifications: NotificationService = .shared) {
+    init(
+        store: StoreManager,
+        defaults: UserDefaults = .standard,
+        notifications: NotificationService = .shared
+    ) {
+        self.store = store
         self.defaults = defaults
         self.notifications = notifications
     }
@@ -38,8 +46,8 @@ final class SettingsViewModel {
 extension SettingsViewModel {
     enum ViewAction: Sendable {
         case onAppear
-        case removeAdsDidTap       // v1 stub（IAP 延後）
-        case restoreDidTap         // v1 stub
+        case removeAdsDidTap       // 購買移除廣告
+        case restoreDidTap         // 還原購買
         case iCloudSyncToggled(Bool)
         case notificationDidTap
         case privacyPolicyDidTap
@@ -51,9 +59,26 @@ extension SettingsViewModel {
             state.iCloudSyncEnabled = defaults.bool(forKey: AppPreferenceKey.iCloudSyncEnabled)
             state.versionText = Self.appVersionText
             state.notificationStatus = await notifications.authorizationStatus()
+            state.adsRemoved = store.adsRemoved
+            state.removeAdsPriceText = store.removeAdsProduct?.displayPrice ?? ""
 
-        case .removeAdsDidTap, .restoreDidTap:
-            state.showComingSoon = true   // 廣告 / IAP 上線後開放
+        case .removeAdsDidTap:
+            guard !state.adsRemoved, !state.purchaseInFlight else { return }
+            state.purchaseInFlight = true
+            do {
+                _ = try await store.purchaseRemoveAds()
+            } catch {
+                state.showPurchaseError = true
+            }
+            state.adsRemoved = store.adsRemoved   // 以 entitlement 為準（含使用者取消 → 維持 false）
+            state.purchaseInFlight = false
+
+        case .restoreDidTap:
+            guard !state.purchaseInFlight else { return }
+            state.purchaseInFlight = true
+            await store.restore()
+            state.adsRemoved = store.adsRemoved
+            state.purchaseInFlight = false
 
         case let .iCloudSyncToggled(isOn):
             defaults.set(isOn, forKey: AppPreferenceKey.iCloudSyncEnabled)

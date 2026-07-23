@@ -17,10 +17,18 @@ final class HomeViewModel {
     private let notifications: NotificationService
 
     @ObservationIgnored
+    private let store: StoreManager
+
+    @ObservationIgnored
     var onRoute: (@MainActor (Router) -> Void)?
 
-    init(manager: SwiftDataManager, notifications: NotificationService = .shared) {
+    init(
+        manager: SwiftDataManager,
+        store: StoreManager,
+        notifications: NotificationService = .shared
+    ) {
         self.manager = manager
+        self.store = store
         self.notifications = notifications
     }
 
@@ -104,6 +112,7 @@ extension HomeViewModel {
 
     private func reload() async {
         let foods = manager.fetchActiveFoods()
+        state.adsRemoved = store.adsRemoved   // 持有移除廣告 entitlement 時隱藏 AdSlotView
         await doAction(.dataResponse(.foodsLoaded(foods)))
     }
 

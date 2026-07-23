@@ -11,6 +11,9 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // 持有 manager 供前景時對帳通知排程。
     private var manager: SwiftDataManager?
 
+    // 持有 store 供 IAP entitlement 對帳與交易更新監聽（單一真相來源）。
+    private var store: StoreManager?
+
     func scene(
         _ scene: UIScene,
         willConnectTo session: UISceneSession,
@@ -21,9 +24,13 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let manager = makeManager()
         self.manager = manager
 
+        let store = StoreManager()
+        self.store = store
+        Task { await store.start() }   // 載入商品 + 對帳 entitlement + 監聽交易更新
+
         let window = UIWindow(windowScene: windowScene)
         window.backgroundColor = .systemBackground   // 防止自訂轉場期間露出黑底
-        window.rootViewController = makeRootTabBarController(manager: manager)
+        window.rootViewController = makeRootTabBarController(manager: manager, store: store)
         window.makeKeyAndVisible()
         self.window = window
 
@@ -62,18 +69,18 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // MARK: - 導航裝配（Phase 2）
 
     // 三 Tab 裝配。
-    private func makeRootTabBarController(manager: SwiftDataManager) -> UITabBarController {
+    private func makeRootTabBarController(manager: SwiftDataManager, store: StoreManager) -> UITabBarController {
         let homeTitle = String(localized: "首頁")
         let analyticsTitle = String(localized: "分析")
         let settingsTitle = String(localized: "設定")
 
-        let home = HomeHostController(manager: manager)
+        let home = HomeHostController(manager: manager, store: store)
         home.navigationItem.title = homeTitle
 
         let analytics = AnalyticsHostController(manager: manager)
         analytics.navigationItem.title = analyticsTitle
 
-        let settings = SettingsHostController()
+        let settings = SettingsHostController(store: store)
         settings.navigationItem.title = settingsTitle
 
         let tabBarController = UITabBarController()
