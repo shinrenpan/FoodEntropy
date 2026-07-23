@@ -19,6 +19,12 @@ final class SwiftDataManager {
         if inMemory {
             configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         } else {
+            // 首次啟動時 Application Support 目錄尚不存在，CoreData 會先報錯再自行復原
+            // （產生一大串嚇人的 log）。預先建立可消除該噪音、也更穩健。
+            try? FileManager.default.createDirectory(
+                at: URL.applicationSupportDirectory,
+                withIntermediateDirectories: true
+            )
             configuration = ModelConfiguration(
                 cloudKitDatabase: cloudKitEnabled ? .automatic : .none
             )
