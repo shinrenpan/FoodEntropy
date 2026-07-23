@@ -13,7 +13,7 @@ settings:
     SWIFT_VERSION: "6.0"                 # Swift 6 語言模式（strict concurrency 內建）
     SWIFT_STRICT_CONCURRENCY: complete   # 明示 strict（00-constitution）
     TARGETED_DEVICE_FAMILY: "1"          # iPhone only
-    MARKETING_VERSION: "0.4.0"
+    MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_TEAM: "VZWPMD258L"       # Apple Developer Team ID（非機密）
     CODE_SIGN_STYLE: Automatic
