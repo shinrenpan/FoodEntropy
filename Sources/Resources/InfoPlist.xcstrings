@@ -2,7 +2,7 @@
   "sourceLanguage" : "zh-Hant",
   "strings" : {
     "CFBundleDisplayName" : {
-      "extractionState" : "manual",
+      "comment" : "Bundle display name",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -14,6 +14,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "食熵"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FoodEntropy"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FoodEntropy"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "comment" : "Privacy - Camera Usage Description",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FoodEntropy needs camera access to take photos of your food items."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要相機權限，用來拍攝食材照片。"
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryUsageDescription" : {
+      "comment" : "Privacy - Photo Library Usage Description",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FoodEntropy needs photo library access to choose photos for your food items."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要相簿權限，用來選擇食材照片。"
           }
         }
       }
