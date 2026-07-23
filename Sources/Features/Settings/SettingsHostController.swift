@@ -28,8 +28,9 @@ final class SettingsHostController: UIHostingController<SettingsView> {
 private extension SettingsHostController {
     func handleRouter(_ router: SettingsViewModel.Router) {
         switch router {
-        case .openSystemSettings:
-            guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        case .openNotificationSettings:
+            // iOS 16+ 深連到本 App 的「通知」設定子頁（模擬器可能只跳 Settings 首頁，真機才精準）。
+            guard let url = URL(string: UIApplication.openNotificationSettingsURLString) else { return }
             UIApplication.shared.open(url)   // 離開 App 到系統設定，非 App 內導航
 
         case let .openPrivacyPolicy(url):
