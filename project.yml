@@ -60,6 +60,8 @@ targets:
         CFBundleDisplayName: 食熵
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        # 僅用標準 HTTPS（AdMob / CloudKit）等豁免加密 → 免每次上傳被問匯出合規。
+        ITSAppUsesNonExemptEncryption: false
         CFBundleLocalizations:                # v1 支援語言（繁中 + 英文）
           - zh-Hant
           - en
