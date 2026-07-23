@@ -146,8 +146,9 @@
 ## Phase 11 — 合規與韌性（`Spec` Production §3 §4 §5）
 
 - [x] 隱私權政策網頁（GitHub Pages，中英雙語，`docs/privacy/`）→ https://shinrenpan.github.io/FoodEntropy/privacy ；App 內設定已連結。上架前將同一 URL 填入 App Store Connect。（接廣告後需補廣告條款）
-- [ ] App Privacy 標籤（相機 / 相簿 / 通知 / 廣告識別）。
-- [ ] Info.plist 權限描述字串（相機 / 相簿 / 通知 / ATT）。
+- [x] **Privacy Manifest**（`PrivacyInfo.xcprivacy`）：`NSPrivacyTracking=false`、無追蹤網域、第一方無收集；required-reason API 僅 UserDefaults（`CA92.1`）。AdMob / UMP 各自帶自身 manifest。已驗證打包進 bundle 根。
+- [ ] App Privacy 標籤（ASC 網頁問卷，**無 API**）：需含 AdMob 收集項（裝置識別碼／用途：第三方廣告）。待逐項答案表 → 手動填。
+- [ ] Info.plist 權限描述字串（相機 / 相簿 / 通知）：ATT 不需（非個人化、不追蹤）。
 - [ ] 空狀態、通知被拒引導、圖片載入失敗等錯誤處理。
 - [ ] Crash：確認 Xcode Organizer 收得到（不接第三方 SDK）。
 - [ ] **無障礙驗收**（`00-constitution` 品質基準）：Dynamic Type 不破版、VoiceOver 標籤、深色模式、Reduce Motion。

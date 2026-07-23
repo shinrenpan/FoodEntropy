@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- 不進行追蹤：非個人化廣告、不存取 IDFA、不跳 ATT（02-architecture §9） -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+
+    <!-- 無追蹤網域（AdMob 以其自身的 PrivacyInfo.xcprivacy 宣告其網域） -->
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+    <!-- 第一方程式碼不對外收集資料；AdMob 收集項由其套件內建 manifest 申報 -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+
+    <!-- Required-reason API：僅用 UserDefaults 讀寫本 App 自身偏好（iCloud 同步開關） -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
