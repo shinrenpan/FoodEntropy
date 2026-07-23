@@ -18,7 +18,7 @@ final class SettingsViewModel {
     @ObservationIgnored
     var onRoute: (@MainActor (Router) -> Void)?
 
-    // TODO: Phase 11 — 換成正式託管的隱私權政策頁面 URL。
+    // 隱私權政策頁（GitHub Pages，中英雙語）；同一 URL 亦填入 App Store Connect。
     static let privacyPolicyURL = URL(string: "https://shinrenpan.github.io/FoodEntropy/privacy")!
 
     init(defaults: UserDefaults = .standard, notifications: NotificationService = .shared) {

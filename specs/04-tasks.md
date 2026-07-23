@@ -131,7 +131,7 @@
 
 ## Phase 11 — 合規與韌性（`Spec` Production §3 §4 §5）
 
-- [ ] 隱私權政策網頁（GitHub Pages / 靜態頁）+ 填入 App Store Connect URL。
+- [x] 隱私權政策網頁（GitHub Pages，中英雙語，`docs/privacy/`）→ https://shinrenpan.github.io/FoodEntropy/privacy ；App 內設定已連結。上架前將同一 URL 填入 App Store Connect。（接廣告後需補廣告條款）
 - [ ] App Privacy 標籤（相機 / 相簿 / 通知 / 廣告識別）。
 - [ ] Info.plist 權限描述字串（相機 / 相簿 / 通知 / ATT）。
 - [ ] 空狀態、通知被拒引導、圖片載入失敗等錯誤處理。
