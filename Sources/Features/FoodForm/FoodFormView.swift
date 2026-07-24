@@ -46,6 +46,18 @@ struct FoodFormView: View {
                     }
                     Button("取消", role: .cancel) {}
                 }
+
+                // 已有照片時，下方 load 大圖預覽（完整顯示、不裁切）。
+                if let data = viewModel.state.imageData, let uiImage = UIImage(data: data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .frame(maxHeight: 260)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 8, trailing: 12))
+                        .accessibilityLabel("食材照片")
+                }
             }
         }
         .navigationTitle(viewModel.navigationTitle)
