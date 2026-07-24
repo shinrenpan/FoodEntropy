@@ -30,12 +30,14 @@ struct HomeViewModelTests {
         #expect(vm.state.adsRemoved == false)
     }
 
+    // FoodItem.mocks 效期偏移：-2（expired）/ 0、+3（nearExpiry）/ +10（fresh）
     @Test
-    func `dataResponse foodsLoaded 更新 items`() async throws {
+    func `dataResponse loaded 依效期分三桶`() async throws {
         let (vm, _) = try makeVM()
-        let foods = FoodItem.mocks
-        await vm.doAction(.dataResponse(.foodsLoaded(foods)))
-        #expect(vm.state.items == foods)
+        await vm.doAction(.dataResponse(.loaded(active: FoodItem.mocks, resolved: [])))
+        #expect(vm.state.expired.count == 1)
+        #expect(vm.state.nearExpiry.count == 2)
+        #expect(vm.state.fresh.count == 1)
     }
 
     @Test
@@ -45,6 +47,38 @@ struct HomeViewModelTests {
         await vm.doAction(.view(.onAppear))
         #expect(vm.state.items.count == 1)
         #expect(vm.state.items.first?.name == "牛奶")
+    }
+
+    @Test
+    func `loaded 計算浪費統計`() async throws {
+        let (vm, manager) = try makeVM()
+        let a = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let b = manager.create(name: "B", purchaseDate: d0, expiryDate: d0)
+        let c = manager.create(name: "C", purchaseDate: d0, expiryDate: d0)
+        manager.markConsumed(id: a.id)
+        manager.markConsumed(id: b.id)
+        manager.markWasted(id: c.id)
+        await vm.doAction(.dataResponse(.loaded(active: [], resolved: manager.fetchResolvedFoods())))
+        #expect(vm.state.consumedCount == 2)
+        #expect(vm.state.wastedCount == 1)
+        #expect(vm.state.hasHistory == true)
+    }
+
+    @Test
+    func `清除歷史統計刪除已處理並歸零`() async throws {
+        let (vm, manager) = try makeVM()
+        let a = manager.create(name: "吃了", purchaseDate: d0, expiryDate: d0)
+        manager.markConsumed(id: a.id)
+        await vm.doAction(.view(.onAppear))
+        #expect(vm.state.hasHistory == true)
+
+        await vm.doAction(.view(.clearHistoryDidTap))
+        #expect(vm.state.showClearHistoryConfirm == true)
+        await vm.doAction(.view(.clearHistoryConfirmed))
+        #expect(vm.state.showClearHistoryConfirm == false)
+        #expect(vm.state.hasHistory == false)
+        #expect(vm.state.consumedCount == 0)
+        #expect(manager.fetchResolvedFoods().isEmpty)
     }
 
     @Test

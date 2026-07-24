@@ -8,6 +8,8 @@ final class HomeViewModel {
         case dataResponse(DataResponse)
     }
 
+    static let wasteWindowDays = 30   // 浪費率統計視窗
+
     var state: State = .init()
 
     @ObservationIgnored
@@ -55,6 +57,8 @@ extension HomeViewModel {
         case extendDidTap(FoodItem)        // 顯示延長 date picker
         case extendCommitted(Date)
         case extendCancelled
+        case clearHistoryDidTap            // 清除歷史統計 → 顯示確認
+        case clearHistoryConfirmed
     }
 
     private func handleViewAction(_ action: ViewAction) async {
@@ -107,16 +111,25 @@ extension HomeViewModel {
 
         case .extendCancelled:
             state.extendingItem = nil
+
+        case .clearHistoryDidTap:
+            state.showClearHistoryConfirm = true
+
+        case .clearHistoryConfirmed:
+            manager.deleteResolvedFoods()
+            state.showClearHistoryConfirm = false
+            await reload()   // 統計歸零、清除鈕收起
         }
     }
 
     private func reload() async {
-        let foods = manager.fetchActiveFoods()
+        let active = manager.fetchActiveFoods()
+        let resolved = manager.fetchResolvedFoods()
         state.adsRemoved = store.adsRemoved   // 持有移除廣告 entitlement 時隱藏 AdSlotView
-        await doAction(.dataResponse(.foodsLoaded(foods)))
+        await doAction(.dataResponse(.loaded(active: active, resolved: resolved)))
     }
 
-    // 資料變動後：重載清單 + 以當前 active 重建通知排程（DEBUG 用 10 秒立即驗證）。
+    // 資料變動後：重載 + 以當前 active 重建通知排程（DEBUG 用 10 秒立即驗證）。
     private func reloadAndReschedule() async {
         await reload()
         await notifications.reconcile(activeFoods: state.items, immediateTestFire: true)
@@ -136,13 +149,23 @@ extension HomeViewModel {
 
 extension HomeViewModel {
     enum DataResponse: Sendable {
-        case foodsLoaded([FoodItem])
+        case loaded(active: [FoodItem], resolved: [FoodItem])
     }
 
     private func handleDataResponse(_ response: DataResponse) async {
         switch response {
-        case let .foodsLoaded(foods):
-            state.items = foods
+        case let .loaded(active, resolved):
+            // 現況：依效期狀態分三桶（active 已依到期日升冪，桶內順序天然正確）。
+            state.expired = active.filter { $0.expiryStatus() == .expired }
+            state.nearExpiry = active.filter { $0.expiryStatus() == .nearExpiry }
+            state.fresh = active.filter { $0.expiryStatus() == .fresh }
+            // 歷史統計：只計「近 30 天」內處理的（滾動視窗，舊資料自然不影響）。
+            let cutoff = Calendar.current.date(byAdding: .day, value: -Self.wasteWindowDays, to: .now) ?? .distantPast
+            let windowed = resolved.filter { ($0.resolvedAt ?? .distantPast) >= cutoff }
+            state.consumedCount = windowed.filter { $0.status == .consumed }.count
+            state.wastedCount = windowed.filter { $0.status == .wasted }.count
+            // all-time：只要有任何已處理紀錄就露出清除鈕（含 30 天視窗外的舊資料）。
+            state.hasHistory = !resolved.isEmpty
         }
     }
 }

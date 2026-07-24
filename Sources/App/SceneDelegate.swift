@@ -78,17 +78,13 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // MARK: - 導航裝配（Phase 2）
 
-    // 三 Tab 裝配。
+    // 兩 Tab 裝配（首頁併入分析，見 03-screens）。
     private func makeRootTabBarController(manager: SwiftDataManager, store: StoreManager) -> UITabBarController {
         let homeTitle = String(localized: "首頁")
-        let analyticsTitle = String(localized: "分析")
         let settingsTitle = String(localized: "設定")
 
         let home = HomeHostController(manager: manager, store: store)
         home.navigationItem.title = homeTitle
-
-        let analytics = AnalyticsHostController(manager: manager)
-        analytics.navigationItem.title = analyticsTitle
 
         let settings = SettingsHostController(store: store)
         settings.navigationItem.title = settingsTitle
@@ -96,7 +92,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
             wrapInTab(home, title: homeTitle, systemImage: "list.bullet"),
-            wrapInTab(analytics, title: analyticsTitle, systemImage: "chart.bar"),
             wrapInTab(settings, title: settingsTitle, systemImage: "gearshape"),
         ]
         #if DEBUG
