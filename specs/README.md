@@ -33,8 +33,8 @@ Spec.md（產品規格）
 | 01 | `01-navigation.md` | 導航結構 / Tab / 畫面清單 | ✅ 定案 |
 | 02 | `02-architecture.md` | 技術架構 / 資料模型 | ✅ 定案 |
 | 03 | `03-screens/form.md` | 食材 Form（新增/編輯） | ✅ 定案 |
-| 03 | `03-screens/home.md` | 首頁（清單/廣告/FAB） | ✅ 定案 |
-| 03 | `03-screens/analytics.md` | 分析（唯讀分桶） | ✅ 定案 |
+| 03 | `03-screens/home.md` | 首頁（統計 + 分桶清單，單頁；已併入分析） | ✅ 定案 |
+| 03 | `03-screens/analytics.md` | 分析（🗄️ v1.0.0 已併入首頁） | 🗄️ 已合併 |
 | 03 | `03-screens/settings.md` | 設定 | ✅ 定案 |
 | 04 | `04-tasks.md` | 實作任務拆解 | ✅ 定案 |
 

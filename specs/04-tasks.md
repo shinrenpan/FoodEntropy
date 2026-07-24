@@ -73,7 +73,11 @@
 - [x] ViewModel 測試（12 個）。
 - [x] 模擬器實跑：seed mock 驗證清單/FoodRow 狀態色與排序正確（DEBUG `SEED_MOCKS` env hook）。
 
-## Phase 5 — 分析（`03-screens/analytics.md`）
+## Phase 5 — 分析（🗄️ v1.0.0 已併入首頁，見 `03-screens/home.md`）
+
+> 後續決策：分析頁分桶清單與首頁雷同 → 併為單頁。現況圖表 + 浪費統計搬到首頁頂部，
+> 分桶清單改用首頁互動 row，移除 Analytics View/VM/HostController。下方為原分析頁任務紀錄。
+
 
 - [x] `AnalyticsViewModel`：三桶 State（expired/nearExpiry/fresh）、onAppear 分桶（`dataResponse` 注入）。
 - [x] `AnalyticsView`：急→緩三 Section（header 桶名+數量、空桶顯示 0 項）、唯讀 row。

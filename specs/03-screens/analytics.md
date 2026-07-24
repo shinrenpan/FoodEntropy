@@ -1,10 +1,14 @@
-# 03 · 分析（唯讀總覽）
+# 03 · 分析（⚠️ 已於 v1.0.0 併入首頁）
 
-> 狀態：✅ 定案
-> 上游：`../01-navigation.md`（§3）、`../02-architecture.md`
-> 對應：`AnalyticsView` + `AnalyticsViewModel`（@Observable @MainActor）
+> 狀態：🗄️ **已合併進 `home.md`**（原獨立分頁移除）
+> 原因：分析頁的分桶清單與首頁食材雷同（兩頁重複）。改為單頁——現況甜甜圈 +
+> 浪費統計併到首頁頂部，分桶清單改用首頁互動 row。`AnalyticsView/ViewModel/
+> HostController` 已刪除，內容併入 `HomeView/HomeViewModel`。
+> **本文件僅保留為設計脈絡參考，實作以 `home.md` 為準。**
 
-現存食材依效期狀態分桶的**唯讀**總覽。不可滑動、不可編輯、無 FAB、無點擊操作。
+---
+
+現存食材依效期狀態分桶的總覽。以下為原分析頁設計（現況圖表 + 浪費統計的規格仍適用，已搬到首頁）。
 
 ---
 

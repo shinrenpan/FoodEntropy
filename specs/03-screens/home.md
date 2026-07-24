@@ -1,32 +1,34 @@
-# 03 · 首頁（食材清單）
+# 03 · 首頁（統計 + 食材清單，單頁）
 
-> 狀態：✅ 定案
+> 狀態：✅ 定案（v1.0.0 合併分析頁）
 > 上游：`../01-navigation.md`（§2）、`../02-architecture.md`
 > 對應：`HomeView` + `HomeViewModel`（@Observable @MainActor）
 
-App 主畫面，管理食材：瀏覽、新增、滑動 / 長按操作。
+App **唯一的清單頁**，兼「現況統計」與「管理食材」。原「分析」分頁已併入本頁（見 `analytics.md` 說明）：頂部放現況甜甜圈 + 浪費統計，下方分桶清單改用互動 row。
 
 ---
 
 ## 資料來源與排序
 
-- **只顯示 `active`** 食材（`consumed` / `wasted` / 已刪除皆不列）。
-- **排序：到期日升冪**（越早到期越前）；已過期者 `daysUntil` 為負，故排在最上方（最需處理者最顯眼）。
-- 同到期日 → 次序以 `createdAt` 升冪（暫定，可調）。
+- **active 食材**：依 `ExpiryStatus` 分三桶（已過期未處理 / 3 天內 / 保存期限內），桶內依**到期日升冪**、次序 `createdAt` 升冪。
+- **已處理（consumed/wasted）**：僅供浪費統計彙總（近 30 天視窗），不列於清單。
 
 ---
 
 ## 版面（由上而下）
 
-1. **廣告 section = `AdSlotView`**（固定最上方，單一則）
-   - **v1.0.0**：AdMob 非個人化 banner（`BannerAdView`，`AdSizeBanner` 320x50），與食材 row 視覺明顯區隔、右上標「廣告」（`02-architecture` §9）。
-   - **`adsRemoved` 為 true 時隱藏**（v1 寫死 false；未來由 IAP entitlement 驅動，見 `02-architecture` §7）。
-2. **食材清單**（rows）
-3. **FAB**（浮於清單下方）→ 點擊 push `FoodFormView(.add)`
+1. **廣告 = `AdSlotView`**（`safeAreaInset` top 釘在清單頂，不透明底防穿透）
+   - AdMob 非個人化 banner（`BannerAdView`，`AdSizeBanner` 320x50），右上標「廣告」（`02-architecture` §9）。
+   - **有 fill → 50pt 顯示；無 fill / 載入失敗 → 收合為 0**（不留空框）。
+   - **`adsRemoved` 為 true 時整條不放**（由 IAP entitlement 驅動，見 `02-architecture` §7）。
+2. **現況甜甜圈**（`StatusChartSection`）：active 三桶佔比 + 中心總數；無 active 顯示「目前沒有食材」。
+3. **浪費統計**（`WasteStatsSection`）：近 30 天浪費率 hero + 綠/紅比例條 + 吃掉/丟棄數；header 右側「清除歷史」鈕（`hasHistory` 才露出）；無紀錄顯示「尚無已處理紀錄」。
+4. **分桶清單**：三個 Section（急→緩），header 桶名 + 數量，**空桶顯示「沒有項目」**；桶內 row 可互動（見下方 Row 操作）。最後一桶 footer 顯示互動 hint。
+5. **新增按鈕 = `AddButton`**（`safeAreaInset` bottom）：**全寬填滿**「＋ 新增食材」→ push `FoodFormView(.add)`。取代原小圓 FAB；底部 padding 與 tab bar 拉開避免誤觸。
 
 ### 空狀態（無 active 食材）
-- 廣告 section **照常顯示**。
-- 顯示空狀態 hint（例：「目前還沒有食材，點下方＋開始記錄」），構成 publisher content。
+- 甜甜圈「目前沒有食材」、三空桶「沒有項目」、浪費統計「尚無已處理紀錄」。
+- 底部「＋ 新增食材」始終可用。
 
 ---
 
