@@ -33,11 +33,9 @@ struct HomeView: View {
         }
         .listStyle(.insetGrouped)
         .safeAreaInset(edge: .top, spacing: 0) {
-            // 廣告釘在清單頂：無廣告時 AdSlotView 自行收合為 0，不留空卡。
+            // 廣告釘在清單頂：AdSlotView 自帶不透明底 + 收合邏輯（無廣告自行消失）。
             if !viewModel.state.adsRemoved {
                 AdSlotView()
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
             }
         }
         .safeAreaInset(edge: .bottom) {
