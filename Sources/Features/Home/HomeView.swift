@@ -8,13 +8,6 @@ struct HomeView: View {
         @Bindable var bVM = viewModel
 
         List {
-            if !viewModel.state.adsRemoved {
-                Section {
-                    AdSlotView()
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                }
-            }
-
             StatusChartSection(
                 expired: viewModel.state.expired.count,
                 nearExpiry: viewModel.state.nearExpiry.count,
@@ -31,9 +24,22 @@ struct HomeView: View {
 
             BucketSection(title: "已過期未處理", items: viewModel.state.expired, send: handleListAction)
             BucketSection(title: "3 天內到期", items: viewModel.state.nearExpiry, send: handleListAction)
-            BucketSection(title: "保存期限內", items: viewModel.state.fresh, send: handleListAction)
+            BucketSection(
+                title: "保存期限內",
+                items: viewModel.state.fresh,
+                footer: "提示：點項目可編輯；左右滑可標記已使用 / 刪除；長按可延長效期或標記丟棄。",
+                send: handleListAction
+            )
         }
         .listStyle(.insetGrouped)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            // 廣告釘在清單頂：無廣告時 AdSlotView 自行收合為 0，不留空卡。
+            if !viewModel.state.adsRemoved {
+                AdSlotView()
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+            }
+        }
         .safeAreaInset(edge: .bottom) {
             AddButton {
                 Task { await viewModel.doAction(.view(.addDidTap)) }
@@ -285,6 +291,7 @@ private extension HomeView {
 
         let title: LocalizedStringKey
         let items: [FoodItem]
+        var footer: LocalizedStringKey? = nil
         let send: (Action) -> Void
 
         var body: some View {
@@ -303,6 +310,10 @@ private extension HomeView {
                     Text(title)
                     Spacer()
                     Text("\(items.count) 項")
+                }
+            } footer: {
+                if let footer {
+                    Text(footer)
                 }
             }
         }
@@ -348,8 +359,8 @@ private extension HomeView {
                     .foregroundStyle(.white)
             }
             .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 6)
+            .padding(.top, 10)
+            .padding(.bottom, 16)   // 與 tab bar 拉開距離，避免誤觸
             .background(.bar)
         }
     }

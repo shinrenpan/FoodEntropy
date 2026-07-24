@@ -251,6 +251,7 @@
       }
     },
     "分析" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -540,6 +541,7 @@
       }
     },
     "提示：點項目可編輯；長按可延長效期或標記丟棄。" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -752,6 +754,7 @@
       }
     },
     "目前還沒有食材" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -995,6 +998,7 @@
       }
     },
     "點右下角的＋開始記錄" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
