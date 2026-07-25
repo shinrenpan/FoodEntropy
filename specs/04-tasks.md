@@ -180,3 +180,4 @@
 ## Backlog（1.0.0 後）
 
 - [ ] **食材價格欄位 + 浪費金額統計**（v1.1，[issue #6](https://github.com/shinrenpan/FoodEntropy/issues/6)）：`FoodItem` 加選填 `price`，浪費統計顯示「已記錄價格的丟棄金額」（金額比比例更有衝擊力）。需重新部署 CloudKit Production schema（additive）。幣別依裝置 locale。
+- [ ] **Pro 進階功能包（含 Widget）**（≥ v1.2，[issue #7](https://github.com/shinrenpan/FoodEntropy/issues/7)）：一個 "Pro" 買斷解鎖進階——WidgetKit（基本免費、進階付費）、自訂提醒時機、歷史趨勢/浪費金額、分類標籤。核心免費不鎖。先觀察上架後需求再投入。
