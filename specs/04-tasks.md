@@ -179,5 +179,6 @@
 
 ## Backlog（1.0.0 後）
 
+- [ ] **App Intents / 新 Siri 整合**（v1.1–1.2，[issue #8](https://github.com/shinrenpan/FoodEntropy/issues/8)）：WWDC26 起 App Intents 為新 Siri 唯一入口。曝露新增/已使用/查詢為 Intent + `FoodItem` AppEntity，白拿 Spotlight/捷徑/控制中心。階段1（iOS 26 可做）、階段2（iOS 27 新 Siri 增強）。**展示價值高、不依賴付費，優先於 #7。**
 - [ ] **食材價格欄位 + 浪費金額統計**（v1.1，[issue #6](https://github.com/shinrenpan/FoodEntropy/issues/6)）：`FoodItem` 加選填 `price`，浪費統計顯示「已記錄價格的丟棄金額」（金額比比例更有衝擊力）。需重新部署 CloudKit Production schema（additive）。幣別依裝置 locale。
 - [ ] **Pro 進階功能包（含 Widget）**（≥ v1.2，[issue #7](https://github.com/shinrenpan/FoodEntropy/issues/7)）：一個 "Pro" 買斷解鎖進階——WidgetKit（基本免費、進階付費）、自訂提醒時機、歷史趨勢/浪費金額、分類標籤。核心免費不鎖。先觀察上架後需求再投入。
