@@ -133,8 +133,9 @@
 - [x] `Info.plist`：`GADApplicationIdentifier`（測試 App ID，⚠️ 待換）+ `SKAdNetworkItems`（先放 Google 主 ID，上架前補齊）。
 - [x] 模擬器驗證：首頁頂部顯示測試橫幅（Test mode），清單空/非空皆顯示。
 - [x] AdMob 後台建 App（食熵 iOS）+ banner 廣告單元（Home Banner）→ 正式 App ID 填入 `Info.plist`、正式單元 ID 填入 `AdConfig` Release 分支（DEBUG 仍用測試單元）。
-- [ ] **上架前**：補齊 Google 公布的完整 `SKAdNetworkItems` 清單。
-- [ ] adsRemoved 由 IAP entitlement 驅動（Phase 8，里程碑 2）。
+- [x] 補齊 Google 完整 `SKAdNetworkItems` 清單（50 筆）→ 消除「49 missing」執行期警告。
+- [x] adsRemoved 由 IAP entitlement 驅動（見 Phase 8）。
+- [x] **app-ads.txt**（AdMob 擁有權驗證）：放於開發者網站根目錄 `https://shinrenpan.github.io/app-ads.txt`（Hugo user-site，檔案置於 `static/`）→ `google.com, pub-9003896396180654, DIRECT, f08c47fec0942fa0`。⏳ 待 AdMob 後台重新驗證（爬蟲排程，可能需數日）。
 
 ## Phase 10 — iCloud 同步驗證（`02-architecture` §6）
 
@@ -164,8 +165,8 @@
 
 - [x] **文案（中英）經 ASC API 寫入**：App 名稱 / 副標（appInfoLocalizations）、描述 / 關鍵字 / 宣傳文字 / 支援 URL（appStoreVersionLocalizations），zh-Hant + en-US。
 - [x] **截圖（6.9"，1320×2868）經 ASC API 上傳**：首頁 / 分析 / 設定 3 張，中英各一組（`APP_IPHONE_67` 展示位）。DEBUG `SCREENSHOT_MODE=1` hook 隱藏廣告取乾淨畫面。
-- [ ] App 圖示（確認 AppIcon 資產齊全）。
-- [ ] App Store Connect 送審（地區已排除全歐洲；1.0.0 + IAP READY_TO_SUBMIT 一起提交）。
+- [x] App 圖示（AppIcon 1024×1024、無 alpha，資產齊全）。
+- [x] **App Store Connect 送審 → ✅ 審核通過、`READY_FOR_SALE`（v1.0.0 build 2 + IAP）**。地區排除全歐洲 + 中國（免 ICP）；年齡分級 4+、版權、Food & Drink 類別、合併版截圖/描述皆就緒。
 
 ---
 
