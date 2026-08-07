@@ -6,7 +6,7 @@
 
 ## 狀態
 
-v1.0.0 早於 Spectra 導入，其 capability 已全數以 `baseline-*` change 回溯補回（見 `openspec/changes/archive/`）。頂層 `specs/` 為 pre-Spectra 設計文件，已完成其素材任務且部分內容與實作脫節（例如 `03-screens/settings.md` 仍描述 v1 的 IAP stub），**不再是任何決策的依據**，可移除。
+v1.0.0 早於 Spectra 導入，其 capability 已全數以 `baseline-*` change 回溯補回（見 `openspec/changes/archive/`）。作為素材的 pre-Spectra 設計文件（頂層 `specs/`）已隨補回完成而移除，內容留在 git 歷史；archive 內的 proposal 仍會引用那些路徑，那是當時的素材出處紀錄，不需更正。
 
 ## Foundation
 

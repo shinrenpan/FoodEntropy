@@ -34,22 +34,16 @@ notification on the expiry day to reduce food waste.
 
 ## Source of truth
 
-**`openspec/specs/` is the source of truth.** A capability with a spec there wins over anything
-in the legacy `specs/` directory. New work goes through the `/spectra-*` workflow above.
+**`openspec/specs/` is the source of truth.** Read the relevant capability spec before
+implementing; all new work goes through the `/spectra-*` workflow above.
+`openspec/specs/README.md` is the capability map — start there to see how they connect.
 
-**Migration in progress** — v1.0.0 predates Spectra, so its capability specs are being backfilled
-as `baseline-*` changes. Until that finishes, the pre-Spectra design documents remain as *source
-material* (not a second source of truth):
+v1.0.0 predates Spectra, so its capabilities were backfilled from the shipped code as
+`baseline-*` changes (archived under `openspec/changes/`). The pre-Spectra design documents
+that served as source material have been removed; they remain in the git history, but they
+are **not** a second source of truth and parts of them contradict the shipped app.
 
-- `specs/00-constitution.md` — non-negotiable platform/architecture/language constraints
-- `specs/01-navigation.md` — tabs, screens, navigation flow
-- `specs/02-architecture.md` — data model, SwiftData/CloudKit, images, notifications, IAP
-- `specs/03-screens/*.md` — per-screen State / Action / UI specs
-- `specs/04-tasks.md` — phased implementation task list + v1.1 backlog
-- `specs/README.md` — index + status of each spec
-- `specs/archive/Spec.md` — **superseded origin seed**, do NOT implement from it
-
-`specs/` is removed once every capability listed in `openspec/specs/README.md` has been backfilled.
+v1.1+ work is tracked as GitHub issues, not in a task file.
 
 ## Non-negotiable rules (from the constitution)
 

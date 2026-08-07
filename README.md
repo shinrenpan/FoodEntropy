@@ -29,28 +29,41 @@ captures the core idea: *if you don't manage it, it goes bad.*
 
 ## Spec-Driven Development
 
-This project was designed spec-first. Every decision — and the reasoning behind it —
-lives in [`specs/`](./specs/) before any code was written:
+This project is designed spec-first: every decision — and the reasoning behind it — is
+written down before the code. Specs live in [`openspec/specs/`](./openspec/specs/),
+organised as capabilities rather than documents, with change proposals in
+[`openspec/changes/`](./openspec/changes/).
 
-| Doc | Scope |
-|-----|-------|
-| [`00-constitution.md`](./specs/00-constitution.md) | Non-negotiable platform / architecture / language constraints |
-| [`01-navigation.md`](./specs/01-navigation.md) | Tabs, screens, navigation flow |
-| [`02-architecture.md`](./specs/02-architecture.md) | Data model, SwiftData/CloudKit, images, notifications, IAP |
-| [`03-screens/`](./specs/03-screens/) | Per-screen State / Action / UI specs |
-| [`04-tasks.md`](./specs/04-tasks.md) | Phased implementation task list |
+| Group | Capabilities |
+|-------|--------------|
+| Foundation | `app-shell`, `navigation` |
+| Domain | `food-item`, `persistence`, `icloud-sync`, `notification`, `iap-remove-ads`, `advertising` |
+| Screens | `home-ui`, `food-form-ui`, `settings-ui` |
+| Cross-cutting | `localization`, `app-store-listing` |
 
-`specs/` is the single source of truth. [`specs/archive/Spec.md`](./specs/archive/Spec.md)
-is the original product seed and is now superseded.
+Each capability spec states requirements as testable `SHALL` statements with WHEN/THEN
+scenarios, and records the decisions that are easy to mistake for oversights — why the
+expiry day counts as *near-expiry* rather than *expired*, why the schema stays
+CloudKit-safe even with sync off, why the app never prompts for tracking permission.
+[`openspec/specs/README.md`](./openspec/specs/README.md) maps how they connect.
+
+v1.0.0 predates this structure; its capabilities were backfilled from the shipped code
+as `baseline-*` changes, which are archived under `openspec/changes/archive/`. The
+original pre-Spectra design documents remain available in the git history.
 
 ## Status
 
-- [x] Product spec & SDD design (constitution → tasks)
-- [ ] Data layer (SwiftData model + manager)
-- [ ] Core screens (Home / Form / Analytics / Settings)
-- [ ] Notifications, IAP, ads
-- [ ] iCloud sync verification
-- [ ] App Store submission
+**v1.0.0 shipped** — available on the App Store.
+
+- [x] Data layer (SwiftData model + manager, CloudKit-safe schema)
+- [x] Core screens (Home with statistics / Form / Settings)
+- [x] Expiry notifications, remove-ads IAP, AdMob banner
+- [x] Opt-in iCloud sync
+- [x] App Store submission
+- [x] Capability specs backfilled (13 capabilities)
+
+Next up is tracked in [issues](https://github.com/shinrenpan/FoodEntropy/issues) —
+App Intents / Siri integration, price tracking, and a Pro tier.
 
 ## Screenshots
 
