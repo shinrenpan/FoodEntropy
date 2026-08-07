@@ -12,4 +12,4 @@
 - [x] 2.1 執行 `spectra validate baseline-app-store-listing`；驗證：指令回傳成功、無 error。
 - [x] 2.2 archive 後補上 `openspec/specs/app-store-listing/spec.md` 的 `## Purpose` 段；驗證：`grep -c "TBD" openspec/specs/app-store-listing/spec.md` 為 0。
 - [x] 2.3 更新 `openspec/specs/README.md`，將 Cross-cutting 兩個 capability 標為已補回並移除「狀態」段的過渡說明；驗證：檔案內無殘留「⬜ 待補」。
-- [ ] 2.4 **未結項目**：補填行銷 URL 為 `https://shinrenpan.github.io/FoodEntropy/`（需隨新版本送審）；驗證：送審通過後以 ASC API 查得 `marketingUrl` 非空，且 24 小時內 AdMob 後台的 app-ads.txt 狀態轉為已驗證、檢索網址非空。
+- [x] 2.4 ~~未結項目：補填行銷 URL~~ → **已轉為獨立 change `add-marketing-url` 追蹤**。baseline 的職責是記錄 v1.0.0 現況（proposal 明載「無行為變更」），不該夾帶未來要執行的動作；archive 代表完成，未勾的 task 留在此處既不會被 `spectra list` 看見，也不會有人執行。規格層面無需變動——`app-store-listing` 的 requirement「The marketing URL is mandatory and its host must serve app-ads.txt」已完整描述所需狀態，其中一個 scenario 正是目前的失敗態。
