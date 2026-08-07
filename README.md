@@ -62,8 +62,8 @@ original pre-Spectra design documents remain available in the git history.
 - [x] App Store submission
 - [x] Capability specs backfilled (13 capabilities)
 
-Next up is tracked in [issues](https://github.com/shinrenpan/FoodEntropy/issues) —
-App Intents / Siri integration, price tracking, and a Pro tier.
+Pending work lives in [`openspec/changes/`](./openspec/changes/) as change proposals —
+each one states what is decided, what is not, and what unblocks it.
 
 ## Screenshots
 

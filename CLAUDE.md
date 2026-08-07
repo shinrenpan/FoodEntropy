@@ -43,7 +43,10 @@ v1.0.0 predates Spectra, so its capabilities were backfilled from the shipped co
 that served as source material have been removed; they remain in the git history, but they
 are **not** a second source of truth and parts of them contradict the shipped app.
 
-v1.1+ work is tracked as GitHub issues, not in a task file.
+**All pending work lives in `openspec/changes/`** — not in GitHub issues, not in a task file.
+A change proposal is the right home even when the work is blocked or its scope is still open:
+state what is decided, what is not, and what unblocks it. This keeps everything the
+`/spectra-*` workflow can read in one place.
 
 ## Non-negotiable rules (from the constitution)
 
