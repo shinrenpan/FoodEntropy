@@ -171,7 +171,7 @@ private extension HomeView {
                         HStack(spacing: 6) {
                             Image(systemName: "exclamationmark.circle")
                                 .foregroundStyle(expiryColor(.nearExpiry))
-                            Text("至少 \(cost, format: .currency(code: Locale.current.currency?.identifier ?? "USD")) 即將到期")
+                            Text("至少 \(cost.currencyText()) 即將到期")
                                 .font(.subheadline)
                         }
                     }
@@ -275,7 +275,7 @@ private extension HomeView {
                         // 已丟棄金額：刻意作為附屬資訊。若放大成 hero，部分填價格造成的
                         // 低估會讀成「才這樣而已」，比原本只有百分比更沒有壓力。
                         if let wastedCost {
-                            Text("其中已記錄價格者共 \(wastedCost, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))")
+                            Text("其中已記錄價格者共 \(wastedCost.currencyText())")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

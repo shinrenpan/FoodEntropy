@@ -71,16 +71,24 @@
 - `persistence`：`@Model` 新增 optional 屬性（additive），CloudKit Production schema 需重新部署。
 - `food-form-ui`：新增選填價格欄位；不影響儲存啟用條件。
 - `home-ui`：新增「即將到期金額」的前瞻呈現；浪費統計區新增已丟棄金額作為附屬資訊。
+- `localization`：百分比比照金額與日期交由系統格式化；在地化字面值須直接寫在呈現處。
+  兩者皆為實作本 change 時發現的既有漏洞——浪費率原本手動接百分比符號，而 legend 透過變數
+  傳遞在地化 key，導致活的翻譯被標為未使用、幾乎被當成垃圾清掉。
+
+`persistence` 另補一條 schema 部署前的驗證要求：CloudKit 的 schema 依「實際寫入的值」
+誕生，而非由 model 定義鏡射。本 change 部署時因此發現 resolvedAt 欄位自 v1.0.0 起
+從未進入 production schema——開啟同步的使用者標記食材為已使用／丟棄時，該時間戳一直
+無法同步，而它正是浪費統計視窗的篩選依據。此次部署一併修復。
 
 ### New Capabilities
 
 （無）
 
-四份 delta spec 隨本 change 提供。
+五份 delta spec 隨本 change 提供。
 
 ## Impact
 
-- Affected specs: `food-item`, `persistence`, `food-form-ui`, `home-ui`
+- Affected specs: `food-item`, `persistence`, `food-form-ui`, `home-ui`, `localization`
 - Affected code:
   - Modified: `Sources/Core/Domain/FoodItem.swift`, `Sources/Core/Persistence/FoodItemEntity.swift`, `Sources/Core/Persistence/SwiftDataManager.swift`, `Sources/Features/FoodForm/FoodFormView.swift`, `Sources/Features/FoodForm/FoodFormViewModel*.swift`, `Sources/Features/Home/HomeView.swift`, `Sources/Features/Home/HomeViewModel*.swift`
 - 外部作業：CloudKit Production schema 重新部署（additive）

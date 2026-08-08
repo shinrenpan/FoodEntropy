@@ -13,3 +13,23 @@ The system SHALL persist the recorded cost as an optional attribute, added witho
 
 - **WHEN** a user with existing food items updates to a version that introduces the cost attribute
 - **THEN** their items load normally with no recorded cost, and no migration prompt or data loss occurs
+
+---
+### Requirement: Every attribute must be written at least once before deploying the schema
+
+The system SHALL, before deploying a schema to the production environment, ensure each attribute — including optional ones — has actually been written with a value in the development environment, and SHALL verify the resulting field list rather than assuming the model definition was mirrored.
+
+#### Scenario: An optional attribute that no record has ever set
+
+- **WHEN** a new optional attribute exists in the model but no record has yet been saved with a value for it
+- **THEN** no corresponding field exists in the development schema, and deploying at that point ships a production schema missing that field
+
+#### Scenario: The missing field surfaces only later, in production
+
+- **WHEN** a production schema lacks a field and a user's record sets that attribute
+- **THEN** the value cannot sync, because production does not create fields on demand — and nothing in the app reports the failure
+
+#### Scenario: Verifying before deployment
+
+- **WHEN** preparing to deploy after adding attributes
+- **THEN** each attribute is exercised with a real value first, and the development field list is checked against the model before the deployment is confirmed
