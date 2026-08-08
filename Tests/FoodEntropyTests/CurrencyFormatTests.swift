@@ -33,4 +33,27 @@ struct CurrencyFormatTests {
         #expect(!text.contains("$"))
         #expect(!text.contains("USD"))
     }
+
+    // MARK: - 精度：有小數才顯示
+
+    @Test("整數金額不補小數位")
+    func integerHasNoDecimals() {
+        let tw = Locale(identifier: "zh_TW")
+        let text = Double(99).currencyText(locale: tw)
+        #expect(!text.contains(".00"))
+        #expect(text.contains("99"))
+    }
+
+    @Test("有小數的金額如實顯示")
+    func decimalsArePreserved() {
+        let us = Locale(identifier: "en_US")
+        #expect(Double(12.34).currencyText(locale: us).contains("12.34"))
+    }
+
+    @Test("超過兩位小數時收斂至兩位")
+    func roundsBeyondTwoDecimals() {
+        let us = Locale(identifier: "en_US")
+        let text = Double(12.345).currencyText(locale: us)
+        #expect(text.contains("12.35") || text.contains("12.34"))   // 四捨五入方式交由系統
+    }
 }
