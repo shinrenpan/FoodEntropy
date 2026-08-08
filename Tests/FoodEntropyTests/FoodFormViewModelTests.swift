@@ -145,4 +145,52 @@ struct FoodFormViewModelTests {
         await vm.doAction(.view(.removeImage))
         #expect(vm.state.imageData == nil)
     }
+
+    // MARK: - 價格（add-price-tracking）
+
+    @Test
+    func `價格留空不影響儲存啟用條件`() async throws {
+        let vm = try makeVM(.add, makeManager())
+        vm.state.name = "牛奶"
+        #expect(vm.state.price == nil)
+        #expect(vm.state.isSaveEnabled == true)   // 價格選填，不列入條件
+    }
+
+    @Test
+    func `edit 模式帶入既有價格`() async throws {
+        let manager = try makeManager()
+        let item = manager.create(name: "牛奶", purchaseDate: d0, expiryDate: day(3, from: d0), price: 60)
+        let vm = makeVM(.edit(item), manager)
+        #expect(vm.state.price == 60)
+    }
+
+    @Test
+    func `僅改價格也算未儲存變更`() async throws {
+        let manager = try makeManager()
+        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let vm = makeVM(.edit(item), manager)
+        vm.state.price = 120
+        await vm.doAction(.view(.dismissDidTap))
+        #expect(vm.state.showDiscardConfirm == true)
+    }
+
+    @Test
+    func `儲存寫入價格`() async throws {
+        let manager = try makeManager()
+        let vm = makeVM(.add, manager)
+        vm.state.name = "牛奶"
+        vm.state.price = 60
+        await vm.doAction(.view(.saveDidTap))
+        #expect(manager.fetchActiveFoods().first?.price == 60)
+    }
+
+    @Test
+    func `編輯既有食材補填價格`() async throws {
+        let manager = try makeManager()
+        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let vm = makeVM(.edit(item), manager)
+        vm.state.price = 88
+        await vm.doAction(.view(.saveDidTap))
+        #expect(manager.fetchActiveFoods().first?.price == 88)
+    }
 }

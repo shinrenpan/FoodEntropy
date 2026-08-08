@@ -39,6 +39,7 @@ final class FoodFormViewModel {
             initial.purchaseDate = item.purchaseDate
             initial.expiryDate = item.expiryDate
             initial.imageData = item.imageData
+            initial.price = item.price
         }
         self.state = initial
         self.original = Snapshot(state: initial)
@@ -113,7 +114,8 @@ extension FoodFormViewModel {
                 name: name,
                 purchaseDate: state.purchaseDate,
                 expiryDate: state.expiryDate,
-                imageData: state.imageData
+                imageData: state.imageData,
+                price: state.price
             )
         case let .edit(item):
             manager.update(
@@ -121,7 +123,8 @@ extension FoodFormViewModel {
                 name: name,
                 purchaseDate: state.purchaseDate,
                 expiryDate: state.expiryDate,
-                imageData: state.imageData
+                imageData: state.imageData,
+                price: state.price
             )
         }
         // 首次儲存請求權限（notDetermined 才跳彈窗）→ 以當前 active 重建排程（DEBUG 用 10 秒立即驗證）。
@@ -150,12 +153,14 @@ private extension FoodFormViewModel {
         let purchaseDate: Date
         let expiryDate: Date
         let imageData: Data?
+        let price: Double?
 
         init(state: State) {
             name = state.name
             purchaseDate = state.purchaseDate
             expiryDate = state.expiryDate
             imageData = state.imageData
+            price = state.price
         }
     }
 }

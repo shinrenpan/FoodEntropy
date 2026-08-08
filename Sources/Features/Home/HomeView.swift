@@ -11,7 +11,8 @@ struct HomeView: View {
             StatusChartSection(
                 expired: viewModel.state.expired.count,
                 nearExpiry: viewModel.state.nearExpiry.count,
-                fresh: viewModel.state.fresh.count
+                fresh: viewModel.state.fresh.count,
+                upcomingExpiryCost: viewModel.state.upcomingExpiryCost
             )
 
             WasteStatsSection(
@@ -19,6 +20,7 @@ struct HomeView: View {
                 wasted: viewModel.state.wastedCount,
                 wasteRate: viewModel.state.wasteRate,
                 hasHistory: viewModel.state.hasHistory,
+                wastedCost: viewModel.state.wastedCost,
                 onClear: { Task { await viewModel.doAction(.view(.clearHistoryDidTap)) } }
             )
 
@@ -136,6 +138,8 @@ private extension HomeView {
         let expired: Int
         let nearExpiry: Int
         let fresh: Int
+        /// nil = 無可計算金額（沒有 nearExpiry 項目帶價格）→ 整行不渲染，不顯示 0。
+        var upcomingExpiryCost: Double? = nil
 
         private var total: Int { expired + nearExpiry + fresh }
         private var slices: [StatusSlice] {
@@ -157,6 +161,18 @@ private extension HomeView {
                         legend()
                     }
                     .padding(.vertical, 8)
+
+                    // 前瞻金額：食材還救得回來時才說話。固定「至少」語氣——涵蓋率會隨
+                    // 未填價格的項目浮動，若文案在「NT$X」與「至少 NT$X」間跳動，反而
+                    // 像在隱瞞什麼。金額格式化交由系統依 locale 處理。
+                    if let cost = upcomingExpiryCost {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.circle")
+                                .foregroundStyle(expiryColor(.nearExpiry))
+                            Text("至少 \(cost, format: .currency(code: Locale.current.currency?.identifier ?? "USD")) 即將到期")
+                                .font(.subheadline)
+                        }
+                    }
                 }
             }
         }
@@ -212,6 +228,8 @@ private extension HomeView {
         let wasted: Int
         let wasteRate: Double?
         let hasHistory: Bool
+        /// nil = 視窗內沒有已記錄價格的丟棄項 → 該行不渲染。附屬資訊，層級低於浪費率。
+        var wastedCost: Double? = nil
         let onClear: () -> Void
 
         var body: some View {
@@ -238,6 +256,14 @@ private extension HomeView {
                         }
                         .font(.footnote)
                         .monospacedDigit()
+
+                        // 已丟棄金額：刻意作為附屬資訊。若放大成 hero，部分填價格造成的
+                        // 低估會讀成「才這樣而已」，比原本只有百分比更沒有壓力。
+                        if let wastedCost {
+                            Text("其中已記錄價格者共 \(wastedCost, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     .padding(.vertical, 8)
                 } else {

@@ -11,6 +11,7 @@ struct FoodItem: Identifiable, Equatable, Sendable {
     var resolvedAt: Date?          // 離開 active（consumed / wasted）的時間
     var imageData: Data?           // 壓縮後 JPEG
     let createdAt: Date
+    var price: Double?             // 選填。這筆記錄的總花費（非單價）
 }
 
 // MARK: - RecordStatus（stored；持久化於 statusRaw）

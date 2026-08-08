@@ -103,7 +103,8 @@ extension HomeViewModel {
                     name: item.name,
                     purchaseDate: item.purchaseDate,
                     expiryDate: newExpiry,
-                    imageData: item.imageData
+                    imageData: item.imageData,
+                    price: item.price   // 延長效期只改到期日，其餘欄位原樣帶回
                 )
             }
             state.extendingItem = nil
@@ -120,6 +121,12 @@ extension HomeViewModel {
             state.showClearHistoryConfirm = false
             await reload()   // 統計歸零、清除鈕收起
         }
+    }
+
+    /// 已記錄價格者的總和；一筆都沒有時回 nil（無可計算，非零）。
+    private static func sumPrices(_ items: [FoodItem]) -> Double? {
+        let prices = items.compactMap(\.price)
+        return prices.isEmpty ? nil : prices.reduce(0, +)
     }
 
     private func reload() async {
@@ -166,6 +173,10 @@ extension HomeViewModel {
             state.wastedCount = windowed.filter { $0.status == .wasted }.count
             // all-time：只要有任何已處理紀錄就露出清除鈕（含 30 天視窗外的舊資料）。
             state.hasHistory = !resolved.isEmpty
+            // 金額：前瞻只取 nearExpiry（還來得及救），回顧沿用同一視窗。
+            // 兩者皆以 nil 表示「無可計算」——畫面據此整行不渲染，而非顯示 0。
+            state.upcomingExpiryCost = Self.sumPrices(state.nearExpiry)
+            state.wastedCost = Self.sumPrices(windowed.filter { $0.status == .wasted })
         }
     }
 }

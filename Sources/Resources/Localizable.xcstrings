@@ -1017,6 +1017,46 @@
           }
         }
       }
+    },
+    "價格": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Price"
+          }
+        }
+      }
+    },
+    "選填": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional"
+          }
+        }
+      }
+    },
+    "至少 %arg 即將到期": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At least %arg expiring soon"
+          }
+        }
+      }
+    },
+    "其中已記錄價格者共 %arg": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recorded prices total %arg"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

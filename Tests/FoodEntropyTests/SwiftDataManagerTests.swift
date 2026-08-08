@@ -47,7 +47,7 @@ struct SwiftDataManagerTests {
         let m = try makeManager()
         let item = m.create(name: "舊", purchaseDate: d0, expiryDate: d0)
         let newExpiry = d0.addingTimeInterval(86_400 * 3)
-        m.update(id: item.id, name: "新", purchaseDate: d0, expiryDate: newExpiry, imageData: nil)
+        m.update(id: item.id, name: "新", purchaseDate: d0, expiryDate: newExpiry, imageData: nil, price: nil)
         let updated = m.fetchActiveFoods().first
         #expect(updated?.name == "新")
         #expect(updated?.expiryDate == newExpiry)
@@ -114,5 +114,58 @@ struct SwiftDataManagerTests {
         m.deleteResolvedFoods()
         #expect(m.fetchResolvedFoods().isEmpty)
         #expect(m.fetchActiveFoods().map(\.id) == [keep.id])   // active 不受影響
+    }
+
+    // MARK: - 價格（add-price-tracking）
+
+    @Test("price 為選填：未給值時為 nil，給值時保存")
+    func entityPriceIsOptional() {
+        let without = FoodItemEntity(name: "無價", purchaseDate: d0, expiryDate: d0)
+        #expect(without.price == nil)
+
+        let with = FoodItemEntity(name: "有價", purchaseDate: d0, expiryDate: d0, price: 99.5)
+        #expect(with.price == 99.5)
+    }
+
+    @Test("toDomain 帶出 price（含 nil 情形）")
+    func toDomainCarriesPrice() {
+        let priced = FoodItemEntity(name: "有價", purchaseDate: d0, expiryDate: d0, price: 120)
+        #expect(priced.toDomain().price == 120)
+
+        let unpriced = FoodItemEntity(name: "無價", purchaseDate: d0, expiryDate: d0)
+        #expect(unpriced.toDomain().price == nil)
+    }
+
+    @Test("create 保存 price；update 可設值亦可清回 nil")
+    func managerPersistsPrice() throws {
+        let m = try makeManager()
+        let item = m.create(name: "牛奶", purchaseDate: d0, expiryDate: d0, price: 60)
+        #expect(m.fetchActiveFoods().first?.price == 60)
+
+        m.update(id: item.id, name: "牛奶", purchaseDate: d0, expiryDate: d0, imageData: nil, price: 75)
+        #expect(m.fetchActiveFoods().first?.price == 75)
+
+        m.update(id: item.id, name: "牛奶", purchaseDate: d0, expiryDate: d0, imageData: nil, price: nil)
+        #expect(m.fetchActiveFoods().first?.price == nil)
+    }
+
+    /// design 決策「解析食材時清除圖片，但**保留**價格」——回顧金額正是算已丟棄項目的價格，
+    /// 若照抄相鄰的 imageData = nil 一併清除，功能會靜默失效。
+    @Test("標記已使用／丟棄時保留 price，但仍剝離圖片")
+    func resolveKeepsPriceButStripsImage() throws {
+        let m = try makeManager()
+        let item = m.create(
+            name: "有圖有價",
+            purchaseDate: d0,
+            expiryDate: d0,
+            imageData: Data([0x01, 0x02]),
+            price: 250
+        )
+        m.markWasted(id: item.id)
+
+        let resolved = m.fetchResolvedFoods()
+        #expect(resolved.count == 1)
+        #expect(resolved.first?.price == 250)      // 保留
+        #expect(resolved.first?.imageData == nil)  // 仍剝離
     }
 }

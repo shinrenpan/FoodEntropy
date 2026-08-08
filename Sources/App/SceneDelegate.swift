@@ -117,7 +117,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     name: mock.name,
                     purchaseDate: mock.purchaseDate,
                     expiryDate: mock.expiryDate,
-                    imageData: mock.imageData
+                    imageData: mock.imageData,
+                    price: mock.price
                 )
             }
             // 給分析頁一些已處理紀錄（4 吃掉、1 丟棄 → 浪費率 20%）

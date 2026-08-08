@@ -15,6 +15,9 @@ final class FoodItemEntity {
     var resolvedAt: Date?
     @Attribute(.externalStorage) var imageData: Data?
     var createdAt: Date = Date.now
+    // 選填。這筆記錄的總花費（非單價，無數量欄位）。optional 即符合 CloudKit-safe。
+    // ⚠️ 與 imageData 不同：解析（consumed / wasted）時**不清除**，回顧金額需要它。
+    var price: Double?
 
     init(
         id: UUID = UUID(),
@@ -24,7 +27,8 @@ final class FoodItemEntity {
         statusRaw: String = RecordStatus.active.rawValue,
         resolvedAt: Date? = nil,
         imageData: Data? = nil,
-        createdAt: Date = Date.now
+        createdAt: Date = Date.now,
+        price: Double? = nil
     ) {
         self.id = id
         self.name = name
@@ -34,6 +38,7 @@ final class FoodItemEntity {
         self.resolvedAt = resolvedAt
         self.imageData = imageData
         self.createdAt = createdAt
+        self.price = price
     }
 }
 
@@ -49,7 +54,8 @@ extension FoodItemEntity {
             status: RecordStatus(rawValue: statusRaw) ?? .active,
             resolvedAt: resolvedAt,
             imageData: imageData,
-            createdAt: createdAt
+            createdAt: createdAt,
+            price: price
         )
     }
 }

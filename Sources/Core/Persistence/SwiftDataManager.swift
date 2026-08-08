@@ -95,13 +95,15 @@ final class SwiftDataManager {
         name: String,
         purchaseDate: Date,
         expiryDate: Date,
-        imageData: Data? = nil
+        imageData: Data? = nil,
+        price: Double? = nil
     ) -> FoodItem {
         let entity = FoodItemEntity(
             name: name,
             purchaseDate: purchaseDate,
             expiryDate: expiryDate,
-            imageData: imageData
+            imageData: imageData,
+            price: price
         )
         context.insert(entity)
         save()
@@ -110,18 +112,22 @@ final class SwiftDataManager {
 
     // MARK: - Update
 
+    /// - Parameter price: 刻意不給預設值——有預設值時，忘記傳的呼叫端（如首頁「延長效期」）
+    ///   會靜默把既有價格清成 nil。無預設值讓編譯器強制每個呼叫端明示意圖。
     func update(
         id: UUID,
         name: String,
         purchaseDate: Date,
         expiryDate: Date,
-        imageData: Data?
+        imageData: Data?,
+        price: Double?
     ) {
         guard let entity = entity(for: id) else { return }
         entity.name = name
         entity.purchaseDate = purchaseDate
         entity.expiryDate = expiryDate
         entity.imageData = imageData
+        entity.price = price
         save()
     }
 

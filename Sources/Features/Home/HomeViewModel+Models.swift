@@ -20,6 +20,10 @@ extension HomeViewModel {
         var hasHistory: Bool = false          // all-time 是否有已處理紀錄（決定清除鈕露出）
         var showClearHistoryConfirm: Bool = false
 
+        // 金額（add-price-tracking）。nil = 無可計算金額 → 該行整行不渲染，不顯示 0。
+        var upcomingExpiryCost: Double? = nil  // 前瞻：nearExpiry 桶中已記錄價格者的總和
+        var wastedCost: Double? = nil          // 回顧：統計視窗內已丟棄且已記錄價格者的總和
+
         /// 全部 active（急→緩），供通知排程與空狀態判斷。
         var items: [FoodItem] { expired + nearExpiry + fresh }
         var activeTotal: Int { expired.count + nearExpiry.count + fresh.count }

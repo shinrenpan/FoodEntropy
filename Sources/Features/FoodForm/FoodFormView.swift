@@ -29,6 +29,17 @@ struct FoodFormView: View {
                     in: viewModel.state.purchaseDate...,
                     displayedComponents: .date
                 )
+                // 價格：選填、只收數值。幣別符號取自 locale 僅供辨識，使用者不輸入符號；
+                // 空白即 nil（TextField 的 optional 重載），小數點分隔符由系統依地區處理。
+                LabeledContent("價格") {
+                    HStack(spacing: 4) {
+                        Text(Locale.current.currencySymbol ?? "")
+                            .foregroundStyle(.secondary)
+                        TextField("選填", value: $bVM.state.price, format: .number)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
             }
 
             Section("照片") {
