@@ -1,7 +1,7 @@
 ## 1. 階段一：新位置就位（零風險，可立即執行）
 
 - [x] 1.1 複製 `docs/index.html` 與 `docs/privacy/index.html` 至 `shinrenpan.github.io/static/FoodEntropy/`，保持目錄名大小寫；驗證：兩檔的 SHA-256 與來源一致，且目錄名為 `FoodEntropy`（非小寫）。
-- [ ] 1.2 於 `shinrenpan.github.io` commit 並 push，等待部署完成；驗證：該 repo 的 Pages 部署成功，且 `https://shinrenpan.github.io/FoodEntropy/` 仍回傳 200（此時仍由 Project Pages 服務，內容不變——確認線上未受影響）。
+- [x] 1.2 於 `shinrenpan.github.io` commit 並 push，等待部署完成；驗證：**已完成**——commit `b431aef`（rebase 於既有的 app-ads.txt 三個 commit 之上，無交集），Pages build 狀態 `built`；線上 `/FoodEntropy/`、`/FoodEntropy/privacy`、`/app-ads.txt`、`/herbmeet/` 皆回傳 200，線上行為未受影響。
 
 ## 2. 階段二：切換與清理（**1.1.0 上架後**才執行）
 
