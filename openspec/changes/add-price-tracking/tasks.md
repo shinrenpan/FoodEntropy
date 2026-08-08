@@ -31,6 +31,12 @@
 ## 5. 外部作業與驗收
 
 - [x] 5.1 重新部署 CloudKit Production schema（additive）— 實現 `persistence` 的「Every attribute must be written at least once before deploying the schema」：部署前先讓每個欄位實際被寫入一次，再核對 development 的欄位清單；驗證：CloudKit Console 的 Production 環境顯示 `CD_price` 已存在。**部署時另發現 resolvedAt 欄位自 v1.0.0 起從未進入 production schema，已一併修復**——見 `persistence` 新增的部署前驗證要求。
-- [ ] 5.2 iCloud 同步跨裝置驗證：於 A 裝置填價格，B 裝置同步後金額一致；驗證：兩裝置的即將到期金額相同。
-- [ ] 5.3 既有使用者升級驗證：以舊版建立資料後安裝新版——對應「Adding the attribute does not disturb existing records」；驗證：既有食材正常載入、`price` 為 nil、無資料遺失、前瞻金額不顯示。
-- [ ] 5.4 無障礙檢查：價格欄位與金額文字支援 Dynamic Type 且有 VoiceOver 標籤；驗證：放大字級不破版，VoiceOver 讀出的是完整語意而非裸數字。
+- [x] 5.2 iCloud 同步跨裝置驗證：於 A 裝置填價格，B 裝置同步後金額一致；驗證：**已於 iPhone + iPad 完成**——兩台皆安裝 Debug 版（同為 CloudKit development 環境）、登入同一 Apple ID 並開啟同步；iPhone 新增帶價格食材後，iPad 同步取得該筆且即將到期金額顯示相同數字。iPad 需切換 Tab 觸發重撈才更新，符合 `persistence` 的明確重撈設計。
+- [x] 5.3 既有使用者升級驗證：以舊版建立資料後安裝新版——對應「Adding the attribute does not disturb existing records」；驗證：**已於真機完成**——刪除後裝回 App Store 正式版（v1.0.0 build 2，舊 schema）建立 2 筆資料，再以 Xcode 覆蓋安裝新版：2 筆資料完整保留、前瞻金額整行不渲染（既有資料 price 為 nil）、編輯頁價格欄位為空、Xcode log 無任何 SwiftData／CoreData／CloudKit 錯誤（僅 AdMob 與系統雜訊）。
+- [x] 5.4 無障礙檢查：價格欄位與金額文字支援 Dynamic Type 且有 VoiceOver 標籤；驗證：**已於真機完成**——最大輔助使用字級下版面不破（環形圖中心加上縮放以免撐出固定尺寸的圓圈）；VoiceOver 唸出的是完整語意。過程中修正六處**既有**缺陷（皆非本 change 引入）：
+  - 金額被唸成「99 美金」——TWD 視覺顯示為 `$`，VoiceOver 依符號誤判幣別。改以 `accessibilityLabel` 提供 `.presentation(.fullName)` 版本（「99元」），視覺維持符號形式。
+  - 環形圖逐一唸出資料點（「1, 3, 1」）——資訊已由 legend 提供，改為對 VoiceOver 隱藏；中心總數不在 legend 內故保留，並以明確 label 唸作「N 項」（`.combine` 會插入停頓唸成「N、項」）。
+  - 浪費長條圖唸出「聲波圖／y 軸為 resolved」等內部細節——Chart 自帶 accessibility tree 與聲波圖，外層覆寫 label 無效，改為隱藏；其資訊已由下方「吃掉 N／丟棄 N」提供。
+  - 前瞻金額的驚嘆號 icon 被唸成「錯誤影像」、`FoodRowView` 無照片時的佔位圖示同類問題——皆為純裝飾，加 `accessibilityHidden`。
+  - legend 三行分開朗讀經確認為**正確行為**，未更動：逐項瀏覽是 VoiceOver 的核心互動，合併反而無法跳過或單獨重聽。
+  - 六處修正未新增任何使用者可見字串（`accessibilityLabel` 皆複用既有句子），Xcode build 後 catalog 零變動。

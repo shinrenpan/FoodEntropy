@@ -17,4 +17,17 @@ extension Double {
         }
         return formatted(.currency(code: code).precision(precision).locale(locale))
     }
+
+    /// VoiceOver 朗讀用：以完整幣別名稱取代符號。
+    ///
+    /// 視覺上 TWD 顯示為 `$`（台灣本地慣例），但 VoiceOver 會把 `$` 唸成「美金」——
+    /// 對台灣使用者是錯的幣別。朗讀改用 `.fullName`（「99元」／「99 US dollars」），
+    /// 視覺呈現則維持簡潔的符號形式。
+    func currencyAccessibilityText(locale: Locale = .current) -> String {
+        let precision: NumberFormatStyleConfiguration.Precision = .fractionLength(0...2)
+        guard let code = locale.currency?.identifier else {
+            return formatted(.number.precision(precision).locale(locale))
+        }
+        return formatted(.currency(code: code).presentation(.fullName).precision(precision).locale(locale))
+    }
 }

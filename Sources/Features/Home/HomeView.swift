@@ -171,8 +171,12 @@ private extension HomeView {
                         HStack(spacing: 6) {
                             Image(systemName: "exclamationmark.circle")
                                 .foregroundStyle(expiryColor(.nearExpiry))
+                                .accessibilityHidden(true)   // 純裝飾，否則唸成「錯誤影像」
                             Text("至少 \(cost.currencyText()) 即將到期")
                                 .font(.subheadline)
+                                // 視覺用符號（$99），朗讀用完整幣別（99元）——
+                                // VoiceOver 會把 $ 唸成「美金」，對非美元地區是錯的。
+                                .accessibilityLabel(Text("至少 \(cost.currencyAccessibilityText()) 即將到期"))
                         }
                     }
                 }
@@ -190,8 +194,14 @@ private extension HomeView {
                 .foregroundStyle(slice.color)
             }
             .chartLegend(.hidden)
+            // 對 VoiceOver 隱藏：會逐一唸出資料點（「1, 3, 1」），而這些數字右側
+            // legend 已完整提供（色點 + 桶名 + 數量）。中心的總數不在 legend 內，
+            // 因此保留於下方 overlay。
+            .accessibilityHidden(true)
             .frame(width: 120, height: 120)
             .overlay {
+                // 圓圈是固定尺寸，極大字級會撐出去——改為縮放而非截斷，
+                // 使用者仍讀得到數字（憲章品質基準：Dynamic Type 不破版）。
                 VStack(spacing: 0) {
                     Text("\(total)")
                         .font(.title2.bold())
@@ -199,6 +209,13 @@ private extension HomeView {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                .lineLimit(1)
+                .minimumScaleFactor(0.4)
+                .padding(.horizontal, 8)
+                // 數字與單位分屬兩個 Text：.combine 會在兩者間插入停頓（唸成「5、項」），
+                // 改以明確 label 唸作「5 項」。此字串與桶 header 共用既有的 catalog key。
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text("\(total) 項"))
             }
         }
 
@@ -278,6 +295,7 @@ private extension HomeView {
                             Text("其中已記錄價格者共 \(wastedCost.currencyText())")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                                .accessibilityLabel(Text("其中已記錄價格者共 \(wastedCost.currencyAccessibilityText())"))
                         }
                     }
                     .padding(.vertical, 8)
@@ -312,6 +330,10 @@ private extension HomeView {
             .chartYAxis(.hidden)
             .chartLegend(.hidden)
             .frame(height: 14)
+            // 對 VoiceOver 隱藏：Chart 自帶 accessibility tree 與聲波圖，會唸出
+            // 「y 軸為 resolved、2 個資料點」這類內部細節；而它呈現的資訊已由下方
+            // 「吃掉 N／丟棄 N」的文字完整提供，重複朗讀只是干擾。
+            .accessibilityHidden(true)
         }
     }
 }

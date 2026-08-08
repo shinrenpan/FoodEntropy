@@ -39,6 +39,7 @@ struct FoodRowView: View {
                 .overlay {
                     Image(systemName: "photo")
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)   // 無照片時的佔位裝飾，不該被朗讀
                 }
         }
     }
