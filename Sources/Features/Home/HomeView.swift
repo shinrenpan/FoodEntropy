@@ -129,9 +129,11 @@ struct HomeView: View {
 
 private extension HomeView {
     struct StatusSlice: Identifiable {
-        let id: String
+        let status: ExpiryStatus
         let count: Int
-        let color: Color
+
+        var id: String { status.rawValue }   // 僅供 Identifiable，不面向使用者
+        var color: Color { expiryColor(status) }
     }
 
     struct StatusChartSection: View {
@@ -144,9 +146,9 @@ private extension HomeView {
         private var total: Int { expired + nearExpiry + fresh }
         private var slices: [StatusSlice] {
             [
-                .init(id: "已過期", count: expired, color: expiryColor(.expired)),
-                .init(id: "3 天內到期", count: nearExpiry, color: expiryColor(.nearExpiry)),
-                .init(id: "保存期限內", count: fresh, color: expiryColor(.fresh)),
+                .init(status: .expired, count: expired),
+                .init(status: .nearExpiry, count: nearExpiry),
+                .init(status: .fresh, count: fresh),
             ]
         }
 
@@ -200,6 +202,17 @@ private extension HomeView {
             }
         }
 
+        /// 字面值必須直接寫在 `Text()` 內，編譯器才會抽成確定的 key。
+        /// 若改成把 `LocalizedStringKey` 當參數傳遞，會被歸入 __PotentialKeys、
+        /// 進而在 String Catalog 中被標為 stale——照 warning 清理就會誤刪掉活的翻譯。
+        @ViewBuilder private func statusLabel(_ status: ExpiryStatus) -> some View {
+            switch status {
+            case .expired: Text("已過期")
+            case .nearExpiry: Text("3 天內到期")
+            case .fresh: Text("保存期限內")
+            }
+        }
+
         @ViewBuilder private func legend() -> some View {
             VStack(alignment: .leading, spacing: 10) {
                 ForEach(slices) { slice in
@@ -207,7 +220,7 @@ private extension HomeView {
                         Circle()
                             .fill(slice.color)
                             .frame(width: 10, height: 10)
-                        Text(LocalizedStringKey(slice.id))
+                        statusLabel(slice.status)
                             .font(.subheadline)
                         Spacer(minLength: 12)
                         Text("\(slice.count)")
@@ -241,7 +254,9 @@ private extension HomeView {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                             Spacer()
-                            Text("\(Int((wasteRate * 100).rounded()))%")
+                            // 百分比交由 FormatStyle 產生：各語言的符號位置與間距不同，
+                            // 手動接 "%" 會在部分地區顯示錯誤。.percent 亦自行處理 0.2 → 20%。
+                            Text(wasteRate, format: .percent.precision(.fractionLength(0)))
                                 .font(.title.bold())
                                 .monospacedDigit()
                                 .foregroundStyle(wasteRate >= 0.3 ? .red : .primary)

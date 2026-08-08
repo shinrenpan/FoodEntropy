@@ -31,61 +31,6 @@
         }
       }
     },
-    "「%arg」今天到期，記得處理。": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "“%arg” expires today — remember to use it."
-          }
-        }
-      }
-    },
-    "「%arg」將被刪除，此操作無法復原。": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "“%arg” will be deleted. This cannot be undone."
-          }
-        }
-      }
-    },
-    "%arg": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%arg"
-          }
-        }
-      }
-    },
-    "%arg 項": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%arg items"
-          }
-        }
-      }
-    },
-    "%arg%%": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%arg%%"
-          }
-        }
-      }
-    },
     "%lld": {
       "localizations": {
         "en": {
@@ -99,31 +44,9 @@
     "%lld 項": {
       "localizations": {
         "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld item"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld items"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "%lld%%": {
-      "localizations": {
-        "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld%%"
+            "value": "%lld items"
           }
         }
       }
@@ -134,17 +57,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expiring within 3 days"
-          }
-        }
-      }
-    },
-    "Ad Placeholder": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ad Placeholder"
           }
         }
       }
@@ -199,17 +111,6 @@
         }
       }
     },
-    "丟棄 %arg": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Discarded %arg"
-          }
-        }
-      }
-    },
     "丟棄 %lld": {
       "localizations": {
         "en": {
@@ -240,6 +141,16 @@
         }
       }
     },
+    "價格": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Price"
+          }
+        }
+      }
+    },
     "儲存": {
       "localizations": {
         "en": {
@@ -250,13 +161,12 @@
         }
       }
     },
-    "分析": {
-      "extractionState": "stale",
+    "其中已記錄價格者共 %@": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Analytics"
+            "value": "Recorded prices total %@"
           }
         }
       }
@@ -281,17 +191,6 @@
         }
       }
     },
-    "即將推出": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coming soon"
-          }
-        }
-      }
-    },
     "取消": {
       "localizations": {
         "en": {
@@ -312,17 +211,6 @@
         }
       }
     },
-    "吃掉 %arg": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Used %arg"
-          }
-        }
-      }
-    },
     "吃掉 %lld": {
       "localizations": {
         "en": {
@@ -339,17 +227,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
-          }
-        }
-      }
-    },
-    "將刪除所有「已使用 / 丟棄」紀錄，此操作無法復原。": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This will delete all Used / Discarded records. This cannot be undone."
           }
         }
       }
@@ -395,7 +272,6 @@
       }
     },
     "已過期": {
-      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -405,35 +281,12 @@
         }
       }
     },
-    "已過期 %arg 天": {
-      "extractionState": "stale",
+    "已過期 %lld 天": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Expired %arg days ago"
-          }
-        }
-      }
-    },
-    "已過期 %lld 天": {
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Expired %lld day ago"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Expired %lld days ago"
-                }
-              }
-            }
+            "value": "Expired %lld days ago"
           }
         }
       }
@@ -474,28 +327,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ad"
-          }
-        }
-      }
-    },
-    "廣告功能上線後開放。": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Available once ads are live."
-          }
-        }
-      }
-    },
-    "廣告與購買功能上線後開放。": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Available once ads and purchases are live."
           }
         }
       }
@@ -546,17 +377,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tap to edit; swipe to mark used / delete; long-press to extend or discard."
-          }
-        }
-      }
-    },
-    "提示：點項目可編輯；長按可延長效期或標記丟棄。": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tip: tap an item to edit; long-press to extend expiry or mark as discarded."
           }
         }
       }
@@ -691,28 +511,6 @@
         }
       }
     },
-    "清除所有「已使用 / 丟棄」紀錄，浪費統計將歸零。此操作無法復原。": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clear all Used / Discarded records; waste stats will reset. This cannot be undone."
-          }
-        }
-      }
-    },
-    "清除歷史統計": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clear History"
-          }
-        }
-      }
-    },
     "清除歷史統計？": {
       "localizations": {
         "en": {
@@ -763,17 +561,6 @@
         }
       }
     },
-    "目前還沒有食材": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No food items yet"
-          }
-        }
-      }
-    },
     "確定刪除？": {
       "localizations": {
         "en": {
@@ -820,6 +607,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Keep Editing"
+          }
+        }
+      }
+    },
+    "至少 %@ 即將到期": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At least %@ expiring soon"
           }
         }
       }
@@ -904,6 +701,16 @@
         }
       }
     },
+    "選填": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional"
+          }
+        }
+      }
+    },
     "還原購買": {
       "localizations": {
         "en": {
@@ -914,35 +721,12 @@
         }
       }
     },
-    "還有 %arg 天": {
-      "extractionState": "stale",
+    "還有 %lld 天": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%arg days left"
-          }
-        }
-      }
-    },
-    "還有 %lld 天": {
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld day left"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld days left"
-                }
-              }
-            }
+            "value": "%lld days left"
           }
         }
       }
@@ -1003,57 +787,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Home"
-          }
-        }
-      }
-    },
-    "點右下角的＋開始記錄": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tap + at the bottom-right to start tracking"
-          }
-        }
-      }
-    },
-    "價格": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Price"
-          }
-        }
-      }
-    },
-    "選填": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Optional"
-          }
-        }
-      }
-    },
-    "至少 %arg 即將到期": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "At least %arg expiring soon"
-          }
-        }
-      }
-    },
-    "其中已記錄價格者共 %arg": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recorded prices total %arg"
           }
         }
       }
