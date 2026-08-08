@@ -238,3 +238,91 @@ code:
   - Sources/Core/Persistence/SwiftDataManager.swift
   - Sources/Core/Image/ImageCompressor.swift
 -->
+
+---
+### Requirement: The recorded cost is persisted as an optional attribute and survives resolution
+
+The system SHALL persist the recorded cost as an optional attribute, added without altering any existing attribute, and SHALL retain it when an item is marked consumed or wasted. Unlike the item's photo, the cost SHALL NOT be cleared on resolution.
+
+#### Scenario: A resolved item keeps its cost
+
+- **WHEN** the user marks an item that has a recorded cost as consumed or wasted
+- **THEN** the stored record retains that cost, so it remains available to waste statistics — while its photo is still cleared as before
+
+#### Scenario: Adding the attribute does not disturb existing records
+
+- **WHEN** a user with existing food items updates to a version that introduces the cost attribute
+- **THEN** their items load normally with no recorded cost, and no migration prompt or data loss occurs
+
+
+<!-- @trace
+source: add-price-tracking
+updated: 2026-08-08
+code:
+  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
+  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
+  - Sources/Features/Home/HomeViewModel+Models.swift
+  - CLAUDE.md
+  - Sources/Features/Home/HomeView.swift
+  - Sources/Core/Persistence/SwiftDataManager.swift
+  - Sources/Core/Persistence/FoodItemEntity.swift
+  - Sources/App/SceneDelegate.swift
+  - Sources/Core/Extensions/CurrencyFormat.swift
+  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
+  - Sources/Core/Components/FoodRowView.swift
+  - Sources/Core/Domain/FoodItem.swift
+  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
+  - Sources/Core/Domain/FoodItemMocks.swift
+  - Sources/Features/FoodForm/FoodFormViewModel.swift
+  - Sources/Resources/Localizable.xcstrings
+  - Sources/Features/FoodForm/FoodFormView.swift
+  - README.md
+  - Sources/Features/Home/HomeViewModel.swift
+  - Tests/FoodEntropyTests/HomeViewModelTests.swift
+-->
+
+---
+### Requirement: Every attribute must be written at least once before deploying the schema
+
+The system SHALL, before deploying a schema to the production environment, ensure each attribute — including optional ones — has actually been written with a value in the development environment, and SHALL verify the resulting field list rather than assuming the model definition was mirrored.
+
+#### Scenario: An optional attribute that no record has ever set
+
+- **WHEN** a new optional attribute exists in the model but no record has yet been saved with a value for it
+- **THEN** no corresponding field exists in the development schema, and deploying at that point ships a production schema missing that field
+
+#### Scenario: The missing field surfaces only later, in production
+
+- **WHEN** a production schema lacks a field and a user's record sets that attribute
+- **THEN** the value cannot sync, because production does not create fields on demand — and nothing in the app reports the failure
+
+#### Scenario: Verifying before deployment
+
+- **WHEN** preparing to deploy after adding attributes
+- **THEN** each attribute is exercised with a real value first, and the development field list is checked against the model before the deployment is confirmed
+
+<!-- @trace
+source: add-price-tracking
+updated: 2026-08-08
+code:
+  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
+  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
+  - Sources/Features/Home/HomeViewModel+Models.swift
+  - CLAUDE.md
+  - Sources/Features/Home/HomeView.swift
+  - Sources/Core/Persistence/SwiftDataManager.swift
+  - Sources/Core/Persistence/FoodItemEntity.swift
+  - Sources/App/SceneDelegate.swift
+  - Sources/Core/Extensions/CurrencyFormat.swift
+  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
+  - Sources/Core/Components/FoodRowView.swift
+  - Sources/Core/Domain/FoodItem.swift
+  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
+  - Sources/Core/Domain/FoodItemMocks.swift
+  - Sources/Features/FoodForm/FoodFormViewModel.swift
+  - Sources/Resources/Localizable.xcstrings
+  - Sources/Features/FoodForm/FoodFormView.swift
+  - README.md
+  - Sources/Features/Home/HomeViewModel.swift
+  - Tests/FoodEntropyTests/HomeViewModelTests.swift
+-->
