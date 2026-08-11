@@ -54,6 +54,13 @@ targets:
         com.apple.developer.icloud-services:
           - CloudKit
         aps-environment: $(APS_ENVIRONMENT)   # CloudKit 靜默推播（Debug=development / Release=production）
+        # Widget 是獨立 process，需與 app 共用容器才讀得到同一份 store。
+        # ⚠️ 僅宣告 entitlement，不得在 ModelConfiguration 指定 configuration name /
+        # url / groupContainer identifier——SwiftData 的既有 store 自動複製掛在
+        # groupContainer 隱含的 .automatic 偵測上，明確指定會繞過它而開出空 store
+        # （見 persistence spec「The store location is never specified explicitly...」）。
+        com.apple.security.application-groups:
+          - group.com.shinrenpan.FoodEntropy
     info:
       path: Sources/App/Info.plist
       properties:

@@ -1,8 +1,8 @@
 ## 1. 動工前置：升級實測（gate）
 
-- [ ] 1.1 於 Apple Developer 後台建立 App Group identifier，命名與既有 bundle identifier 慣例一致（design 的待解問題）；驗證：identifier 已存在於後台，且格式為 group 前綴加既有 bundle identifier 的反向網域。
-- [ ] 1.2 **gate 判定** — 對應「The store location is never specified explicitly once an app group is adopted」，落實 design 的「不為 App Group 指定容器位置或名稱」：以升級情境實測自動複製。取已有資料的 v1.1.0 build 安裝並建立數筆記錄（含照片與價格），再直接升級為僅加了 App Group entitlement、未修改任何 `ModelConfiguration` 的 build；驗證：升級後所有記錄仍在，照片與價格完整。**iCloud 同步開啟與關閉各測一次。任一未通過即停止本 change，回到 proposal 重新評估資料傳遞方式。**
-- [ ] 1.3 記錄實測所觀察到的降級行為 — 對應該 requirement 的「自動複製未發生」情境；驗證：確認複製失敗時 app 是沿用既有記錄繼續運作，而非開出空 store；若觀察到後者，於 proposal 記錄並停止。
+- [x] 1.1 於 Apple Developer 後台建立 App Group identifier，命名與既有 bundle identifier 慣例一致（design 的待解問題）；驗證：identifier 已存在於後台，且格式為 group 前綴加既有 bundle identifier 的反向網域。
+- [x] 1.2 **gate 判定** — 對應「The store location is never specified explicitly once an app group is adopted」，落實 design 的「不為 App Group 指定容器位置或名稱」：以升級情境實測自動複製。取已有資料的 v1.1.0 build 安裝並建立數筆記錄（含照片與價格），再直接升級為僅加了 App Group entitlement、未修改任何 `ModelConfiguration` 的 build；驗證：**已完成，兩輪皆通過**——(a) iCloud 關閉（模擬器）：升級後 10 筆記錄完整，`_EXTERNAL_DATA` 的圖片一併搬入 App Group 容器；刪除 app 私有容器的 store 後資料仍在，證明 app 讀的確實是新位置。(b) iCloud 開啟（實機）：升級前 3 項／$500，升級後 3 項與照片完整。**關鍵佐證**：SDK 介面確認 `ModelConfiguration` 的 `groupContainer` 預設值即為 `.automatic`，故「只加 entitlement、不碰 `ModelConfiguration`」成立，`SwiftDataManager` 全程零修改。
+- [x] 1.3 記錄實測所觀察到的降級行為 — 對應該 requirement 的「自動複製未發生」情境；驗證：**已完成，未觸發降級**——`makeResilient` 第一層即成功，無需退回本機或記憶體。兩項附帶觀察值得記錄：(a) **SwiftData 是複製而非移動**，舊位置的 `default.store` 仍留存，實際影響是資料庫佔用雙倍空間（含外部圖片），公開文件未說明何時清除。(b) **iCloud 開啟時 CloudKit 會出現一次 `Change Token Expired`（21/2026）**，訊息為 client knowledge differs from server knowledge，系統隨即以 `ServerChangeTokenExpired` 為由自動 reset 並重新同步，資料未受影響——此即 design 待解問題「與 CloudKit 併用時的行為」的答案。
 
 ## 2. 抽出共用元件（純重構，不得改變視覺）
 
