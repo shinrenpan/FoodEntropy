@@ -37,6 +37,8 @@ DerivedData/
 *.xcodeproj/
 Sources/App/Info.plist
 Sources/App/FoodEntropy.entitlements
+Sources/Widget/Info.plist
+Sources/Widget/FoodEntropyWidget.entitlements
 
 # Swift Package Manager
 .build/

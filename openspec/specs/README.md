@@ -16,7 +16,7 @@ v1.0.0 早於 Spectra 導入，其 capability 已全數以 `baseline-*` change �
 ## Domain rules（跨畫面共用——不併入任何單一畫面）
 
 - **`food-item`** ✅ — Domain model、`RecordStatus`／`ExpiryStatus` 雙軸狀態、四種 row 出口（延長／已使用／丟棄／刪除）。被所有畫面消費。
-- **`persistence`** ✅ — SwiftData `@Model` 的 CloudKit-safe 約束、`SwiftDataManager` 與 `toDomain()` 轉換、`VersionedSchema`、圖片 externalStorage 與壓縮。`app-shell` 負責建立它，本 capability 定義它的契約。
+- **`persistence`** ✅ — SwiftData `@Model` 的 CloudKit-safe 約束、`SwiftDataManager` 與 `toDomain()` 轉換、`VersionedSchema`、圖片 externalStorage 與壓縮。`app-shell` 負責建立它，本 capability 定義它的契約。store 位於 App Group 容器以供 `widget` 讀取——**容器位置不得在程式碼中明確指定**，指定即會關閉 SwiftData 的既有 store 自動複製。
 - **`icloud-sync`** ✅ — opt-in、預設關、下次啟動生效。由 `settings-ui` 操作，影響 `persistence` 的容器選擇。
 - **`notification`** ✅ — 到期當天 09:00、一項一則、首次儲存請求權限、前景對帳排程。由 `food-form-ui` 觸發排程、`app-shell` 在進前景時觸發對帳。
 - **`iap-remove-ads`** ✅ — `StoreManager`、購買與還原、entitlement 單一真相來源。由 `settings-ui` 操作，`advertising` 讀其結果。
@@ -27,6 +27,10 @@ v1.0.0 早於 Spectra 導入，其 capability 已全數以 `baseline-*` change �
 - **`home-ui`** ✅ — 現況甜甜圈 + 浪費統計 + 分桶清單（原分析頁已於 v1.0.0 併入），透過 `navigation` 進出 `food-form-ui`。
 - **`food-form-ui`** ✅ — 新增／編輯共用 Form、照片選取與大圖預覽。
 - **`settings-ui`** ✅ — 承載 `iap-remove-ads`、`icloud-sync`、`notification` 權限引導、隱私權政策、版本。
+
+## App 之外的呈現
+
+- **`widget`** ✅ — 主畫面中尺寸 Widget。資料來自 `persistence`（透過 App Group 共用同一份 store，extension 開自己的連線）；效期規則沿用 `food-item`（`ExpiryStatus` 讀取時算，故 timeline 需跨日刷新）；**呈現與 `home-ui` 共用同一份實作**，而非各自維護相似版面——分桶與前瞻金額的計算亦然，兩處顯示的數字因此必然相同。不含互動、不寫入資料。
 
 ## Cross-cutting
 

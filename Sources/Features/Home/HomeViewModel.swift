@@ -123,12 +123,6 @@ extension HomeViewModel {
         }
     }
 
-    /// 已記錄價格者的總和；一筆都沒有時回 nil（無可計算，非零）。
-    private static func sumPrices(_ items: [FoodItem]) -> Double? {
-        let prices = items.compactMap(\.price)
-        return prices.isEmpty ? nil : prices.reduce(0, +)
-    }
-
     private func reload() async {
         let active = manager.fetchActiveFoods()
         let resolved = manager.fetchResolvedFoods()
@@ -163,9 +157,11 @@ extension HomeViewModel {
         switch response {
         case let .loaded(active, resolved):
             // 現況：依效期狀態分三桶（active 已依到期日升冪，桶內順序天然正確）。
-            state.expired = active.filter { $0.expiryStatus() == .expired }
-            state.nearExpiry = active.filter { $0.expiryStatus() == .nearExpiry }
-            state.fresh = active.filter { $0.expiryStatus() == .fresh }
+            // 計算共用給 Widget——兩處顯示的數字必須相同，故邏輯只有一份。
+            let summary = FoodStatusSummary(active: active)
+            state.expired = summary.expired
+            state.nearExpiry = summary.nearExpiry
+            state.fresh = summary.fresh
             // 歷史統計：只計「近 30 天」內處理的（滾動視窗，舊資料自然不影響）。
             let cutoff = Calendar.current.date(byAdding: .day, value: -Self.wasteWindowDays, to: .now) ?? .distantPast
             let windowed = resolved.filter { ($0.resolvedAt ?? .distantPast) >= cutoff }
@@ -175,8 +171,8 @@ extension HomeViewModel {
             state.hasHistory = !resolved.isEmpty
             // 金額：前瞻只取 nearExpiry（還來得及救），回顧沿用同一視窗。
             // 兩者皆以 nil 表示「無可計算」——畫面據此整行不渲染，而非顯示 0。
-            state.upcomingExpiryCost = Self.sumPrices(state.nearExpiry)
-            state.wastedCost = Self.sumPrices(windowed.filter { $0.status == .wasted })
+            state.upcomingExpiryCost = summary.upcomingExpiryCost
+            state.wastedCost = FoodStatusSummary.sumPrices(windowed.filter { $0.status == .wasted })
         }
     }
 }

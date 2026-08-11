@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import WidgetKit
 
 // 資料層邊界（02-architecture §1 §4 §6）。
 // - 持有 ModelContainer / mainContext
@@ -178,6 +179,12 @@ final class SwiftDataManager {
     private func save() {
         do {
             try context.save()
+            // Widget 讀的是同一份 store，但 iOS 不會主動通知它資料變了。
+            // 放在這裡而非各 ViewModel：這是所有寫入的單一出口，
+            // 分散到呼叫端遲早會漏掉一條路徑（widget spec:「SHALL request a
+            // reload when items are added, resolved, or deleted」）。
+            // 沒有 widget 時為 no-op，故不需條件判斷。
+            WidgetCenter.shared.reloadAllTimelines()
         } catch {
             assertionFailure("SwiftDataManager save failed: \(error)")
         }

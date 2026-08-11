@@ -29,9 +29,12 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+        excludes:
+          - "Widget/**"          # extension 自己的 target 編譯，避免 @main 衝突
     dependencies:
       - package: GoogleMobileAds
         product: GoogleMobileAds
+      - target: FoodEntropyWidget
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.shinrenpan.FoodEntropy
@@ -146,6 +149,44 @@ targets:
           - CFBundleURLName: com.shinrenpan.FoodEntropy
             CFBundleURLSchemes:
               - foodentropy
+
+  # Widget extension：獨立 process，透過 App Group 讀同一份 store。
+  # sources 逐檔列出而非整個 Core——整包會帶進 AdMob / StoreKit / 通知等
+  # extension 用不到也不該連結的相依。
+  FoodEntropyWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Sources/Widget
+      - path: Sources/Core/Domain/FoodItem.swift          # Domain Model 與 ExpiryStatus
+      - path: Sources/Core/Domain/FoodStatusSummary.swift # 與首頁共用的分桶與金額計算
+      - path: Sources/Core/Persistence/FoodItemEntity.swift   # @Model 與 toDomain()
+      - path: Sources/Core/Components/StatusChartView.swift   # 與首頁共用的呈現
+      - path: Sources/Core/Components/FoodRowView.swift       # expiryColor 定義於此
+      - path: Sources/Core/Extensions/CurrencyFormat.swift    # 金額格式化
+      - path: Sources/Resources/Localizable.xcstrings         # 使用者可見字串
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.shinrenpan.FoodEntropy.Widget
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Sources/Widget/Info.plist
+        SWIFT_EMIT_LOC_STRINGS: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
+    entitlements:
+      path: Sources/Widget/FoodEntropyWidget.entitlements
+      properties:
+        # 與 app 相同的群組；缺少任一邊，extension 就讀不到 store。
+        com.apple.security.application-groups:
+          - group.com.shinrenpan.FoodEntropy
+    info:
+      path: Sources/Widget/Info.plist
+      properties:
+        CFBundleDisplayName: 食熵
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
 
   FoodEntropyTests:
     type: bundle.unit-test
