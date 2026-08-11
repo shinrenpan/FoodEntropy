@@ -6,8 +6,8 @@
 
 ## 2. 抽出共用元件（純重構，不得改變視覺）
 
-- [ ] 2.1 將首頁「現況」區塊的內容抽至 `Sources/Core/Components/StatusChartView.swift` — 對應「The widget and the in-app screen share one presentation implementation」，落實 design 的「呈現層抽為共用元件，而非在 Widget 重寫一份相似版面」：抽出範圍為甜甜圈、legend 三行、前瞻金額行；元件只接受三個桶的數量與可選金額，不自行讀取資料；`Section` 容器與「現況」標題留在 `Sources/Features/Home/HomeView.swift`；驗證：`HomeView` 不再包含甜甜圈與 legend 的繪製程式碼，且新元件無任何資料讀取。
-- [ ] 2.2 首頁迴歸驗證；驗證：同一組資料下，抽出前後的首頁「現況」區塊視覺相同；將字級調至最大確認甜甜圈中心數字仍縮放而非截斷；以 VoiceOver 逐項朗讀，內容與抽出前相同（中心唸「N 項」、legend 逐行唸色點對應的桶名與數量、金額行唸完整幣別）。
+- [x] 2.1 將首頁「現況」區塊的內容抽至 `Sources/Core/Components/StatusChartView.swift` — 對應「The widget and the in-app screen share one presentation implementation」，落實 design 的「呈現層抽為共用元件，而非在 Widget 重寫一份相似版面」：抽出範圍為甜甜圈、legend 三行、前瞻金額行；元件只接受三個桶的數量與可選金額，不自行讀取資料；`Section` 容器與「現況」標題留在 `Sources/Features/Home/HomeView.swift`；驗證：`HomeView` 不再包含甜甜圈與 legend 的繪製程式碼，且新元件無任何資料讀取。
+- [x] 2.2 首頁迴歸驗證；驗證：同一組資料下，抽出前後的首頁「現況」區塊視覺相同；將字級調至最大確認甜甜圈中心數字仍縮放而非截斷；以 VoiceOver 逐項朗讀，內容與抽出前相同（中心唸「N 項」、legend 逐行唸色點對應的桶名與數量、金額行唸完整幣別）。
 
 ## 3. Widget extension
 
