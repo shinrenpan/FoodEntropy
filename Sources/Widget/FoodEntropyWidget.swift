@@ -41,12 +41,7 @@ struct StatusProvider: TimelineProvider {
         let entry = StatusEntry(date: now, summary: WidgetStore.loadSummary(today: now))
         // 效期是日期的函式——同一筆資料跨過午夜就換桶，因此刷新點設在次日零時。
         // 資料變動時另由 app 主動要求重載（WidgetCenter.reloadAllTimelines）。
-        let nextMidnight = Calendar.current.nextDate(
-            after: now,
-            matching: DateComponents(hour: 0, minute: 0, second: 0),
-            matchingPolicy: .nextTime
-        ) ?? now.addingTimeInterval(60 * 60)
-        completion(Timeline(entries: [entry], policy: .after(nextMidnight)))
+        completion(Timeline(entries: [entry], policy: .after(DayBoundary.next(after: now))))
     }
 }
 

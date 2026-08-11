@@ -15,17 +15,17 @@
 - [x] 3.2 將 `Sources/Core/Components/StatusChartView.swift` 與其相依的 Domain 型別加入 extension target — 對應「Source files follow the MVVMC folder convention」新增的「A presentation is consumed by both the app and an extension」情境；驗證：extension target 可編譯並引用該元件，且專案中不存在第二份相同實作。
 - [x] 3.3 確認 `SectorMark` 在 WidgetKit 可正確渲染（design 的風險項）；驗證：Widget 預覽中甜甜圈呈現三桶佔比與中心總數；若不可用，改以基本圖形繪出相同版面，共用元件的抽出仍保留。
 - [x] 3.4 實作 extension 端的資料讀取 — 對應「The widget reads data without exposing persisted types」與「The store is reachable by every process that needs it」，落實 design 的「Widget 端的資料讀取自行建立容器，且失敗時不終止」：於 extension 內建立自己的容器（同樣不指定容器位置），讀取後轉為 Domain Model 放入 `TimelineEntry`；驗證：`TimelineEntry` 的屬性只有數量與可選金額，無任何持久化型別；Widget 顯示的數字與 app 首頁一致。
-- [ ] 3.5 實作失敗路徑 — 對應「The widget never terminates on failure」：容器建立或讀取失敗時回傳空 entry 並呈現首頁既有的空狀態文案，不使用 `fatalError`；驗證：以無法開啟 store 的情境執行，Widget 顯示空狀態而非空白磚。
+- [x] 3.5 實作失敗路徑 — 對應「The widget never terminates on failure」：容器建立或讀取失敗時回傳空 entry 並呈現首頁既有的空狀態文案，不使用 `fatalError`；驗證：**已完成，但為結構性驗證而非真實 I/O 失敗實測**——`WidgetStore.loadSummary` 有兩層 `guard let try?`（容器建立、fetch），任一失敗即回傳空 summary；extension 內無 `fatalError` 亦無 `try!`（已 grep 確認為 0）。該空 summary 走的正是 5.2 已實測過的空狀態路徑，Widget 顯示「目前沒有食材」。**未涵蓋**：真實的檔案損毀或權限失敗——模擬器上刪除 store 只會讓 app 重建一個空的，無法區分「無資料」與「讀不到」，製造真實 I/O 失敗的成本高於這條路徑的風險。
 - [x] 3.6 前瞻金額行的版面處理 — 對應「The widget shows the same status figures as the home screen」的無金額情境；驗證：有金額與無金額兩種資料下，Widget 其餘內容位置不變。
 
 ## 4. Timeline 策略
 
-- [ ] 4.1 將 timeline 的下一個刷新點設為次日零時 — 對應「The timeline refreshes at each day boundary and on data change」，落實 design 的「Timeline 以每日起始為刷新點，並由 app 在資料變動時主動要求重載」；驗證：將裝置時間推進跨過午夜，Widget 的分桶結果隨日期改變，過程中不開啟 app。
-- [ ] 4.2 app 端在新增、標記已使用／丟棄、刪除後要求重新載入 timeline；驗證：於 app 內完成一次標記已使用後返回主畫面，Widget 內容已更新。
-- [ ] 4.3 點擊行為 — 對應「Tapping the widget opens the app」；驗證：點擊 Widget 任一處開啟 app 並停在首頁。
+- [x] 4.1 將 timeline 的下一個刷新點設為次日零時 — 對應「The timeline refreshes at each day boundary and on data change」，落實 design 的「Timeline 以每日起始為刷新點，並由 app 在資料變動時主動要求重載」；驗證：**已完成，但驗證方式已調整**——原訂「將裝置時間推進跨過午夜」不可行：模擬器時鐘跟隨 macOS 主機，實測需更動開發機系統時間，副作用遠大於這條規則的風險。改為將刷新點計算抽為 `DayBoundary.next(after:calendar:)`（置於 Domain 而非 extension 內，否則進不了測試 target），以 6 個測試釘住：一般時刻、接近午夜、正好零時（須為再隔一天，否則 timeline 立即失效而反覆刷新）、跨月、跨年，以及「回傳值必定晚於輸入」的全時段檢查。本專案能保證的是**告訴 WidgetKit 正確的刷新時間**；屆時是否真的喚醒由系統負責，不在可控範圍。
+- [x] 4.2 app 端在新增、標記已使用／丟棄、刪除後要求重新載入 timeline；驗證：於 app 內完成一次標記已使用後返回主畫面，Widget 內容已更新。
+- [x] 4.3 點擊行為 — 對應「Tapping the widget opens the app」；驗證：點擊 Widget 任一處開啟 app 並停在首頁。
 
 ## 5. 驗收
 
 - [x] 5.1 視覺一致性；驗證：同一組資料下，Widget 與首頁「現況」區塊的甜甜圈比例、中心總數、legend 三行數字、前瞻金額四項皆相同。
-- [ ] 5.2 空狀態一致性；驗證：清空所有記錄後，Widget 顯示的文案與首頁相同。
+- [x] 5.2 空狀態一致性；驗證：清空所有記錄後，Widget 顯示的文案與首頁相同。
 - [x] 5.3 更新 `openspec/specs/README.md` 的 capability map，加入 `widget` 並標註其與 `persistence`、`home-ui`、`food-item` 的關係；驗證：README 可看出 Widget 的資料來自 `persistence`、呈現與 `home-ui` 共用、狀態規則來自 `food-item`。

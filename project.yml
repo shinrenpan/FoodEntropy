@@ -160,6 +160,7 @@ targets:
       - path: Sources/Widget
       - path: Sources/Core/Domain/FoodItem.swift          # Domain Model 與 ExpiryStatus
       - path: Sources/Core/Domain/FoodStatusSummary.swift # 與首頁共用的分桶與金額計算
+      - path: Sources/Core/Domain/DayBoundary.swift       # timeline 的跨日刷新點
       - path: Sources/Core/Persistence/FoodItemEntity.swift   # @Model 與 toDomain()
       - path: Sources/Core/Components/StatusChartView.swift   # 與首頁共用的呈現
       - path: Sources/Core/Components/FoodRowView.swift       # expiryColor 定義於此
