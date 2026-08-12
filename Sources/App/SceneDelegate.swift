@@ -80,8 +80,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // 兩 Tab 裝配（首頁併入分析，見 03-screens）。
     private func makeRootTabBarController(manager: SwiftDataManager, store: StoreManager) -> UITabBarController {
-        let homeTitle = String(localized: "首頁")
-        let settingsTitle = String(localized: "設定")
+        let homeTitle = String(localized: "Home")
+        let settingsTitle = String(localized: "Settings")
 
         let home = HomeHostController(manager: manager, store: store)
         home.navigationItem.title = homeTitle

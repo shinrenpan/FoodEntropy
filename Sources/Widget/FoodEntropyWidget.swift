@@ -76,8 +76,8 @@ struct FoodEntropyWidget: Widget {
         // 系統預設四周各約 16pt，扣掉後高度不足以容納環形圖與金額行；
         // 停用後由 EntryView 自行控制較緊湊的內距。
         .contentMarginsDisabled()
-        .configurationDisplayName("效期現況")
-        .description("一眼看見有多少食材快過期。")
+        .configurationDisplayName("Expiry Overview")
+        .description("See at a glance how much food is about to expire.")
         .supportedFamilies([.systemMedium])
     }
 }

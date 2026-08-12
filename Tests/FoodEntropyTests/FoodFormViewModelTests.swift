@@ -28,13 +28,13 @@ struct FoodFormViewModelTests {
         #expect(vm.state.name == "牛奶")
         #expect(vm.state.purchaseDate == d0)
         #expect(vm.state.expiryDate == day(3, from: d0))
-        #expect(vm.navigationTitle == String(localized: "編輯食材"))
+        #expect(vm.navigationTitle == String(localized: "Edit Food"))
     }
 
     @Test
     func `add 模式標題為新增食材`() async throws {
         let vm = try makeVM(.add, makeManager())
-        #expect(vm.navigationTitle == String(localized: "新增食材"))
+        #expect(vm.navigationTitle == String(localized: "Add Food"))
     }
 
     // MARK: - 驗證

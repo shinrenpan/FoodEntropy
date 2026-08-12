@@ -47,8 +47,8 @@ final class FoodFormViewModel {
 
     var navigationTitle: String {
         switch mode {
-        case .add: String(localized: "新增食材")
-        case .edit: String(localized: "編輯食材")
+        case .add: String(localized: "Add Food")
+        case .edit: String(localized: "Edit Food")
         }
     }
 

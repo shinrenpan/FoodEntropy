@@ -88,8 +88,8 @@ final class NotificationService {
 
     private func makeRequest(for food: FoodItem, fireDate: Date, calendar: Calendar, shortTrigger: Bool) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "食材到期提醒")
-        content.body = String(localized: "「\(food.name)」今天到期，記得處理。")
+        content.title = String(localized: "Food Expiry Reminder")
+        content.body = String(localized: "“\(food.name)” expires today — remember to use it.")
         content.sound = .default
         content.userInfo = ["deeplink": "foodentropy://home"]   // 點擊 → 首頁（SceneDelegate 已處理）
 

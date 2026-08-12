@@ -28,15 +28,15 @@ struct SettingsView: View {
         .onAppear {
             Task { await viewModel.doAction(.view(.onAppear)) }
         }
-        .alert("設定已變更", isPresented: $bVM.state.showRestartNotice) {
-            Button("好") {}
+        .alert("Setting changed", isPresented: $bVM.state.showRestartNotice) {
+            Button("OK") {}
         } message: {
-            Text("iCloud 同步將於下次開啟 App 後生效。")
+            Text("iCloud sync will take effect the next time you open the app.")
         }
-        .alert("購買失敗", isPresented: $bVM.state.showPurchaseError) {
-            Button("好") {}
+        .alert("Purchase Failed", isPresented: $bVM.state.showPurchaseError) {
+            Button("OK") {}
         } message: {
-            Text("購買未能完成，請稍後再試。")
+            Text("The purchase couldn't be completed. Please try again later.")
         }
     }
 
@@ -86,9 +86,9 @@ private extension SettingsView {
             Section {
                 if adsRemoved {
                     HStack {
-                        Text("移除廣告")
+                        Text("Remove Ads")
                         Spacer()
-                        Label("已購買", systemImage: "checkmark.circle.fill")
+                        Label("Purchased", systemImage: "checkmark.circle.fill")
                             .foregroundStyle(.green)
                             .labelStyle(.titleAndIcon)
                     }
@@ -97,7 +97,7 @@ private extension SettingsView {
                         send(.removeAdsDidTap)
                     } label: {
                         HStack {
-                            Text("移除廣告")
+                            Text("Remove Ads")
                             Spacer()
                             if inFlight {
                                 ProgressView()
@@ -108,11 +108,11 @@ private extension SettingsView {
                     }
                     .disabled(inFlight)
 
-                    Button("還原購買") { send(.restoreDidTap) }
+                    Button("Restore Purchase") { send(.restoreDidTap) }
                         .disabled(inFlight)
                 }
             } footer: {
-                Text(adsRemoved ? "感謝支持，首頁廣告已移除。" : "一次性購買，永久移除首頁橫幅廣告。")
+                Text(adsRemoved ? "Thanks for your support — the home banner ad has been removed." : "A one-time purchase to permanently remove the home banner ad.")
             }
         }
     }
@@ -129,7 +129,7 @@ private extension SettingsView {
 
         var body: some View {
             Section {
-                Toggle("iCloud 同步", isOn: Binding(
+                Toggle("iCloud Sync", isOn: Binding(
                     get: { iCloudOn },
                     set: { send(.iCloudToggled($0)) }
                 ))
@@ -138,7 +138,7 @@ private extension SettingsView {
                     send(.notificationDidTap)
                 } label: {
                     HStack {
-                        Text("通知")
+                        Text("Notifications")
                             .foregroundStyle(.primary)
                         Spacer()
                         Text(notificationStatusText)
@@ -146,15 +146,15 @@ private extension SettingsView {
                     }
                 }
             } footer: {
-                Text("iCloud 同步預設關閉；開啟後將備份至你的 iCloud。通知權限請於系統設定調整。")
+                Text("iCloud sync is off by default; when on, your data is backed up to your iCloud. Adjust notification permissions in system Settings.")
             }
         }
 
         private var notificationStatusText: String {
             switch notificationStatus {
-            case .authorized: String(localized: "已開啟")
-            case .denied: String(localized: "已關閉")
-            case .notDetermined: String(localized: "未設定")
+            case .authorized: String(localized: "On")
+            case .denied: String(localized: "Off")
+            case .notDetermined: String(localized: "Not set")
             }
         }
     }
@@ -169,9 +169,9 @@ private extension SettingsView {
 
         var body: some View {
             Section {
-                Button("隱私權政策") { send(.privacyPolicyDidTap) }
+                Button("Privacy Policy") { send(.privacyPolicyDidTap) }
                 HStack {
-                    Text("版本")
+                    Text("Version")
                     Spacer()
                     Text(versionText)
                         .foregroundStyle(.secondary)

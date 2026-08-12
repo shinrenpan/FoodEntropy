@@ -10,7 +10,7 @@ struct HomeView: View {
         List {
             // 內容由 Core/Components 的共用元件負責，Widget 引用同一份；
             // Section 容器與標題留在這裡——Widget 沒有 List 語境。
-            Section("現況") {
+            Section("Current") {
                 StatusChartView(
                     expired: viewModel.state.expired.count,
                     nearExpiry: viewModel.state.nearExpiry.count,
@@ -28,12 +28,12 @@ struct HomeView: View {
                 onClear: { Task { await viewModel.doAction(.view(.clearHistoryDidTap)) } }
             )
 
-            BucketSection(title: "已過期未處理", items: viewModel.state.expired, send: handleListAction)
-            BucketSection(title: "3 天內到期", items: viewModel.state.nearExpiry, send: handleListAction)
+            BucketSection(title: "Expired, unhandled", items: viewModel.state.expired, send: handleListAction)
+            BucketSection(title: "Expiring within 3 days", items: viewModel.state.nearExpiry, send: handleListAction)
             BucketSection(
-                title: "保存期限內",
+                title: "Fresh",
                 items: viewModel.state.fresh,
-                footer: "提示：點項目可編輯；左右滑可標記已使用 / 刪除；長按可延長效期或標記丟棄。",
+                footer: "Tap to edit; swipe to mark used / delete; long-press to extend or discard.",
                 send: handleListAction
             )
         }
@@ -53,26 +53,26 @@ struct HomeView: View {
             Task { await viewModel.doAction(.view(.onAppear)) }
         }
         .alert(
-            "確定刪除？",
+            "Delete this item?",
             isPresented: deleteAlertPresented(),
             presenting: viewModel.state.pendingDeleteItem
         ) { _ in
-            Button("刪除", role: .destructive) {
+            Button("Delete", role: .destructive) {
                 Task { await viewModel.doAction(.view(.deleteConfirmed)) }
             }
-            Button("取消", role: .cancel) {
+            Button("Cancel", role: .cancel) {
                 Task { await viewModel.doAction(.view(.deleteCancelled)) }
             }
         } message: { item in
-            Text("「\(item.name)」將被刪除，此操作無法復原。")
+            Text("“\(item.name)” will be deleted. This cannot be undone.")
         }
-        .alert("清除歷史統計？", isPresented: $bVM.state.showClearHistoryConfirm) {
-            Button("清除", role: .destructive) {
+        .alert("Clear history?", isPresented: $bVM.state.showClearHistoryConfirm) {
+            Button("Clear", role: .destructive) {
                 Task { await viewModel.doAction(.view(.clearHistoryConfirmed)) }
             }
-            Button("取消", role: .cancel) {}
+            Button("Cancel", role: .cancel) {}
         } message: {
-            Text("將刪除所有「已使用 / 丟棄」紀錄，浪費統計將歸零。此操作無法復原。")
+            Text("This will delete all Used / Discarded records; waste stats will reset. This cannot be undone.")
         }
         .sheet(item: extendItemBinding()) { item in
             ExtendSheet(item: item, send: handleExtendAction)
@@ -146,7 +146,7 @@ private extension HomeView {
                 if let wasteRate {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(alignment: .firstTextBaseline) {
-                            Text("浪費率")
+                            Text("Waste rate")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                             Spacer()
@@ -159,10 +159,10 @@ private extension HomeView {
                         }
                         proportionBar()
                         HStack {
-                            Label("吃掉 \(consumed)", systemImage: "checkmark.circle.fill")
+                            Label("Used \(consumed)", systemImage: "checkmark.circle.fill")
                                 .foregroundStyle(.green)
                             Spacer()
-                            Label("丟棄 \(wasted)", systemImage: "trash.fill")
+                            Label("Discarded \(wasted)", systemImage: "trash.fill")
                                 .foregroundStyle(.red)
                         }
                         .font(.footnote)
@@ -171,38 +171,38 @@ private extension HomeView {
                         // 已丟棄金額：刻意作為附屬資訊。若放大成 hero，部分填價格造成的
                         // 低估會讀成「才這樣而已」，比原本只有百分比更沒有壓力。
                         if let wastedCost {
-                            Text("其中已記錄價格者共 \(wastedCost.currencyText())")
+                            Text("Recorded prices total \(wastedCost.currencyText())")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                                .accessibilityLabel(Text("其中已記錄價格者共 \(wastedCost.currencyAccessibilityText())"))
+                                .accessibilityLabel(Text("Recorded prices total \(wastedCost.currencyAccessibilityText())"))
                         }
                     }
                     .padding(.vertical, 8)
                 } else {
-                    Text("尚無已處理紀錄")
+                    Text("No records yet")
                         .foregroundStyle(.secondary)
                 }
             } header: {
                 HStack {
-                    Text("浪費統計")
+                    Text("Waste Stats")
                     Spacer()
                     if hasHistory {
-                        Button("清除", role: .destructive, action: onClear)
+                        Button("Clear", role: .destructive, action: onClear)
                             .font(.caption)
                             .textCase(nil)   // 覆寫 section header 的自動大寫
                     }
                 }
             } footer: {
-                Text("近 30 天內標記「已使用」與「丟棄」的統計。")
+                Text("Stats for items marked Used / Discarded in the last 30 days.")
             }
         }
 
         // 綠（吃掉）/ 紅（丟棄）比例條
         @ViewBuilder private func proportionBar() -> some View {
             Chart {
-                BarMark(x: .value("吃掉", consumed), y: .value("", "resolved"))
+                BarMark(x: .value("Used", consumed), y: .value("", "resolved"))
                     .foregroundStyle(.green)
-                BarMark(x: .value("丟棄", wasted), y: .value("", "resolved"))
+                BarMark(x: .value("Discarded", wasted), y: .value("", "resolved"))
                     .foregroundStyle(.red)
             }
             .chartXAxis(.hidden)
@@ -237,7 +237,7 @@ private extension HomeView {
         var body: some View {
             Section {
                 if items.isEmpty {
-                    Text("沒有項目")
+                    Text("No items")
                         .font(.subheadline)
                         .foregroundStyle(.tertiary)
                 } else {
@@ -249,7 +249,7 @@ private extension HomeView {
                 HStack {
                     Text(title)
                     Spacer()
-                    Text("\(items.count) 項")
+                    Text("\(items.count) items")
                 }
             } footer: {
                 if let footer {
@@ -264,7 +264,7 @@ private extension HomeView {
                 .onTapGesture { send(.rowDidTap(item)) }
                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button { send(.consumeDidTap(item)) } label: {
-                        Label("已使用", systemImage: "checkmark")
+                        Label("Mark as used", systemImage: "checkmark")
                     }
                     .tint(.green)
                 }
@@ -273,15 +273,15 @@ private extension HomeView {
                 // 改用 .tint(.red) 保留紅色。allowsFullSwipe 維持 true 與 leading 一致。見 issue #1。
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button { send(.deleteDidTap(item)) } label: {
-                        Label("刪除", systemImage: "trash")
+                        Label("Delete", systemImage: "trash")
                     }
                     .tint(.red)
                 }
                 // 編輯 → 點 row；刪除 → 左滑。長按只放「不在滑動 / 點擊上」的動作。
                 .contextMenu {
-                    Button { send(.extendDidTap(item)) } label: { Label("延長效期", systemImage: "calendar") }
-                    Button { send(.consumeDidTap(item)) } label: { Label("標記已使用", systemImage: "checkmark.circle") }
-                    Button { send(.wasteDidTap(item)) } label: { Label("標記丟棄", systemImage: "trash.slash") }
+                    Button { send(.extendDidTap(item)) } label: { Label("Extend expiry", systemImage: "calendar") }
+                    Button { send(.consumeDidTap(item)) } label: { Label("Mark as Used", systemImage: "checkmark.circle") }
+                    Button { send(.wasteDidTap(item)) } label: { Label("Mark as Discarded", systemImage: "trash.slash") }
                 }
         }
     }
@@ -291,7 +291,7 @@ private extension HomeView {
 
         var body: some View {
             Button(action: action) {
-                Label("新增食材", systemImage: "plus")
+                Label("Add Food", systemImage: "plus")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
@@ -326,20 +326,20 @@ private extension HomeView {
             NavigationStack {
                 Form {
                     DatePicker(
-                        "新的到期日",
+                        "New expiry date",
                         selection: $newExpiry,
                         in: item.purchaseDate...,
                         displayedComponents: .date
                     )
                 }
-                .navigationTitle("延長效期")
+                .navigationTitle("Extend expiry")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("取消") { send(.cancelDidTap) }
+                        Button("Cancel") { send(.cancelDidTap) }
                     }
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("儲存") { send(.confirmDidTap(newExpiry)) }
+                        Button("Save") { send(.confirmDidTap(newExpiry)) }
                     }
                 }
             }

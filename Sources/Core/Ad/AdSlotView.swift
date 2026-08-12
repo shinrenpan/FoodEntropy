@@ -20,7 +20,7 @@ struct AdSlotView: View {
         .clipped()
         .overlay(alignment: .topTrailing) {
             if state == .loaded {
-                Text("廣告")
+                Text("Ad")
                     .font(.caption2)
                     .padding(.horizontal, 4)
                     .foregroundStyle(.secondary)

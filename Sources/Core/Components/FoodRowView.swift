@@ -46,11 +46,11 @@ struct FoodRowView: View {
 
     private func expiryText(days: Int) -> Text {
         if days < 0 {
-            Text("已過期 \(-days) 天")
+            Text("Expired \(-days) days ago")
         } else if days == 0 {
-            Text("今天到期")
+            Text("Expires today")
         } else {
-            Text("還有 \(days) 天")
+            Text("\(days) days left")
         }
     }
 }

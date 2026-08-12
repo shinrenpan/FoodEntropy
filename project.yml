@@ -4,7 +4,7 @@ options:
   bundleIdPrefix: com.shinrenpan
   deploymentTarget:
     iOS: "26.0"
-  developmentLanguage: zh-Hant
+  developmentLanguage: en          # 與 catalog 的 sourceLanguage、CFBundleDevelopmentRegion 三者一致
   createIntermediateGroups: true
   groupSortPosition: top
 
@@ -75,10 +75,10 @@ targets:
         CFBundleLocalizations:                # v1 支援語言（繁中 + 英文）
           - zh-Hant
           - en
-        # 找不到使用者偏好語言時的退路。刻意與 developmentLanguage（zh-Hant）不同：
-        # 後者決定 String Catalog 的 sourceLanguage（key 是中文字面值，不能改），
-        # 前者決定 bundle 的 fallback。維持 zh-Hant 會讓非中文使用者看到看不懂的
-        # 繁體中文——退到英文至少是國際通用語。
+        # 找不到使用者偏好語言時的退路，與 developmentLanguage、catalog 的
+        # sourceLanguage 三者一致皆為 en。source 與 fallback 相同是刻意的：
+        # 兩者不同時，source language 沒有自己的編譯字串檔，其使用者會被
+        # 靜默導向 fallback（2026-08-12 曾以繁中為 source 時踩過）。
         CFBundleDevelopmentRegion: en
         UIBackgroundModes:                    # CloudKit 靜默推播需要
           - remote-notification

@@ -6,36 +6,6 @@ The String Catalog conventions, running the uncommon direction: Traditional Chin
 
 ## Requirements
 
-### Requirement: Traditional Chinese is the source language and English is the translation
-
-The system SHALL use Traditional Chinese as the String Catalog's source language, SHALL declare Traditional Chinese and English as its supported localisations, and SHALL provide an English translation for every catalog entry. English SHALL also be the language shown when the device's preferred languages match neither declared localisation, because it is the only one of the two with international reach.
-
-#### Scenario: An English-speaking user sees English
-
-- **WHEN** a user whose device language is English opens the app
-- **THEN** every interface string appears in English
-
-#### Scenario: A user of an unsupported language
-
-- **WHEN** a user whose preferred languages include neither declared localisation opens the app
-- **THEN** the interface appears in English rather than in the source language, since an unreadable interface serves that user no better than no translation at all
-
-#### Scenario: Currency and dates still follow the user's region
-
-- **WHEN** the interface has fallen back to English for a user in a third region
-- **THEN** amounts and dates remain formatted for that user's own locale — the fallback governs wording, not number formatting
-
-
-<!-- @trace
-source: amend-language-fallback
-updated: 2026-08-12
-code:
-  - CLAUDE.md
-  - Sources/Resources/Localizable.xcstrings
-  - project.yml
--->
-
----
 ### Requirement: User-facing strings reach the catalog, and the required syntax differs by layer
 
 The system SHALL route every user-facing string through the String Catalog: written as a literal where the surrounding API accepts a localised string key, and explicitly wrapped as a localised string everywhere else. Domain types SHALL NOT carry user-facing text.
@@ -241,32 +211,86 @@ code:
 -->
 
 ---
-### Requirement: The source language carries its own catalog entries
+### Requirement: English is the source language and Traditional Chinese is the translation
 
-The system SHALL give every catalog entry an explicit entry for the source language, with the same value as its key, rather than relying on the key itself being displayed when no translation is found.
+The system SHALL use English as the String Catalog's source language, SHALL write user-facing literals in the code in English, SHALL declare English and Traditional Chinese as its supported localisations, and SHALL provide a Traditional Chinese translation for every catalog entry. English SHALL also be the language shown when the device's preferred languages match neither declared localisation.
 
-This looks redundant and is not. Without those entries the source language has no compiled strings file at all, and its text reaches the screen only through the missing-translation path. Once another language is declared as the fallback, that path stops leading to the source language — and every source-language user silently receives the fallback instead.
+Source language and fallback language SHALL be the same. When they differ, the source language has no compiled strings file of its own — its text reaches the screen only through the missing-translation path — and declaring a different fallback silently redirects its own users elsewhere.
 
-#### Scenario: Entries for the source language appear redundant during cleanup
+#### Scenario: An English-speaking user sees English
 
-- **WHEN** entries whose value equals their key are reviewed as candidates for removal
-- **THEN** they are kept, because deleting them removes the source language's compiled strings file and its users fall through to the fallback language
+- **WHEN** a user whose device language is English opens the app
+- **THEN** every interface string appears in English
 
-#### Scenario: The failure is silent
+#### Scenario: A Traditional Chinese user sees Chinese
 
-- **WHEN** the source language's entries are missing
-- **THEN** the build still succeeds and no warning is produced — the defect surfaces only as the wrong language on screen, so it SHALL be caught by declaring the entries rather than by review
+- **WHEN** a user whose preferred languages include Traditional Chinese opens the app
+- **THEN** every interface string appears in Chinese, served from that language's own compiled strings file
 
-#### Scenario: A new user-facing string is added
+#### Scenario: A user of an unsupported language
 
-- **WHEN** a string is added and the catalog gains a new entry
-- **THEN** it receives entries for both the source language and the translation before the work is considered complete
+- **WHEN** a user whose preferred languages include neither declared localisation opens the app
+- **THEN** the interface appears in English rather than in an unreadable language
+
+#### Scenario: Currency and dates still follow the user's region
+
+- **WHEN** the interface has fallen back to English for a user in a third region
+- **THEN** amounts and dates remain formatted for that user's own locale — the fallback governs wording, not number formatting
+
 
 <!-- @trace
-source: amend-language-fallback
+source: switch-source-language-to-english
 updated: 2026-08-12
 code:
-  - CLAUDE.md
-  - Sources/Resources/Localizable.xcstrings
+  - Sources/Core/Notification/NotificationService.swift
+  - Sources/Features/FoodForm/FoodFormViewModel.swift
+  - Sources/Features/Settings/SettingsView.swift
+  - Sources/Core/Components/StatusChartView.swift
   - project.yml
+  - Sources/Core/Ad/AdSlotView.swift
+  - Sources/Core/Components/FoodRowView.swift
+  - CLAUDE.md
+  - Sources/App/SceneDelegate.swift
+  - Sources/Features/FoodForm/FoodFormView.swift
+  - Sources/Widget/FoodEntropyWidget.swift
+  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
+  - Sources/Features/Home/HomeView.swift
+  - Sources/Resources/Localizable.xcstrings
+-->
+
+---
+### Requirement: A translated word is not reused across different meanings
+
+The system SHALL give distinct user-facing meanings distinct catalog keys, even where one language would naturally use the same word for both.
+
+An action and a state are different meanings. So are a chart label and a section heading. Merging them saves one entry and costs the ability to word them differently in any other language — a loss that only surfaces in the language that needed the distinction.
+
+#### Scenario: One language merges what another separates
+
+- **WHEN** two entries with different meanings would translate to the same word in the source language
+- **THEN** they are given distinct keys, and the source-language wording is made specific enough to tell them apart
+
+#### Scenario: A row action and a status share a word
+
+- **WHEN** the same word would label both an action the user performs and a state an item is in
+- **THEN** the action's key names the action, so that neither meaning is forced to follow the other's wording
+
+<!-- @trace
+source: switch-source-language-to-english
+updated: 2026-08-12
+code:
+  - Sources/Core/Notification/NotificationService.swift
+  - Sources/Features/FoodForm/FoodFormViewModel.swift
+  - Sources/Features/Settings/SettingsView.swift
+  - Sources/Core/Components/StatusChartView.swift
+  - project.yml
+  - Sources/Core/Ad/AdSlotView.swift
+  - Sources/Core/Components/FoodRowView.swift
+  - CLAUDE.md
+  - Sources/App/SceneDelegate.swift
+  - Sources/Features/FoodForm/FoodFormView.swift
+  - Sources/Widget/FoodEntropyWidget.swift
+  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
+  - Sources/Features/Home/HomeView.swift
+  - Sources/Resources/Localizable.xcstrings
 -->

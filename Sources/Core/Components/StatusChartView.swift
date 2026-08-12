@@ -25,7 +25,7 @@ struct StatusChartView: View {
 
     var body: some View {
         if total == 0 {
-            Text("目前沒有食材")
+            Text("No food items")
                 .foregroundStyle(.secondary)
         } else {
             HStack(spacing: 24) {
@@ -42,11 +42,11 @@ struct StatusChartView: View {
                     Image(systemName: "exclamationmark.circle")
                         .foregroundStyle(expiryColor(.nearExpiry))
                         .accessibilityHidden(true)   // 純裝飾，否則唸成「錯誤影像」
-                    Text("至少 \(cost.currencyText()) 即將到期")
+                    Text("At least \(cost.currencyText()) expiring soon")
                         .font(.subheadline)
                         // 視覺用符號（$99），朗讀用完整幣別（99元）——
                         // VoiceOver 會把 $ 唸成「美金」，對非美元地區是錯的。
-                        .accessibilityLabel(Text("至少 \(cost.currencyAccessibilityText()) 即將到期"))
+                        .accessibilityLabel(Text("At least \(cost.currencyAccessibilityText()) expiring soon"))
                 }
             }
         }
@@ -71,7 +71,7 @@ private extension StatusChartView {
     @ViewBuilder func donut() -> some View {
         Chart(slices) { slice in
             SectorMark(
-                angle: .value("數量", slice.count),
+                angle: .value("Count", slice.count),
                 innerRadius: .ratio(0.62),
                 angularInset: 2
             )
@@ -90,7 +90,7 @@ private extension StatusChartView {
             VStack(spacing: 0) {
                 Text("\(total)")
                     .font(.title2.bold())
-                Text("項")
+                Text("items")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -100,7 +100,7 @@ private extension StatusChartView {
             // 數字與單位分屬兩個 Text：.combine 會在兩者間插入停頓（唸成「5、項」），
             // 改以明確 label 唸作「5 項」。此字串與桶 header 共用既有的 catalog key。
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text("\(total) 項"))
+            .accessibilityLabel(Text("\(total) items"))
         }
     }
 
@@ -109,9 +109,9 @@ private extension StatusChartView {
     /// 進而在 String Catalog 中被標為 stale——照 warning 清理就會誤刪掉活的翻譯。
     @ViewBuilder func statusLabel(_ status: ExpiryStatus) -> some View {
         switch status {
-        case .expired: Text("已過期")
-        case .nearExpiry: Text("3 天內到期")
-        case .fresh: Text("保存期限內")
+        case .expired: Text("Expired")
+        case .nearExpiry: Text("Expiring within 3 days")
+        case .fresh: Text("Fresh")
         }
     }
 

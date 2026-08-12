@@ -14,48 +14,48 @@ struct FoodFormView: View {
 
         Form {
             Section {
-                TextField("食材名稱", text: $bVM.state.name)
+                TextField("Food name", text: $bVM.state.name)
             }
 
             Section {
                 DatePicker(
-                    "購買日期",
+                    "Purchase date",
                     selection: purchaseDateBinding(),
                     displayedComponents: .date
                 )
                 DatePicker(
-                    "到期日期",
+                    "Expiry date",
                     selection: $bVM.state.expiryDate,
                     in: viewModel.state.purchaseDate...,
                     displayedComponents: .date
                 )
                 // 價格：選填、只收數值。幣別符號取自 locale 僅供辨識，使用者不輸入符號；
                 // 空白即 nil（TextField 的 optional 重載），小數點分隔符由系統依地區處理。
-                LabeledContent("價格") {
+                LabeledContent("Price") {
                     HStack(spacing: 4) {
                         Text(Locale.current.currencySymbol ?? "")
                             .foregroundStyle(.secondary)
-                        TextField("選填", value: $bVM.state.price, format: .number)
+                        TextField("Optional", value: $bVM.state.price, format: .number)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                     }
                 }
             }
 
-            Section("照片") {
+            Section("Photo") {
                 ImageRow(imageData: viewModel.state.imageData) {
                     showImageDialog = true
                 }
                 // 掛在觸發列上（而非 Form 根層），確保 dialog 錨點正確、不會跑到畫面頂部。
-                .confirmationDialog("食材照片", isPresented: $showImageDialog, titleVisibility: .visible) {
-                    Button("拍照") { showCamera = true }
-                    Button("從相簿選") { showLibrary = true }
+                .confirmationDialog("Food Photo", isPresented: $showImageDialog, titleVisibility: .visible) {
+                    Button("Take Photo") { showCamera = true }
+                    Button("Choose from Library") { showLibrary = true }
                     if viewModel.state.imageData != nil {
-                        Button("移除照片", role: .destructive) {
+                        Button("Remove Photo", role: .destructive) {
                             Task { await viewModel.doAction(.view(.removeImage)) }
                         }
                     }
-                    Button("取消", role: .cancel) {}
+                    Button("Cancel", role: .cancel) {}
                 }
 
                 // 已有照片時，下方 load 大圖預覽（完整顯示、不裁切）。
@@ -67,7 +67,7 @@ struct FoodFormView: View {
                         .frame(maxHeight: 260)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 8, trailing: 12))
-                        .accessibilityLabel("食材照片")
+                        .accessibilityLabel("Food Photo")
                 }
             }
         }
@@ -76,12 +76,12 @@ struct FoodFormView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("取消") {
+                Button("Cancel") {
                     Task { await viewModel.doAction(.view(.dismissDidTap)) }
                 }
             }
             ToolbarItem(placement: .confirmationAction) {
-                Button("儲存") {
+                Button("Save") {
                     Task { await viewModel.doAction(.view(.saveDidTap)) }
                 }
                 .disabled(!viewModel.state.isSaveEnabled)
@@ -98,11 +98,11 @@ struct FoodFormView: View {
             }
             .ignoresSafeArea()
         }
-        .alert("要放棄變更嗎？", isPresented: $bVM.state.showDiscardConfirm) {
-            Button("放棄", role: .destructive) {
+        .alert("Discard changes?", isPresented: $bVM.state.showDiscardConfirm) {
+            Button("Discard", role: .destructive) {
                 Task { await viewModel.doAction(.view(.discardConfirmed)) }
             }
-            Button("繼續編輯", role: .cancel) {
+            Button("Keep Editing", role: .cancel) {
                 Task { await viewModel.doAction(.view(.discardCancelled)) }
             }
         }
@@ -142,7 +142,7 @@ private extension FoodFormView {
             Button(action: onTap) {
                 HStack(spacing: 12) {
                     thumbnail()
-                    Text(imageData == nil ? "新增照片" : "更換照片")
+                    Text(imageData == nil ? "Add Photo" : "Change Photo")
                         .foregroundStyle(.tint)
                     Spacer()
                 }
