@@ -74,3 +74,18 @@ state what is decided, what is not, and what unblocks it. This keeps everything 
 - Row exits: 延長 (stay active) / 已使用 (consumed) / 丟棄 (wasted) / 刪除 (hard delete, no record).
 - iCloud sync is **opt-in, default off, applies on next launch**.
 - Notifications fire at **09:00 on the expiry day**, one per item, permission requested on first save.
+
+## Out of scope
+
+Deliberate non-goals. Do not propose these as gaps, and do not add tasks or specs for them
+unless the author asks.
+
+- **Accessibility is not a goal of this project.** No spec or constitution rule has ever
+  required it. About ten `accessibility*` modifiers exist across four view files (chart hidden
+  from VoiceOver, ring-centre and currency labels, decorative icons hidden) — those were added
+  incidentally during `add-price-tracking` and are **kept**: they work, they carry no
+  maintenance cost, and removing them would risk already-shipped UI for no gain. What stops is
+  the *expansion*: no accessibility capability, no VoiceOver verification tasks on new work, no
+  treating missing coverage as a defect. The widget not announcing the ring-centre total is a
+  known, accepted difference. When refactoring, preserve the existing behaviour if convenient;
+  do not verify it as an acceptance criterion.
