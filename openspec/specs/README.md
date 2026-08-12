@@ -34,5 +34,5 @@ v1.0.0 早於 Spectra 導入，其 capability 已全數以 `baseline-*` change �
 
 ## Cross-cutting
 
-- **`localization`** ✅ — String Catalog（zh-Hant base + en）、日期與數字的系統格式化、「哪些刻意不翻譯」的界線。橫跨全部 UI capability。
+- **`localization`** ✅ — String Catalog（en base + zh-Hant）、日期與數字的系統格式化、「哪些刻意不翻譯」的界線。橫跨全部 UI capability。
 - **`app-store-listing`** ✅ — App Store 線上 metadata 與 app 實際功能的一致性規範。唯一規範對象不在 repo 內的 capability，線上實際值以 App Store Connect API 查詢為準。須涵蓋行銷 URL 必填且其 hostname 需與 `advertising` 的 app-ads.txt 託管網域一致——v1.0.0 因此欄留空導致 AdMob 無法驗證 app-ads.txt。

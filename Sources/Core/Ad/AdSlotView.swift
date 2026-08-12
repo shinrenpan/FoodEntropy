@@ -1,6 +1,6 @@
 import SwiftUI
 
-// 首頁頂部廣告位（02-architecture §9、01-navigation §2）。
+// 首頁頂部廣告位（見 advertising、home-ui）。
 // AdMob 非個人化 banner，右上角標「廣告」明確區隔內容。
 // 釘在清單頂端：加不透明底色避免捲動內容穿透；版位保留 50pt 讓 banner 能載入，
 // 只有「確定無 fill / 載入失敗」才連同底色收合為 0。

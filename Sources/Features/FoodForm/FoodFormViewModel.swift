@@ -77,7 +77,7 @@ extension FoodFormViewModel {
         case let .purchaseDateChanged(date):
             state.purchaseDate = date
             if date > state.expiryDate {
-                state.expiryDate = date   // 到期日不得早於購買日（03-screens/form.md 驗證 2）
+                state.expiryDate = date   // 到期日不得早於購買日（見 food-form-ui）
             }
 
         case let .imagePicked(data):

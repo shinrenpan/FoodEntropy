@@ -1,6 +1,6 @@
 import GoogleMobileAds
 
-// 廣告設定集中處（02-architecture §9）。
+// 廣告設定集中處（見 advertising）。
 // 決策：非個人化廣告、不跳 ATT（不追蹤、不存取 IDFA），全球上架、排除歐盟。
 enum AdConfig {
     /// 首頁頂部 banner 廣告單元 ID。

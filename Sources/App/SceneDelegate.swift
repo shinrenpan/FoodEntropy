@@ -78,7 +78,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // MARK: - 導航裝配（Phase 2）
 
-    // 兩 Tab 裝配（首頁併入分析，見 03-screens）。
+    // 兩 Tab 裝配（分析已於 v1.0.0 併入首頁，見 app-shell）。
     private func makeRootTabBarController(manager: SwiftDataManager, store: StoreManager) -> UITabBarController {
         let homeTitle = String(localized: "Home")
         let settingsTitle = String(localized: "Settings")
@@ -103,7 +103,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return tabBarController
     }
 
-    // Composition root：依 iCloud 開關偏好建立 SwiftDataManager（02-architecture §6）。
+    // Composition root：依 iCloud 開關偏好建立 SwiftDataManager（見 icloud-sync）。
     private func makeManager() -> SwiftDataManager {
         let cloudKitEnabled = UserDefaults.standard.bool(forKey: AppPreferenceKey.iCloudSyncEnabled)
         // 三層優雅降級（含 CloudKit → 純本機 → 記憶體），避免 store 建立失敗導致 launch crash loop。
@@ -121,7 +121,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     price: mock.price
                 )
             }
-            // 給分析頁一些已處理紀錄（4 吃掉、1 丟棄 → 浪費率 20%）
+            // 給首頁的浪費統計一些已處理紀錄（4 吃掉、1 丟棄 → 浪費率 20%）
             for name in ["已吃-優格", "已吃-吐司", "已吃-香蕉", "已吃-起司"] {
                 let f = manager.create(name: name, purchaseDate: .now, expiryDate: .now)
                 manager.markConsumed(id: f.id)

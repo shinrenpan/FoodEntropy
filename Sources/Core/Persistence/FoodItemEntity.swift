@@ -4,7 +4,7 @@ import SwiftData
 // 持久化層（扮演 DTO 角色）。CloudKit-safe：
 // - 所有屬性有預設值或為 optional（CloudKit 要求）
 // - 無 @Attribute(.unique)（CloudKit 不支援）
-// - imageData 用 externalStorage，隨 CloudKit 同步（02-architecture §2.1 §3）
+// - imageData 用 externalStorage，隨 CloudKit 同步（見 persistence）
 @Model
 final class FoodItemEntity {
     var id: UUID = UUID()

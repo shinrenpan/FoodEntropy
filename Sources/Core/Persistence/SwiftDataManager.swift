@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 import WidgetKit
 
-// 資料層邊界（02-architecture §1 §4 §6）。
+// 資料層邊界（見 persistence）。
 // - 持有 ModelContainer / mainContext
 // - CRUD 只回傳 Domain（呼叫 toDomain()），絕不外洩 @Model
 // - container 依「iCloud 開關」偏好決定掛不掛 cloudKitDatabase（啟動時決定、重啟才變更）
@@ -64,7 +64,7 @@ final class SwiftDataManager {
 
     // MARK: - Read
 
-    /// 現存（active）食材，依到期日升冪、次序 createdAt 升冪（03-screens/home.md）。
+    /// 現存（active）食材，依到期日升冪、次序 createdAt 升冪（見 persistence 的查詢排序契約）。
     func fetchActiveFoods() -> [FoodItem] {
         let activeRaw = RecordStatus.active.rawValue
         let descriptor = FetchDescriptor<FoodItemEntity>(
@@ -78,7 +78,7 @@ final class SwiftDataManager {
         return entities.map { $0.toDomain() }
     }
 
-    /// 已處理（consumed / wasted）食材，依 resolvedAt 由新到舊。供分析頁浪費統計用。
+    /// 已處理（consumed / wasted）食材，依 resolvedAt 由新到舊。供首頁的浪費統計用。
     func fetchResolvedFoods() -> [FoodItem] {
         let activeRaw = RecordStatus.active.rawValue
         let descriptor = FetchDescriptor<FoodItemEntity>(

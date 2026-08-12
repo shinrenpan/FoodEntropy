@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The String Catalog conventions, running the uncommon direction: Traditional Chinese is the source language and English is the translation, because the product's copy is authored in Chinese and its primary market reads it. Two boundaries matter more than the rule itself. First, the syntax differs by layer — a literal in a view is extracted automatically, the same sentence in a view model is not unless explicitly wrapped, and a miss there produces no build warning, only a string that is never translated. Second, three categories stay out of the catalog on purpose: developer diagnostics (translating them makes errors unsearchable and machine-dependent), debug-only fixtures (absent from release builds entirely), and URL scheme strings (translating one breaks routing).
+The String Catalog conventions. English is the source language and Traditional Chinese is the translation, with source and fallback deliberately identical — when they differ, the source language has no compiled strings file of its own and its own users are silently served the fallback instead, with no build warning. Two further boundaries matter more than the rule itself. First, the syntax differs by layer — a literal in a view is extracted automatically, the same sentence in a view model is not unless explicitly wrapped, and a miss there produces no build warning, only a string that is never translated. Second, three categories stay out of the catalog on purpose: developer diagnostics (translating them makes errors unsearchable and machine-dependent), debug-only fixtures (absent from release builds entirely), and URL scheme strings (translating one breaks routing).
 
 ## Requirements
 

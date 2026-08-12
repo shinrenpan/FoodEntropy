@@ -1,6 +1,6 @@
 import StoreKit
 
-// IAP 資料層（02-architecture §7）。StoreKit 2「移除廣告」非消耗型購買。
+// IAP 資料層（見 iap-remove-ads）。StoreKit 2「移除廣告」非消耗型購買。
 // 單一 entitlement 真相來源：`adsRemoved` 由 `Transaction.currentEntitlements` 推導，不自存旗標。
 @MainActor
 final class StoreManager {

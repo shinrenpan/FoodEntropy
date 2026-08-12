@@ -32,7 +32,8 @@ context: |
   SwiftData @Model must stay CloudKit-safe even while sync is off: every attribute
   has a default value or is optional, no @Attribute(.unique), relationships optional.
   iCloud sync is opt-in, defaults to off, and applies on next launch.
-  All user-facing strings go through the String Catalog (zh-Hant first); never
+  All user-facing strings go through the String Catalog; literals in code are English
+  (English is the source language, Traditional Chinese the translation); never
   hardcode a user-facing string.
   Google AdMob is the only third-party dependency. No third-party analytics or crash
   SDK — use Xcode Organizer and App Store Connect Analytics instead.

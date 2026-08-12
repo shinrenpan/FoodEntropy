@@ -31,7 +31,7 @@ enum ExpiryStatus: String, Sendable {
 }
 
 extension ExpiryStatus {
-    /// nearExpiry 的天數門檻（含）。02-architecture §5，可調常數。
+    /// nearExpiry 的天數門檻（含）。見 food-item，可調常數。
     static let nearExpiryWindowDays = 3
 
     /// 到期日與今天的日曆日差（忽略時分秒）。負值代表已過期。

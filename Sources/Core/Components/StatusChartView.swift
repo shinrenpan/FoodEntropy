@@ -97,8 +97,8 @@ private extension StatusChartView {
             .lineLimit(1)
             .minimumScaleFactor(0.4)
             .padding(.horizontal, 8)
-            // 數字與單位分屬兩個 Text：.combine 會在兩者間插入停頓（唸成「5、項」），
-            // 改以明確 label 唸作「5 項」。此字串與桶 header 共用既有的 catalog key。
+            // 數字與單位分屬兩個 Text：.combine 會在兩者間插入停頓（唸成「5、items」），
+            // 改以明確 label 唸作「5 items」。此字串與桶 header 共用同一個 catalog key。
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("\(total) items"))
         }

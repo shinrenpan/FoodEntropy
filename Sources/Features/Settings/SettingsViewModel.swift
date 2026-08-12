@@ -83,7 +83,7 @@ extension SettingsViewModel {
         case let .iCloudSyncToggled(isOn):
             defaults.set(isOn, forKey: AppPreferenceKey.iCloudSyncEnabled)
             state.iCloudSyncEnabled = isOn
-            state.showRestartNotice = true   // 重啟才實際生效（02-architecture §6）
+            state.showRestartNotice = true   // 重啟才實際生效（見 icloud-sync）
 
         case .notificationDidTap:
             switch state.notificationStatus {

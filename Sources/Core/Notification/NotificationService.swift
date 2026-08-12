@@ -6,7 +6,7 @@ enum NotificationAuthStatus: String, Sendable {
     case authorized, denied, notDetermined
 }
 
-// 到期通知服務（02-architecture §8）。
+// 到期通知服務（見 notification）。
 // 採「reconcile」策略：以當前 active 清單重建待發通知，天然涵蓋
 // 排程 / 取消 / 重排，並以「最近到期優先」滿足 iOS 64 則上限。
 @MainActor

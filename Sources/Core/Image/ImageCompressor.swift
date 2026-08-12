@@ -1,6 +1,6 @@
 import UIKit
 
-// 圖片壓縮（02-architecture §3）：拍照 / 選圖當下縮圖 + JPEG 壓縮，不存原圖。
+// 圖片壓縮（見 persistence）：拍照 / 選圖當下縮圖 + JPEG 壓縮，不存原圖。
 // 預設 JPEG 0.7、長邊上限 1024px，目標約 100–300KB/張。數值可滾動微調。
 enum ImageCompressor {
     static let defaultMaxDimension: CGFloat = 1024

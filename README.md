@@ -1,6 +1,6 @@
 # FoodEntropy (食熵)
 
-> 🚧 **In Development** — specs complete, implementation starting.
+> **v1.1.0 is on the App Store** — actively maintained.
 
 A food-expiry tracking iOS app. Record groceries, track expiry dates, and get a
 local notification on the day something expires — so less food goes to waste
@@ -15,6 +15,7 @@ captures the core idea: *if you don't manage it, it goes bad.*
 - **Persistence:** SwiftData (local) + CloudKit (opt-in iCloud sync)
 - **Architecture:** MVVMC
 - **Notifications:** UserNotifications (local)
+- **Widget:** WidgetKit (medium size, sharing the app's own presentation code)
 - **Monetization:** free + ads (Google AdMob), one-time IAP to remove ads
 - **Target:** iPhone only · iOS 26+ · portrait · light/dark
 
@@ -39,6 +40,7 @@ organised as capabilities rather than documents, with change proposals in
 | Foundation | `app-shell`, `navigation` |
 | Domain | `food-item`, `persistence`, `icloud-sync`, `notification`, `iap-remove-ads`, `advertising` |
 | Screens | `home-ui`, `food-form-ui`, `settings-ui` |
+| Beyond the app | `widget` |
 | Cross-cutting | `localization`, `app-store-listing` |
 
 Each capability spec states requirements as testable `SHALL` statements with WHEN/THEN
@@ -53,14 +55,16 @@ original pre-Spectra design documents remain available in the git history.
 
 ## Status
 
-**v1.0.0 shipped** — available on the App Store.
+**v1.1.0 on the App Store.**
 
 - [x] Data layer (SwiftData model + manager, CloudKit-safe schema)
 - [x] Core screens (Home with statistics / Form / Settings)
 - [x] Expiry notifications, remove-ads IAP, AdMob banner
 - [x] Opt-in iCloud sync
 - [x] App Store submission
-- [x] Capability specs backfilled (13 capabilities)
+- [x] Price tracking with a forward-looking total (v1.1.0)
+- [x] Medium home-screen widget, sharing the app's presentation code
+- [x] Capability specs (14 capabilities; the original 13 backfilled from v1.0.0)
 
 Pending work lives in [`openspec/changes/`](./openspec/changes/) as change proposals —
 each one states what is decided, what is not, and what unblocks it.
@@ -81,8 +85,9 @@ open FoodEntropy.xcodeproj
 ```
 
 - **Requirements:** Xcode 26+, iOS 26+ target.
-- **Team:** `DEVELOPMENT_TEAM` is intentionally empty — the simulator builds/runs as is;
-  a real device / iCloud / Push / IAP require setting your team in `project.yml`.
+- **Team:** `project.yml` carries the author's `DEVELOPMENT_TEAM`. The simulator builds and
+  runs as is; a real device — and iCloud / Push / IAP / the widget's App Group — requires
+  replacing it with your own team ID.
 
 ## License
 
