@@ -57,6 +57,11 @@ state what is decided, what is not, and what unblocks it. This keeps everything 
 - SwiftData `@Model` must be **CloudKit-safe**: every attribute has a default value or is optional,
   no `@Attribute(.unique)`, relationships optional — even when sync is off.
 - All user-facing strings go through **String Catalog** (zh-Hant first). Never hardcode strings.
+  Every entry needs **both** a `zh-Hant` and an `en` entry — including `zh-Hant`, whose value
+  equals its key. Those look redundant during stale cleanup and **must not be deleted**: without
+  them `zh-Hant.lproj` has no compiled strings file, and since the bundle's fallback is `en`
+  (`CFBundleDevelopmentRegion`), Chinese users silently get English. The build stays green either
+  way — nothing warns you.
 - **Swift Concurrency strict mode.**
 - Navigation goes through the **Router**; do not bypass it.
 - Third-party deps: **Google AdMob only**. No third-party analytics/crash SDK

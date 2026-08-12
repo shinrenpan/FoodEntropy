@@ -75,6 +75,11 @@ targets:
         CFBundleLocalizations:                # v1 支援語言（繁中 + 英文）
           - zh-Hant
           - en
+        # 找不到使用者偏好語言時的退路。刻意與 developmentLanguage（zh-Hant）不同：
+        # 後者決定 String Catalog 的 sourceLanguage（key 是中文字面值，不能改），
+        # 前者決定 bundle 的 fallback。維持 zh-Hant 會讓非中文使用者看到看不懂的
+        # 繁體中文——退到英文至少是國際通用語。
+        CFBundleDevelopmentRegion: en
         UIBackgroundModes:                    # CloudKit 靜默推播需要
           - remote-notification
         UILaunchScreen: {}
@@ -186,6 +191,10 @@ targets:
         CFBundleDisplayName: 食熵
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: en   # 與 app 一致：非中英使用者退到英文
+        CFBundleLocalizations:
+          - zh-Hant
+          - en
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 

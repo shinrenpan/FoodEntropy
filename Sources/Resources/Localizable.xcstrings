@@ -18,6 +18,12 @@
             "state" : "translated",
             "value" : "“%@” expires today — remember to use it."
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」今天到期，記得處理。"
+          }
         }
       }
     },
@@ -28,12 +34,24 @@
             "state" : "translated",
             "value" : "“%@” will be deleted. This cannot be undone."
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」將被刪除，此操作無法復原。"
+          }
         }
       }
     },
     "%lld" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld"
@@ -60,6 +78,12 @@
               }
             }
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 項"
+          }
         }
       }
     },
@@ -69,6 +93,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expiring within 3 days"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 天內到期"
           }
         }
       }
@@ -80,6 +110,12 @@
             "state" : "translated",
             "value" : "iCloud Sync"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 同步"
+          }
         }
       }
     },
@@ -89,6 +125,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud sync will take effect the next time you open the app."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 同步將於下次開啟 App 後生效。"
           }
         }
       }
@@ -100,6 +142,12 @@
             "state" : "translated",
             "value" : "iCloud sync is off by default; when on, your data is backed up to your iCloud. Adjust notification permissions in system Settings."
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 同步預設關閉；開啟後將備份至你的 iCloud。通知權限請於系統設定調整。"
+          }
         }
       }
     },
@@ -109,6 +157,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A one-time purchase to permanently remove the home banner ad."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一次性購買，永久移除首頁橫幅廣告。"
           }
         }
       }
@@ -120,6 +174,12 @@
             "state" : "translated",
             "value" : "See at a glance how much food is about to expire."
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一眼看見有多少食材快過期。"
+          }
         }
       }
     },
@@ -129,6 +189,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Discarded"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "丟棄"
           }
         }
       }
@@ -140,6 +206,12 @@
             "state" : "translated",
             "value" : "Discarded %lld"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "丟棄 %lld"
+          }
         }
       }
     },
@@ -149,6 +221,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expires today"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天到期"
           }
         }
       }
@@ -160,6 +238,12 @@
             "state" : "translated",
             "value" : "Fresh"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存期限內"
+          }
         }
       }
     },
@@ -169,6 +253,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Price"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "價格"
           }
         }
       }
@@ -180,6 +270,12 @@
             "state" : "translated",
             "value" : "Save"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存"
+          }
         }
       }
     },
@@ -189,6 +285,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recorded prices total %@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其中已記錄價格者共 %@"
           }
         }
       }
@@ -200,6 +302,12 @@
             "state" : "translated",
             "value" : "Delete"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除"
+          }
         }
       }
     },
@@ -209,6 +317,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expiry date"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "到期日期"
           }
         }
       }
@@ -220,6 +334,12 @@
             "state" : "translated",
             "value" : "Cancel"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
         }
       }
     },
@@ -229,6 +349,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Used"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "吃掉"
           }
         }
       }
@@ -240,6 +366,12 @@
             "state" : "translated",
             "value" : "Used %lld"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "吃掉 %lld"
+          }
         }
       }
     },
@@ -249,6 +381,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好"
           }
         }
       }
@@ -260,6 +398,12 @@
             "state" : "translated",
             "value" : "This will delete all Used / Discarded records; waste stats will reset. This cannot be undone."
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將刪除所有「已使用 / 丟棄」紀錄，浪費統計將歸零。此操作無法復原。"
+          }
         }
       }
     },
@@ -269,6 +413,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No records yet"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚無已處理紀錄"
           }
         }
       }
@@ -280,6 +430,12 @@
             "state" : "translated",
             "value" : "Used"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已使用"
+          }
         }
       }
     },
@@ -290,6 +446,12 @@
             "state" : "translated",
             "value" : "Purchased"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已購買"
+          }
         }
       }
     },
@@ -299,6 +461,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expired"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已過期"
           }
         }
       }
@@ -322,6 +490,12 @@
               }
             }
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已過期 %lld 天"
+          }
         }
       }
     },
@@ -331,6 +505,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expired"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已過期未處理"
           }
         }
       }
@@ -342,6 +522,12 @@
             "state" : "translated",
             "value" : "On"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已開啟"
+          }
         }
       }
     },
@@ -351,6 +537,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Off"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已關閉"
           }
         }
       }
@@ -362,6 +554,12 @@
             "state" : "translated",
             "value" : "Ad"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "廣告"
+          }
         }
       }
     },
@@ -371,6 +569,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Extend expiry"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "延長效期"
           }
         }
       }
@@ -382,6 +586,12 @@
             "state" : "translated",
             "value" : "Choose from Library"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從相簿選"
+          }
         }
       }
     },
@@ -391,6 +601,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thanks for your support — the home banner ad has been removed."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "感謝支持，首頁廣告已移除。"
           }
         }
       }
@@ -402,6 +618,12 @@
             "state" : "translated",
             "value" : "Take Photo"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拍照"
+          }
         }
       }
     },
@@ -411,6 +633,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tap to edit; swipe to mark used / delete; long-press to extend or discard."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提示：點項目可編輯；左右滑可標記已使用 / 刪除；長按可延長效期或標記丟棄。"
           }
         }
       }
@@ -422,6 +650,12 @@
             "state" : "translated",
             "value" : "Discard"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放棄"
+          }
         }
       }
     },
@@ -431,6 +665,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expiry Overview"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "效期現況"
           }
         }
       }
@@ -442,6 +682,12 @@
             "state" : "translated",
             "value" : "Count"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "數量"
+          }
         }
       }
     },
@@ -451,6 +697,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add Photo"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增照片"
           }
         }
       }
@@ -462,6 +714,12 @@
             "state" : "translated",
             "value" : "Add Food"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增食材"
+          }
         }
       }
     },
@@ -471,6 +729,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New expiry date"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新的到期日"
           }
         }
       }
@@ -482,6 +746,12 @@
             "state" : "translated",
             "value" : "Change Photo"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更換照片"
+          }
         }
       }
     },
@@ -491,6 +761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not set"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未設定"
           }
         }
       }
@@ -502,6 +778,12 @@
             "state" : "translated",
             "value" : "Mark as Discarded"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標記丟棄"
+          }
         }
       }
     },
@@ -511,6 +793,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mark as Used"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標記已使用"
           }
         }
       }
@@ -522,6 +810,12 @@
             "state" : "translated",
             "value" : "No items"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有項目"
+          }
         }
       }
     },
@@ -531,6 +825,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Waste rate"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "浪費率"
           }
         }
       }
@@ -542,6 +842,12 @@
             "state" : "translated",
             "value" : "Waste Stats"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "浪費統計"
+          }
         }
       }
     },
@@ -551,6 +857,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clear"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除"
           }
         }
       }
@@ -562,6 +874,12 @@
             "state" : "translated",
             "value" : "Clear history?"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除歷史統計？"
+          }
         }
       }
     },
@@ -571,6 +889,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Photo"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片"
           }
         }
       }
@@ -582,6 +906,12 @@
             "state" : "translated",
             "value" : "Version"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本"
+          }
         }
       }
     },
@@ -591,6 +921,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Current"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現況"
           }
         }
       }
@@ -602,6 +938,12 @@
             "state" : "translated",
             "value" : "No food items"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前沒有食材"
+          }
         }
       }
     },
@@ -611,6 +953,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete this item?"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確定刪除？"
           }
         }
       }
@@ -622,6 +970,12 @@
             "state" : "translated",
             "value" : "Remove Ads"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除廣告"
+          }
         }
       }
     },
@@ -631,6 +985,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove Photo"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除照片"
           }
         }
       }
@@ -642,6 +1002,12 @@
             "state" : "translated",
             "value" : "Edit Food"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯食材"
+          }
         }
       }
     },
@@ -651,6 +1017,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keep Editing"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "繼續編輯"
           }
         }
       }
@@ -662,6 +1034,12 @@
             "state" : "translated",
             "value" : "At least %@ expiring soon"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "至少 %@ 即將到期"
+          }
         }
       }
     },
@@ -671,6 +1049,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Discard changes?"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要放棄變更嗎？"
           }
         }
       }
@@ -682,6 +1066,12 @@
             "state" : "translated",
             "value" : "Settings"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
         }
       }
     },
@@ -691,6 +1081,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Setting changed"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定已變更"
           }
         }
       }
@@ -702,6 +1098,12 @@
             "state" : "translated",
             "value" : "Purchase Failed"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買失敗"
+          }
         }
       }
     },
@@ -711,6 +1113,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Purchase date"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買日期"
           }
         }
       }
@@ -722,6 +1130,12 @@
             "state" : "translated",
             "value" : "The purchase couldn't be completed. Please try again later."
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買未能完成，請稍後再試。"
+          }
         }
       }
     },
@@ -731,6 +1145,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stats for items marked Used / Discarded in the last 30 days."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "近 30 天內標記「已使用」與「丟棄」的統計。"
           }
         }
       }
@@ -742,6 +1162,12 @@
             "state" : "translated",
             "value" : "Notifications"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通知"
+          }
         }
       }
     },
@@ -752,6 +1178,12 @@
             "state" : "translated",
             "value" : "Optional"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選填"
+          }
         }
       }
     },
@@ -761,6 +1193,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Restore Purchase"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還原購買"
           }
         }
       }
@@ -784,6 +1222,12 @@
               }
             }
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還有 %lld 天"
+          }
         }
       }
     },
@@ -793,6 +1237,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Privacy Policy"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱私權政策"
           }
         }
       }
@@ -804,6 +1254,12 @@
             "state" : "translated",
             "value" : "items"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項"
+          }
         }
       }
     },
@@ -813,6 +1269,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Food Expiry Reminder"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "食材到期提醒"
           }
         }
       }
@@ -824,6 +1286,12 @@
             "state" : "translated",
             "value" : "Food name"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "食材名稱"
+          }
         }
       }
     },
@@ -834,6 +1302,12 @@
             "state" : "translated",
             "value" : "Food Photo"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "食材照片"
+          }
         }
       }
     },
@@ -843,6 +1317,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Home"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首頁"
           }
         }
       }
