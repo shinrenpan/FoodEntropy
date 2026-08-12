@@ -49,12 +49,18 @@ struct FoodEntropyWidgetEntryView: View {
     var entry: StatusEntry
 
     var body: some View {
-        StatusChartView(
-            expired: entry.expired,
-            nearExpiry: entry.nearExpiry,
-            fresh: entry.fresh,
-            upcomingExpiryCost: entry.upcomingExpiryCost
-        )
+        // 內距是容器的責任：app 內由 List 的 row insets 提供，Widget 沒有 List，
+        // 故在此自行補上（與「Section 容器留在 HomeView」同一個原則）。
+        VStack(spacing: 2) {
+            StatusChartView(
+                expired: entry.expired,
+                nearExpiry: entry.nearExpiry,
+                fresh: entry.fresh,
+                upcomingExpiryCost: entry.upcomingExpiryCost
+            )
+        }
+        .padding(.horizontal, 14)
+        .padding(.bottom, 8)
     }
 }
 
@@ -67,6 +73,9 @@ struct FoodEntropyWidget: Widget {
             FoodEntropyWidgetEntryView(entry: entry)
                 .containerBackground(.background, for: .widget)
         }
+        // 系統預設四周各約 16pt，扣掉後高度不足以容納環形圖與金額行；
+        // 停用後由 EntryView 自行控制較緊湊的內距。
+        .contentMarginsDisabled()
         .configurationDisplayName("效期現況")
         .description("一眼看見有多少食材快過期。")
         .supportedFamilies([.systemMedium])
