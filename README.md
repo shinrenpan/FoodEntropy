@@ -1,6 +1,6 @@
 # FoodEntropy (食熵)
 
-> **v1.1.0 is on the App Store** — actively maintained.
+> **v1.2.0 is on the App Store** — actively maintained.
 
 A food-expiry tracking iOS app. Record groceries, track expiry dates, and get a
 local notification on the day something expires — so less food goes to waste
@@ -8,6 +8,10 @@ because you forgot about it.
 
 **"Entropy"** — food left unmanaged drifts toward disorder over time. The name
 captures the core idea: *if you don't manage it, it goes bad.*
+
+<a href="https://apps.apple.com/app/id6793926521">
+  <img src="./design/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="48">
+</a>
 
 ## Tech Stack
 
@@ -55,7 +59,7 @@ original pre-Spectra design documents remain available in the git history.
 
 ## Status
 
-**v1.1.0 on the App Store.**
+**v1.2.0 on the App Store.**
 
 - [x] Data layer (SwiftData model + manager, CloudKit-safe schema)
 - [x] Core screens (Home with statistics / Form / Settings)
@@ -63,7 +67,7 @@ original pre-Spectra design documents remain available in the git history.
 - [x] Opt-in iCloud sync
 - [x] App Store submission
 - [x] Price tracking with a forward-looking total (v1.1.0)
-- [x] Medium home-screen widget, sharing the app's presentation code
+- [x] Medium home-screen widget, sharing the app's presentation code (v1.2.0)
 - [x] Capability specs (14 capabilities; the original 13 backfilled from v1.0.0)
 
 Pending work lives in [`openspec/changes/`](./openspec/changes/) as change proposals —
@@ -71,7 +75,13 @@ each one states what is decided, what is not, and what unblocks it.
 
 ## Screenshots
 
-_Coming soon._
+The App Store screenshots — Home, the home-screen widget, and Settings.
+
+<p>
+  <img src="./design/screenshots/home.png" alt="Home — expiry ring, waste stats, and the expiring items list" width="30%">
+  <img src="./design/screenshots/widget.png" alt="Medium home-screen widget showing the same expiry ring" width="30%">
+  <img src="./design/screenshots/settings.png" alt="Settings — remove ads, iCloud sync, notifications" width="30%">
+</p>
 
 ## Build
 
