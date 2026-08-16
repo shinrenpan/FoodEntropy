@@ -17,7 +17,7 @@ captures the core idea: *if you don't manage it, it goes bad.*
 
 - **UI:** SwiftUI (bridged to a UIKit Router via HostControllers)
 - **Persistence:** SwiftData (local) + CloudKit (opt-in iCloud sync)
-- **Architecture:** MVVMC
+- **Architecture:** [MVVMC](https://github.com/shinrenpan/MVVMC)
 - **Notifications:** UserNotifications (local)
 - **Widget:** WidgetKit (medium size, sharing the app's own presentation code)
 - **Monetization:** free + ads (Google AdMob), one-time IAP to remove ads
@@ -34,8 +34,9 @@ captures the core idea: *if you don't manage it, it goes bad.*
 
 ## Spec-Driven Development
 
-This project is designed spec-first: every decision — and the reasoning behind it — is
-written down before the code. Specs live in [`openspec/specs/`](./openspec/specs/),
+This project is designed spec-first with
+[Spectra](https://github.com/kaochenlong/spectra-app): every decision — and the reasoning
+behind it — is written down before the code. Specs live in [`openspec/specs/`](./openspec/specs/),
 organised as capabilities rather than documents, with change proposals in
 [`openspec/changes/`](./openspec/changes/).
 
