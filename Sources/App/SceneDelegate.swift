@@ -103,11 +103,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return tabBarController
     }
 
-    // Composition root：依 iCloud 開關偏好建立 SwiftDataManager（見 icloud-sync）。
+    // Composition root：取用 process 層級的共用連線（見 persistence）。
+    // 不自行建立——App Intents 在無 scene 時也要取到同一份連線，兩個 container
+    // 指向同一份 store 會讓 Intent 的寫入不反映到畫面既有的 context。
+    // 偏好讀取與三層降級都在該取用點內完成（見 icloud-sync）。
     private func makeManager() -> SwiftDataManager {
-        let cloudKitEnabled = UserDefaults.standard.bool(forKey: AppPreferenceKey.iCloudSyncEnabled)
-        // 三層優雅降級（含 CloudKit → 純本機 → 記憶體），避免 store 建立失敗導致 launch crash loop。
-        let manager = SwiftDataManager.makeResilient(cloudKitEnabled: cloudKitEnabled)
+        let manager = SwiftDataManager.shared
         #if DEBUG
         // 開發用：以 SEED_MOCKS=1 啟動時，清單為空則塞入 mock 食材。
         if ProcessInfo.processInfo.environment["SEED_MOCKS"] == "1",

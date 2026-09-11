@@ -1,0 +1,148 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Add a food item to ${applicationName}": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "new",
+            "values": [
+              "Add a food item to ${applicationName}",
+              "Record groceries in ${applicationName}"
+            ]
+          }
+        },
+        "zh-Hant": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "在${applicationName}新增食材",
+              "用${applicationName}記錄食材"
+            ]
+          }
+        }
+      }
+    },
+    "Extend ${target} in ${applicationName}": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "new",
+            "values": [
+              "Extend ${target} in ${applicationName}",
+              "Extend a food item's expiry in ${applicationName}"
+            ]
+          }
+        },
+        "zh-Hant": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "在${applicationName}延長${target}",
+              "在${applicationName}延長食材效期"
+            ]
+          }
+        }
+      }
+    },
+    "Find food items in ${applicationName}": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "new",
+            "values": [
+              "Find food items in ${applicationName}",
+              "What is expiring in ${applicationName}"
+            ]
+          }
+        },
+        "zh-Hant": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "在${applicationName}尋找食材",
+              "${applicationName}有什麼快到期"
+            ]
+          }
+        }
+      }
+    },
+    "Mark ${target} as discarded in ${applicationName}": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "new",
+            "values": [
+              "Mark ${target} as discarded in ${applicationName}",
+              "Mark food as discarded in ${applicationName}",
+              "I threw away an item in ${applicationName}"
+            ]
+          }
+        },
+        "zh-Hant": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "在${applicationName}把${target}標記為丟棄",
+              "在${applicationName}標記食材為丟棄",
+              "在${applicationName}丟棄食材"
+            ]
+          }
+        }
+      }
+    },
+    "Mark ${target} as used in ${applicationName}": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "new",
+            "values": [
+              "Mark ${target} as used in ${applicationName}",
+              "Mark food as used in ${applicationName}",
+              "I used an item in ${applicationName}"
+            ]
+          }
+        },
+        "zh-Hant": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "在${applicationName}把${target}標記為已使用",
+              "在${applicationName}標記食材為已使用",
+              "在${applicationName}用掉食材"
+            ]
+          }
+        }
+      }
+    },
+    "Open ${target} in ${applicationName}": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringSet": {
+            "state": "new",
+            "values": [
+              "Open ${target} in ${applicationName}",
+              "Open a food item in ${applicationName}"
+            ]
+          }
+        },
+        "zh-Hant": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "在${applicationName}開啟${target}",
+              "在${applicationName}開啟食材"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

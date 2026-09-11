@@ -1,8 +1,11 @@
+import AppIntents
 import Charts
 import SwiftUI
+import UIKit
 
 struct HomeView: View {
     let viewModel: HomeViewModel
+
 
     var body: some View {
         @Bindable var bVM = viewModel
@@ -50,6 +53,21 @@ struct HomeView: View {
             }
         }
         .onAppear {
+            Task { await viewModel.doAction(.view(.onAppear)) }
+        }
+        // App Intents 可能在 app 停留背景時改動資料（見 app-intents 決策八）。
+        // .onAppear 不會因為回到前景而再次觸發，少了這條首頁會顯示已處理的食材。
+        //
+        // 用 UIApplication 的通知而非 @Environment(\.scenePhase)：食熵是 UIKit
+        // 生命週期（UIHostingController），scenePhase 不會送到這裡——2026-09-11
+        // 實機實測，捷徑在背景標記已使用後切回前景，清單沒更新，滑掉重開才正確。
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            // 沿用既有的 onAppear ViewAction，不新增 Action case（維持單向資料流）。
+            Task { await viewModel.doAction(.view(.onAppear)) }
+        }
+        // 前景中被改動時（iOS 27 可在 app 前景下拉 Spotlight 執行動作），
+        // 沒有生命週期轉換可依附，改聽資料層的變動廣播。
+        .onReceive(NotificationCenter.default.publisher(for: SwiftDataManager.didChangeNotification)) { _ in
             Task { await viewModel.doAction(.view(.onAppear)) }
         }
         .alert(
@@ -260,6 +278,12 @@ private extension HomeView {
 
         @ViewBuilder private func row(_ item: FoodItem) -> some View {
             FoodRowView(item: item)
+                // 螢幕感知（見 app-intents 決策五）：讓 Siri 把「這個」解析到對應食材。
+                // 只掛在真正的食材列——掛在整個 List 上時，系統會連甜甜圈與浪費統計
+                // 那兩列也一併索取 identifier，映射不到就回報 Missing id 並拖到逾時
+                // （2026-09-11 實機 log：'UICollectionView Item AppIntents Payload'
+                // 逾時 3.2 秒），反而讓 Siri 拿不到可解析的內容。
+                .appEntityIdentifier(EntityIdentifier(for: FoodItemAppEntity.self, identifier: item.id))
                 .contentShape(Rectangle())
                 .onTapGesture { send(.rowDidTap(item)) }
                 .swipeActions(edge: .leading, allowsFullSwipe: true) {

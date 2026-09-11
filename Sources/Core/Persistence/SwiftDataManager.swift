@@ -33,6 +33,28 @@ final class SwiftDataManager {
         container = try ModelContainer(for: FoodItemEntity.self, configurations: configuration)
     }
 
+    /// 資料變動廣播。App Intents 與畫面同在 app process，因此 in-process 的
+    /// NotificationCenter 就夠——不必依賴前景／背景轉換。
+    /// iOS 27 可在 app 前景直接下拉 Spotlight 執行動作，那條路徑**沒有**
+    /// 生命週期轉換可依附（2026-09-11 實機發現）。
+    static let didChangeNotification = Notification.Name("SwiftDataManagerDidChange")
+
+    // MARK: - Process 層級取用點
+
+    /// 整個 app process 共用的單一連線。
+    ///
+    /// App Intents 的 `perform()` 可能在 app 未啟動、或啟動至背景而無 scene 時執行，
+    /// 取不到 `SceneDelegate` 持有的實例。若各自建立，同一 process 內會出現兩個
+    /// `ModelContainer` 指向同一份 store——Intent 的寫入不會反映到畫面既有的 context。
+    /// 故統一由此取用（見 persistence:「The store is reachable from a process-level accessor」）。
+    ///
+    /// 偏好於首次存取時讀取一次，而 process 生命週期即為「一次啟動」，
+    /// 因此 `icloud-sync` 的「下次啟動生效」語意不變。
+    static let shared: SwiftDataManager = {
+        let cloudKitEnabled = UserDefaults.standard.bool(forKey: AppPreferenceKey.iCloudSyncEnabled)
+        return makeResilient(cloudKitEnabled: cloudKitEnabled)
+    }()
+
     // MARK: - Resilient factory
 
     /// 依序嘗試建立，第一個成功者勝出；全失敗回 nil。純函式，供測試注入失敗閉包。
@@ -76,6 +98,24 @@ final class SwiftDataManager {
         )
         let entities = (try? context.fetch(descriptor)) ?? []
         return entities.map { $0.toDomain() }
+    }
+
+    /// 與 `fetchActiveFoods()` 相同的結果與排序，但**不載入 `imageData`**。
+    /// 供 App Intents 的 entity query 使用——entity 不含圖片，逐列標註時
+    /// 每列都載入 JPEG 會讓系統的 payload 索取逾時。
+    /// 作法與 `WidgetStore` 一致（`propertiesToFetch` 避開大欄位）。
+    func fetchActiveFoodsWithoutImages() -> [FoodItem] {
+        let activeRaw = RecordStatus.active.rawValue
+        var descriptor = FetchDescriptor<FoodItemEntity>(
+            predicate: #Predicate { $0.statusRaw == activeRaw },
+            sortBy: [
+                SortDescriptor(\.expiryDate, order: .forward),
+                SortDescriptor(\.createdAt, order: .forward),
+            ]
+        )
+        descriptor.propertiesToFetch = [\.id, \.name, \.purchaseDate, \.expiryDate, \.statusRaw, \.createdAt, \.price]
+        let entities = (try? context.fetch(descriptor)) ?? []
+        return entities.map { $0.toDomainWithoutImage() }
     }
 
     /// 已處理（consumed / wasted）食材，依 resolvedAt 由新到舊。供首頁的浪費統計用。
@@ -185,6 +225,12 @@ final class SwiftDataManager {
             // reload when items are added, resolved, or deleted」）。
             // 沒有 widget 時為 no-op，故不需條件判斷。
             WidgetCenter.shared.reloadAllTimelines()
+            // Spotlight 索引同理：同一個「資料變了要通知誰」的出口，
+            // 散到各呼叫端必漏（見 app-intents 決策七）。
+            let active = fetchActiveFoods()
+            Task { await FoodItemSpotlightIndex.reindex(active: active) }
+            // 同一個出口再廣播給畫面（見 app-intents 決策八）。
+            NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
         } catch {
             assertionFailure("SwiftDataManager save failed: \(error)")
         }

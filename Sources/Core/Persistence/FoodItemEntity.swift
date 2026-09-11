@@ -45,6 +45,26 @@ final class FoodItemEntity {
 // MARK: - toDomain（邊界轉換是 DTO 自身的責任）
 
 extension FoodItemEntity {
+    /// 不讀取 `imageData` 的轉換。
+    ///
+    /// `imageData` 是 `.externalStorage` 的大欄位，一旦被存取就會 fault 進來。
+    /// App Intents 的 entity 不含圖片，逐列標註時系統會為每一列回頭索取 entity，
+    /// 走 `toDomain()` 等於每列都把 JPEG 載入一次（2026-09-11 實機 log：
+    /// 'View AppIntents Payload' 逾時 2 秒）。
+    func toDomainWithoutImage() -> FoodItem {
+        FoodItem(
+            id: id,
+            name: name,
+            purchaseDate: purchaseDate,
+            expiryDate: expiryDate,
+            status: RecordStatus(rawValue: statusRaw) ?? .active,
+            resolvedAt: resolvedAt,
+            imageData: nil,
+            createdAt: createdAt,
+            price: price
+        )
+    }
+
     func toDomain() -> FoodItem {
         FoodItem(
             id: id,

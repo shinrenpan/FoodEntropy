@@ -1,3 +1,4 @@
+import AppIntents
 import Foundation
 import UserNotifications
 
@@ -92,6 +93,13 @@ final class NotificationService {
         content.body = String(localized: "“\(food.name)” expires today — remember to use it.")
         content.sound = .default
         content.userInfo = ["deeplink": "foodentropy://home"]   // 點擊 → 首頁（SceneDelegate 已處理）
+        // 螢幕感知（見 app-intents 決策六）：通知在畫面上時，使用者對 Siri 說
+        // 「這個延長三天」才有東西可指涉。iOS 27 才有此欄位，iOS 26 維持原樣。
+        if #available(iOS 27.0, *) {
+            content.appEntityIdentifiers = [
+                EntityIdentifier(for: FoodItemAppEntity.self, identifier: food.id)
+            ]
+        }
 
         let trigger: UNNotificationTrigger
         if shortTrigger {

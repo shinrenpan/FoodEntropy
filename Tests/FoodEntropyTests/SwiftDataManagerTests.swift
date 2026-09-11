@@ -169,3 +169,18 @@ struct SwiftDataManagerTests {
         #expect(resolved.first?.imageData == nil)  // 仍剝離
     }
 }
+
+// MARK: - Process 層級取用點（add-app-intents 決策一）
+
+@MainActor
+struct SwiftDataManagerSharedTests {
+
+    /// App Intents 可能在沒有 scene 時執行，必須與畫面取到同一份連線——
+    /// 兩個 ModelContainer 指向同一份 store 會讓 Intent 的寫入不反映到既有 context。
+    @Test("同一 process 內重複取用回傳同一實例")
+    func sharedIsStableWithinProcess() {
+        let first = SwiftDataManager.shared
+        let second = SwiftDataManager.shared
+        #expect(first === second)
+    }
+}

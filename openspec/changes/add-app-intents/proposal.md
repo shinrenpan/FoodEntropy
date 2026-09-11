@@ -1,76 +1,96 @@
-## Summary
+## Why
 
-把食熵的核心動作（新增食材、標記已使用、查詢即將到期）曝露為 App Intents，使其可在捷徑、Spotlight 與 Siri 中被觸發。**範圍尚未確定**——取決於一項只能用 iOS 27 SDK 確認的前提，見下方「待確認前提」。本 proposal 先固定目標、已知約束與決策點；設計與任務待前提釐清後補上。
+WWDC 2026（2026-06-09）棄用 SiriKit，**App Intents 成為 Siri 呼叫第三方 app 的唯一途徑**。iOS 27 於 2026-09-14 發布（台灣 9/15），新 Siri 會跨 app 組合多步驟動作——有宣告 Intent 的 app 進入那個組合，沒有的直接被排除。
 
-## Motivation
+食熵的動作天生結構化（新增／已使用／丟棄／延長／查詢），可直接複用 `persistence` 既有的 CRUD，不需重寫業務邏輯。
 
-WWDC 2026（2026-06-09）正式棄用 SiriKit，App Intents 成為 Siri 呼叫第三方 app 的**唯一**途徑。新 Siri 由 Google Gemini 模型驅動，會跨 app 組合多步驟動作——有宣告 Intent 的 app 進入那個組合，沒有的直接被排除在外。既有 SiriKit 實作僅在 iOS 26 以下有效，且已產生編譯期棄用警告，Apple 給出約兩到三年的支援窗口。
+本 proposal 原先卡在一項「只能用 iOS 27 SDK 確認」的前提而無法進入設計階段。**該前提已於 2026-09-11 用 Xcode 27 RC 確認完畢**，結論與原先推測不同，故本文件據以重寫。
 
-食熵的動作天生結構化（新增／已使用／查詢），是 App Intents 的合適對象，且邏輯可直接複用 `persistence` 的既有 CRUD，不需重寫。
+## 前提確認結果（2026-09-11，Xcode 27.0 / 27A266a）
 
-## 待確認前提（決定本 change 的範圍）
+直接讀 `iPhoneOS27.0.sdk` 的 `AppIntents.swiftinterface` 取得，非文件推測。
 
-**Siri 的自然語言理解僅對 schema-based 的 Intent 生效。** WWDC26 session 的原話是：「App Intents expose actions to the system. App schemas make those actions understandable by Siri.」兩者是分開的能力。
+**一、schema domain 共 22 個，確實沒有食材／庫存／購物：**
 
-而 `@AssistantIntent(schema:)` 只涵蓋預定義 domain——查到的清單包含 Messages、Mail、Photos、Contacts、Documents、Books、Journal、Presentations、Spreadsheets、System 等系統常見概念，**食材／庫存不在其中**。
+`Assistant` `Audio` `Books` `Browser` `Calendar` `Camera` `Clock` `Files` `Journal` `Mail` `Maps` `Messages` `Notes` `Phone` `Photos` `Presentation` `Reader` `Reminders` `Spreadsheet` `System` `VisualIntelligence` `Whiteboard` `WordProcessor`
 
-若確實沒有可用的 domain，則「跟 Siri 說『加一盒牛奶，後天到期』」這類自然語言操作**做不到**，能拿到的只有捷徑與 Spotlight。
+**二、但存在不綁 domain 的逃生門**——原 proposal 據以推論「沒有 domain 就拿不到自然語言」的前提因此不成立：
 
-**確認方式**：安裝 Xcode 27 後，以 `@AssistantIntent(schema:` 的自動補完列出完整 domain 清單，確認有無食材／庫存／購物之類可用者。成本約 30 分鐘，是本 change 的第一項工作。
+```swift
+@available(anyAppleOS 27.0, *)
+extension AppSchema.SystemIntent {
+    var searchInApp: some AppSchemaIntent   // SystemSearchInAppIntent
+    var open: some AppSchemaIntent          // OpenIntent
+}
+```
 
-> 上述 domain 清單來自 WWDC26 session 頁面摘要，非逐字查證，且可能未涵蓋 iOS 27 新增項目。實際以 SDK 為準。
+任何 app 都能採用。可得「在食熵裡找牛奶」「打開食熵裡的牛奶」；**新增仍無自然語言路徑**（沒有任何 domain 提供「新增庫存品項」）。
 
-## 三層可觸發性（已查證）
+**三、螢幕感知不需要 iOS 27**——原 proposal 誤將其列為 iOS 27 專屬：
 
-| 層級 | 需要什麼 | 現在（iOS 26）可做 |
-|---|---|---|
-| 捷徑 App | 任何 `AppIntent` | ✅ |
-| Spotlight 執行動作 | 任何 `AppIntent` | ✅ |
-| Siri 自然語言 | schema-based Intent | ❌ 前提未確認 |
+| API | 實際可用版本 |
+| --- | --- |
+| `.appEntityIdentifier(_:)` / `(forSelectionType:)` SwiftUI modifier | **iOS 18.4** |
+| `EntityIdentifier` | iOS 16.0 |
+| `AppEntityAnnotatable` | iOS 18.2 |
+| `UNMutableNotificationContent.appEntityIdentifiers` | **iOS 27.0** |
+| `OwnershipProvidingEntity` / `IndexedEntityQuery` | iOS 27.0 |
 
-## 候選範圍（擇一，待前提釐清後決定）
+**四、macro 已改名**：`@AssistantIntent` / `@AssistantEntity` / `AssistantSchemas` 全數標記 deprecated，改為 `@AppIntent(schema:)` / `@AppEntity(schema:)` / `AppSchema`。原 proposal 建議的驗證手法（`@AssistantIntent(schema:` 自動補完）會補到已棄用的 API。
 
-**A. 僅捷徑與 Spotlight** — 定義 `AppIntent`、`AppEntity`、`AppShortcutsProvider`，複用既有 CRUD。iOS 26 即可實作，不需等待。拿不到 Siri 對話。
+## 可用性現況（決定範圍切分的主軸）
 
-**B. 完整整合** — 在 A 之上加入 iOS 27 專屬能力：`IndexedEntity`（把食材餵進 Spotlight 的語義索引，非字串比對）、View Annotations（`.appEntityIdentifier`，螢幕感知，讓使用者指著畫面說「這個」）、`IntentValueQuery`（跨 app 內容媒合）、`AppIntentsTesting`（新測試框架）。需 iOS 27 SDK；若同時要求執行期能力，須評估是否拉高部署基準。
+新 Siri 的 API 能力與**使用者實際拿得到的範圍**落差極大：
 
-選 B 且要求 iOS 27 執行期能力時，拉高部署基準會捨棄 iOS 26 使用者——本 app 上架未久、基數小，代價相對低，但仍是獨立決定，不由本 change 預先決定。
+| | 需要 iOS 27 | 需要 Siri AI | 繁中使用者現在可用 |
+| --- | --- | --- | --- |
+| 捷徑 + Spotlight | ❌ | ❌ | ✅ |
+| Spotlight 語義索引（`IndexedEntity`） | ❌（18.0） | ❌ | ✅ |
+| `.system.searchInApp` / `.system.open` | ✅ | ✅ | ❌ |
+| 螢幕感知標註 | ❌（18.4） | ✅ | ❌ |
+| 到期通知的 entity 標註 | ✅ | ✅ | ❌ |
 
-## Proposed Solution
+Siri AI 的門檻：**僅英文**（10 月加法／日／韓／葡／西，**繁中未公布日期**）、**iPhone 15 Pro 以上**、EU 的 iOS 不提供（台灣不在限制區）。
 
-待前提確認後，於後續補上 design 與 tasks。無論選 A 或 B，共同的骨幹是：以 `persistence` 既有的 CRUD 為實作來源定義 Intent 與 Entity，不重寫業務邏輯；`FoodItem` 曝露為 `AppEntity` 並提供對應的 query。
+**但開發端可完整驗證**：作者持有 iPhone 15 Pro 且已升 iOS 27 RC，將裝置語言切為英文即可啟用 Siri AI。12GB RAM 門檻只擋「Siri 語音表情調整」與「進階聽寫」，螢幕感知、app actions、personal context 全部支援。因此本 change 不需要為了「做了也測不了」而延後 Siri 專屬部分。
 
-## Non-Goals
+## What Changes
 
-- 不重寫既有業務邏輯——Intent 呼叫 `persistence` 的既有方法。
-- 不在本 change 決定是否拉高部署基準至 iOS 27。
-- 不涵蓋 Widget（屬另一個尚未決定的項目）。
-- 不涵蓋 SiriKit 的相容或遷移——本專案從未實作 SiriKit。
+- 新增 `app-intents` capability：`FoodItemEntity`（App Intents 的 `AppEntity`，與 persistence 的 `FoodItemEntity` `@Model` 同名衝突，實作時需另行命名）、entity query、六個 Intent、`AppShortcutsProvider`。
+- 六個 Intent：新增食材、標記已使用、標記丟棄、延長效期、開啟食材（`.system.open`）、搜尋食材（`.system.searchInApp`）。全部複用 `SwiftDataManager` 既有方法，不新增業務邏輯。
+- 食材進入 Spotlight 語義索引（`IndexedEntity`），可用自然語言在 Spotlight 找到，而非字串比對。
+- 首頁清單與食材列曝露 `.appEntityIdentifier`，Siri 得以解析「這個」。
+- 到期通知帶上 entity 標註，使用者看到通知時可對 Siri 說「這個延長三天」。
+- **`persistence` 契約變更**：App Intents 在沒有 scene 的情況下執行，需要一個 process 層級的 `SwiftDataManager` 取用點，取代目前只在 `SceneDelegate` 建立的單一路徑。
+- **`notification` 契約變更**：通知內容新增 entity 標註欄位。
+- 部署基準**維持 iOS 26**，iOS 27 專屬能力以 `@available(iOS 27.0, *)` 包覆。
 
 ## Capabilities
 
 ### New Capabilities
 
-- `app-intents`（暫定）：Intent 與 Entity 的定義、與既有 CRUD 的對應關係、可觸發表面。範圍確定後補上 delta spec。
+- `app-intents`：Intent 與 Entity 的定義、與既有 CRUD 的對應、可觸發表面（捷徑／Spotlight／Siri）、螢幕感知標註的契約。
 
 ### Modified Capabilities
 
-（待定）視最終範圍，可能影響 `food-item`（`FoodItem` 曝露為 `AppEntity` 的欄位需求）與 `persistence`（Intent 執行路徑的資料存取）。
+- `persistence`：新增 process 層級的 `SwiftDataManager` 取用契約，供無 scene 的 App Intents 執行路徑使用；原本「由 `SceneDelegate` 建立」的單一來源不再成立。
+- `notification`：到期通知的內容契約新增 entity 標註，使 Siri 能將通知對應到食材。
 
 ## Impact
 
-- Affected specs: 待定
+- Affected specs: `app-intents`（新增）、`persistence`（修改）、`notification`（修改）
 - Affected code:
-  - New: App Intents 相關型別（位置待定，依 MVVMC 資料夾慣例應在 `Sources/Core/` 或新的 feature 目錄）
-  - Modified: 可能需要在 `Sources/Core/Domain/FoodItem.swift` 補 `AppEntity` 相關宣告
-  - Reference: `Sources/Core/Persistence/SwiftDataManager.swift`, `Sources/Core/Domain/FoodItem.swift`
-- 外部相依：**iOS 27 SDK（Xcode 27）**；iOS 27 公開發布為 2026 年 9 月
-- 本 change 在前提確認前無法進入設計階段，故 park
+  - New：`Sources/Core/Intents/`（Entity、query、六個 Intent、`AppShortcutsProvider`）
+  - Modified：`Sources/Core/Persistence/SwiftDataManager.swift`（process 層級取用點）、`Sources/App/SceneDelegate.swift`（改用該取用點）、`Sources/Core/Notification/NotificationService.swift`（entity 標註）、`Sources/Core/Components/FoodRowView.swift` 與 `Sources/Features/Home/HomeView.swift`（螢幕感知標註）、`Sources/Resources/Localizable.xcstrings`（Intent 標題與 Siri 語句）、`openspec/specs/README.md`（capability map 新增 `app-intents`）
+  - Reference：`Sources/Core/Domain/FoodItem.swift`、`Sources/Widget/WidgetStore.swift`（process 外開 store 的既有作法）
+- 外部相依：**iOS 27 SDK（Xcode 27）**。部署基準不變（iOS 26）。
+- 無新增第三方相依（符合憲章：AdMob 為唯一第三方）。
 
 ## 來源
 
-- [WWDC26: Build intelligent Siri experiences with App Schemas](https://developer.apple.com/videos/play/wwdc2026/240/)
+- iOS 27 SDK `AppIntents.swiftinterface`（`iPhoneOS27.0.sdk`）——domain 清單、API 可用版本、macro 改名的第一手依據
 - [WWDC26: Explore advanced App Intents features for Siri and Apple Intelligence](https://developer.apple.com/videos/play/wwdc2026/343/)
-- [WWDC26: Discover new capabilities in the App Intents framework](https://developer.apple.com/videos/play/wwdc2026/345/)
-- [WWDC26 Apple Intelligence guide](https://developer.apple.com/wwdc26/guides/apple-intelligence/)
-- [AssistantIntent(schema:) — Apple Developer Documentation](https://developer.apple.com/documentation/appintents/assistantintent(schema:))
+- [WWDC26: Build intelligent Siri experiences with App Schemas](https://developer.apple.com/videos/play/wwdc2026/240/)
+- [Apple Developer News: App Store submissions now open](https://developer.apple.com/news/?id=k1mtkt1k)
+- [9to5Mac: Siri AI launches in English this month, five languages in October](https://9to5mac.com/2026/09/09/apple-confirms-siri-ai-launches-in-english-this-month-will-add-five-languages-in-october/)
+- [MacRumors: iPhone 17's 8GB limit costs it these two Siri AI features](https://www.macrumors.com/2026/06/10/iphone-17s-8gb-limit-loses-siri-ai-features/)
