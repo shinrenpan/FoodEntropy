@@ -63,18 +63,14 @@ struct FoodEntropyShortcuts: AppShortcutsProvider {
             systemImageName: "magnifyingglass"
         )
 
-        // .system.open 的自然語言辨識來自 schema 本身；這裡另外給它一張捷徑磚，
-        // 讓 iOS 27 使用者也能在捷徑 app 裡直接取用（決策四）。
-        if #available(iOS 27.0, *) {
-            AppShortcut(
-                intent: OpenFoodItemIntent(),
-                phrases: [
-                    "Open \(\.$target) in \(.applicationName)",
-                    "Open a food item in \(.applicationName)",
-                ],
-                shortTitle: "Open Food Item",
-                systemImageName: "arrow.up.forward.app"
-            )
-        }
+        AppShortcut(
+            intent: OpenFoodItemIntent(),
+            phrases: [
+                "Open \(\.$target) in \(.applicationName)",
+                "Open a food item in \(.applicationName)",
+            ],
+            shortTitle: "Open Food Item",
+            systemImageName: "arrow.up.forward.app"
+        )
     }
 }

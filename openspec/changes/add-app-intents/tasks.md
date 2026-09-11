@@ -43,3 +43,12 @@
 - [x] 6.4 Siri 的實機驗收：裝置語言英文 + Siri AI 啟用下完成。已確認：Siri 捷徑授權對話框列出全部六組語句、`.system.open` 可開啟 app、Siri 可叫用 Intent 並正確顯示 entity 消歧清單。**名稱綁定與螢幕感知未能驗證**——Siri AI 為首發 beta 且裝置索引未完成，作者判斷螢幕感知投報率過低，決定不再追查（見 app-intents spec：助理端的解析結果不列為驗收標準）。app 端的義務（標註存在、不改變版面、payload 不逾時）已由 log 確認達成。
 
 - [x] 6.5 capability map 反映新增的能力：於 `openspec/specs/README.md` 加入 `app-intents` 並標註其與 `persistence`、`notification`、`home-ui`、`navigation` 的引用關係。驗證：內容審閱確認新條目與既有條目格式一致。
+
+## 7. 開啟動作前往 detail（實機回報後補做）
+
+- [x] 7.1 助理與 Spotlight 開啟食材時抵達該筆 detail 而非停在首頁：`Deeplink` 新增 `.foodItem(UUID)` 目標與對應的 URL 產生，`SceneDelegate` 補上推出編輯 Form 的分支，目標已離開 active 時停在首頁且不報錯。滿足 `A single food item is a deeplink destination`。驗證：新增 `DeeplinkTests` 涵蓋 spec 的 URL 解析表格與往返一致性，`xcodebuild test` 全數通過。（決策十：開啟動作放棄 `.system.open`，換取全版本的 detail 導航）
+
+- [x] 7.2 開啟動作在 iOS 26 與 27 皆可用：`OpenFoodItemIntent` 改為直接 conform `OpenIntent` 並自訂 `perform()` 產生 deeplink URL，移除 `.system.open` schema 與 `@available(iOS 27.0, *)`，`appShortcuts` 內的 `if #available` 分支一併移除。滿足 `Opening a food item presents that item`。驗證：`generic/platform=iOS` 建置零警告，且該型別與其捷徑項目不再帶版本條件。
+
+- [ ] 7.3 實機驗收：在 iPhone 15 Pro 上以 Spotlight 搜尋食材並點擊結果，確認進入該筆的編輯畫面；再以 Siri「Open <食材> in FoodEntropy」確認同樣抵達 detail；最後對已標記的食材重複一次，確認停在首頁且不報錯。驗證：作者實測並回報結果。
+

@@ -57,7 +57,7 @@ Siri AI 的門檻：**僅英文**（10 月加法／日／韓／葡／西，**繁
 ## What Changes
 
 - 新增 `app-intents` capability：`FoodItemEntity`（App Intents 的 `AppEntity`，與 persistence 的 `FoodItemEntity` `@Model` 同名衝突，實作時需另行命名）、entity query、六個 Intent、`AppShortcutsProvider`。
-- 六個 Intent：新增食材、標記已使用、標記丟棄、延長效期、開啟食材（`.system.open`）、搜尋食材（`.system.searchInApp`）。全部複用 `SwiftDataManager` 既有方法，不新增業務邏輯。
+- 六個 Intent：新增食材、標記已使用、標記丟棄、延長效期、開啟食材、尋找食材。全部複用 `SwiftDataManager` 既有方法，不新增業務邏輯。兩個 system schema 最終皆未採用，理由見 design 的決策四與決策十。
 - 食材進入 Spotlight 語義索引（`IndexedEntity`），可用自然語言在 Spotlight 找到，而非字串比對。
 - 首頁清單與食材列曝露 `.appEntityIdentifier`，Siri 得以解析「這個」。
 - 到期通知帶上 entity 標註，使用者看到通知時可對 Siri 說「這個延長三天」。
@@ -75,13 +75,14 @@ Siri AI 的門檻：**僅英文**（10 月加法／日／韓／葡／西，**繁
 
 - `persistence`：新增 process 層級的 `SwiftDataManager` 取用契約，供無 scene 的 App Intents 執行路徑使用；原本「由 `SceneDelegate` 建立」的單一來源不再成立。
 - `notification`：到期通知的內容契約新增 entity 標註，使 Siri 能將通知對應到食材。
+- `navigation`：新增「單筆食材」的 deeplink 目標，供 Spotlight 點擊結果與助理的開啟動作共用；原本僅有首頁一個目標。
 
 ## Impact
 
-- Affected specs: `app-intents`（新增）、`persistence`（修改）、`notification`（修改）
+- Affected specs: `app-intents`（新增）、`persistence`（修改）、`notification`（修改）、`navigation`（修改）
 - Affected code:
   - New：`Sources/Core/Intents/`（Entity、query、六個 Intent、`AppShortcutsProvider`）
-  - Modified：`Sources/Core/Persistence/SwiftDataManager.swift`（process 層級取用點）、`Sources/App/SceneDelegate.swift`（改用該取用點）、`Sources/Core/Notification/NotificationService.swift`（entity 標註）、`Sources/Core/Components/FoodRowView.swift` 與 `Sources/Features/Home/HomeView.swift`（螢幕感知標註）、`Sources/Resources/Localizable.xcstrings`（Intent 標題與 Siri 語句）、`openspec/specs/README.md`（capability map 新增 `app-intents`）
+  - Modified：`Sources/Core/Persistence/SwiftDataManager.swift`（process 層級取用點）、`Sources/App/SceneDelegate.swift`（改用該取用點）、`Sources/Core/Notification/NotificationService.swift`（entity 標註）、`Sources/Features/Home/HomeView.swift`（螢幕感知標註與前景重載）、`Sources/App/Deeplink.swift`（單筆食材目標）、`Sources/Resources/Localizable.xcstrings`（Intent 標題與 Siri 語句）、`openspec/specs/README.md`（capability map 新增 `app-intents`）
   - Reference：`Sources/Core/Domain/FoodItem.swift`、`Sources/Widget/WidgetStore.swift`（process 外開 store 的既有作法）
 - 外部相依：**iOS 27 SDK（Xcode 27）**。部署基準不變（iOS 26）。
 - 無新增第三方相依（符合憲章：AdMob 為唯一第三方）。

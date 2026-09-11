@@ -116,6 +116,28 @@ Intent 的 `title`、參數摘要與 `AppShortcut.phrases` 皆為使用者可見
 
 `AppShortcut.phrases` 必須包含 `\(.applicationName)`，且每個語言各自需要可唸出的語句——繁中語句在繁中 Siri AI 開通前不會被使用，但仍須提供，否則該語言的捷徑列表顯示為空。
 
+### 決策十：開啟動作放棄 `.system.open`，換取全版本的 detail 導航
+
+**問題**：`OpenFoodItemIntent` 原本掛 `.system.open` schema，因此整個型別被 `@available(iOS 27.0, *)` 鎖住，且使用框架預設的 `perform()`——效果只是把 app 打開停在首頁，並未前往指定食材。其描述字串寫著「Opens FoodEntropy showing a food item」，與實際行為不符。
+
+同一個 Intent 也是 **Spotlight 點擊食材結果**時系統所呼叫的對象，因此該缺陷同時表現在兩處：Siri 說「開啟某食材」與 Spotlight 點擊，都只會停在首頁。
+
+**決定**：拿掉 schema，改為直接conform `OpenIntent`（iOS 16+），並自訂 `perform()` 把目標轉成 `Deeplink.foodItem(id)` 的 URL 後交給既有的 URL 進入點。
+
+**權衡**：
+
+| | 保留 schema | 拿掉 schema（採用） |
+| --- | --- | --- |
+| Spotlight 點擊進 detail | 僅 iOS 27 | iOS 26 與 27 皆可 |
+| Siri 以固定語句開啟 | 可 | 可（`AppShortcut` 語句不綁 schema） |
+| Siri 自由語句理解 | 可 | 不可 |
+
+schema 的獨家收益是自由語句理解，而那需要 Siri AI——英文限定、繁中未公布日期，且實機測試顯示參數綁定當時尚未生效。用「每天都會用到、全版本可用的 Spotlight 點擊」去換它並不划算。
+
+> 未經查證的一點：`.system.open` 是否另有助於 Siri AI 認得「此 app 有可開啟的項目」，文件未明說，故不計入權衡。
+
+**導航路徑**：Intent 不自行操作 view controller，而是產生 URL 走 `scene(_:openURLContexts:)`——`navigation` 要求所有進入點收斂到同一份 `Deeplink`，新增 detail 目標正是該檔註釋預留的擴充點。
+
 ## Implementation Contract
 
 **行為**：

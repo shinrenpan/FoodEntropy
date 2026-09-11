@@ -32,7 +32,7 @@ v1.0.0 早於 Spectra 導入，其 capability 已全數以 `baseline-*` change �
 
 - **`widget`** ✅ — 主畫面中尺寸 Widget。資料來自 `persistence`（透過 App Group 共用同一份 store，extension 開自己的連線）；效期規則沿用 `food-item`（`ExpiryStatus` 讀取時算，故 timeline 需跨日刷新）；**呈現與 `home-ui` 共用同一份實作**，而非各自維護相似版面——分桶與前瞻金額的計算亦然，兩處顯示的數字因此必然相同。不含互動、不寫入資料。
 
-- **`app-intents`** 🆕 — 把核心動作（新增／已使用／丟棄／延長／開啟／搜尋）曝露給捷徑、Spotlight 與 Siri。動作一律呼叫 `persistence` 既有 CRUD，不重寫業務邏輯；食材以 `FoodItemAppEntity` 曝露，分層沿用 `food-item` 的 Domain Model（不持有 `@Model`）。無 scene 時經 `persistence` 的 process 層級取用點取得同一份連線。螢幕感知標註掛在 `home-ui` 的清單上，到期通知的 entity 標註由 `notification` 攜帶（兩者皆為 iOS 27 + Siri AI 才有消費端）。`.system.open` 的開啟目標沿用 `navigation` 的首頁。
+- **`app-intents`** 🆕 — 把核心動作（新增／已使用／丟棄／延長／開啟／搜尋）曝露給捷徑、Spotlight 與 Siri。動作一律呼叫 `persistence` 既有 CRUD，不重寫業務邏輯；食材以 `FoodItemAppEntity` 曝露，分層沿用 `food-item` 的 Domain Model（不持有 `@Model`）。無 scene 時經 `persistence` 的 process 層級取用點取得同一份連線。螢幕感知標註掛在 `home-ui` 的清單上，到期通知的 entity 標註由 `notification` 攜帶（兩者皆為 iOS 27 + Siri AI 才有消費端）。開啟食材（Spotlight 點擊結果與助理的開啟動作共用同一條路）經 `navigation` 新增的「單筆食材」deeplink 目標抵達編輯 Form。
 
 ## Cross-cutting
 

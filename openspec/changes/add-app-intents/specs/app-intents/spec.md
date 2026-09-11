@@ -61,16 +61,23 @@ The system SHALL resolve entities by identifier, SHALL filter entities by a name
 | Milk, Bread | "MILK" | Milk |
 | Milk, Bread | "cheese" | (none) |
 
-### Requirement: Opening a food item by voice is available on iOS 27
+### Requirement: Opening a food item presents that item
 
-On iOS 27 and later the system SHALL expose an open action that the assistant can invoke by natural language. On earlier versions that action SHALL be absent, and every other action SHALL remain available.
+The system SHALL expose an open action that takes one food item and presents that item's detail, not merely the app. The action SHALL be available on every supported version, and SHALL reach its destination through the centralized deeplink rather than navigating on its own.
 
-The system SHALL NOT claim in-app search as an assistant capability. Finding food items is exposed as an ordinary action that returns its matches, usable from Shortcuts and Spotlight on every supported version; it carries no schema, so the assistant reaches it only through the app's stated phrases, not through free-form search requests.
+This action is also what the system invokes when a person taps a food item in Spotlight, so both routes SHALL arrive at the same destination.
 
-#### Scenario: Opening an item by voice on iOS 27
+The system SHALL NOT claim in-app search as an assistant capability. Finding food items is exposed as an ordinary action that returns its matches; it carries no schema, so the assistant reaches it only through the app's stated phrases, not through free-form search requests.
+
+#### Scenario: Opening an item by voice
 
 - **WHEN** the user asks the assistant to open a named food item
-- **THEN** the app is brought to the foreground showing the home destination
+- **THEN** the app comes to the foreground showing that item's detail
+
+#### Scenario: Tapping a food item in Spotlight
+
+- **WHEN** the user taps a food item among Spotlight's results
+- **THEN** the app comes to the foreground showing that item's detail
 
 #### Scenario: Finding items returns matches rather than presenting them
 
@@ -80,7 +87,7 @@ The system SHALL NOT claim in-app search as an assistant capability. Finding foo
 #### Scenario: Running on iOS 26
 
 - **WHEN** the app runs on iOS 26
-- **THEN** every action except the open action is available in Shortcuts, without any error or degraded-mode message
+- **THEN** every action including the open action is available, without any error or degraded-mode message
 
 ### Requirement: Food items are indexed for Spotlight
 

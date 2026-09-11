@@ -68,12 +68,32 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // MARK: - Deeplink 處理
 
-    // v1：唯一目標 .home → 切首頁 Tab（present-style 目標未來再擴充）。
     private func handle(_ deeplink: Deeplink) {
+        guard let tabBarController = window?.rootViewController as? UITabBarController else { return }
+        tabBarController.selectedIndex = Self.homeTabIndex
+
         switch deeplink {
         case .home:
-            (window?.rootViewController as? UITabBarController)?.selectedIndex = Self.homeTabIndex
+            break   // 切到首頁 Tab 即是全部
+        case let .foodItem(id):
+            showFoodItem(id: id, in: tabBarController)
         }
+    }
+
+    // Spotlight 點擊食材結果與 Siri 的「開啟某食材」都走這裡（見 app-intents）。
+    // 找不到就停在首頁——食材可能已被標記或刪除，那不是錯誤，只是目標不在了。
+    private func showFoodItem(id: UUID, in tabBarController: UITabBarController) {
+        guard let manager,
+              let item = manager.fetchActiveFoods().first(where: { $0.id == id }),
+              let nav = tabBarController.selectedViewController as? UINavigationController,
+              let home = nav.viewControllers.first
+        else { return }
+
+        // 連續開啟不同食材時，先回到首頁再推——否則會疊出一長串編輯頁。
+        if nav.viewControllers.count > 1 {
+            nav.popToRootViewController(animated: false)
+        }
+        AppRouter.shared.to(FoodFormHostController(mode: .edit(item), manager: manager), from: home)
     }
 
     // MARK: - 導航裝配（Phase 2）
