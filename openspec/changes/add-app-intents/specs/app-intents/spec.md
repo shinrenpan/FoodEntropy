@@ -61,24 +61,26 @@ The system SHALL resolve entities by identifier, SHALL filter entities by a name
 | Milk, Bread | "MILK" | Milk |
 | Milk, Bread | "cheese" | (none) |
 
-### Requirement: Natural-language search and open are available on iOS 27
+### Requirement: Opening a food item by voice is available on iOS 27
 
-On iOS 27 and later the system SHALL expose a search action and an open action that the assistant can invoke by natural language. On earlier versions these two actions SHALL be absent, and every other action SHALL remain available.
+On iOS 27 and later the system SHALL expose an open action that the assistant can invoke by natural language. On earlier versions that action SHALL be absent, and every other action SHALL remain available.
 
-#### Scenario: Searching by voice on iOS 27
-
-- **WHEN** the user asks the assistant to search the app for a food item by name
-- **THEN** the matching active items are returned
+The system SHALL NOT claim in-app search as an assistant capability. Finding food items is exposed as an ordinary action that returns its matches, usable from Shortcuts and Spotlight on every supported version; it carries no schema, so the assistant reaches it only through the app's stated phrases, not through free-form search requests.
 
 #### Scenario: Opening an item by voice on iOS 27
 
 - **WHEN** the user asks the assistant to open a named food item
 - **THEN** the app is brought to the foreground showing the home destination
 
+#### Scenario: Finding items returns matches rather than presenting them
+
+- **WHEN** the find action runs with a name fragment
+- **THEN** it returns the matching active items as values to its caller, and the app is not brought to the foreground
+
 #### Scenario: Running on iOS 26
 
 - **WHEN** the app runs on iOS 26
-- **THEN** the four core actions are available in Shortcuts and the two natural-language actions are absent, without any error or degraded-mode message
+- **THEN** every action except the open action is available in Shortcuts, without any error or degraded-mode message
 
 ### Requirement: Food items are indexed for Spotlight
 

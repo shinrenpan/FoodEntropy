@@ -14,7 +14,7 @@
 
 ## 3. iOS 27 專屬的自然語言動作
 
-- [ ] 3.1 iOS 27 上可用語音搜尋與開啟，iOS 26 上這兩個動作不存在且其餘四個不受影響：以 `@available(iOS 27.0, *)` 宣告 `SearchFoodItemsIntent`（`.system.searchInApp`）與 `OpenFoodItemIntent`（`.system.open`，只需宣告 `target`），並在 `appShortcuts` 內以 `if #available` 分支加入。滿足 `Natural-language search and open are available on iOS 27`。驗證：以 `-destination 'generic/platform=iOS'` 建置零警告，並確認四個核心動作的型別不帶 `@available` 包覆。（決策四：iOS 27 專屬能力以 @available 包覆，部署基準不變）
+- [x] 3.1 iOS 27 上可用語音開啟，iOS 26 上該動作不存在且其餘動作不受影響：以 `@available(iOS 27.0, *)` 宣告 `OpenFoodItemIntent`（`.system.open`），並在 `appShortcuts` 內以 `if #available` 分支加入。滿足 `Opening a food item by voice is available on iOS 27`。**`.system.searchInApp` 決定不採用**——其協定 `ShowInAppSearchResultsIntent` 的契約是「開啟 app 並顯示搜尋結果」，而首頁沒有搜尋介面；採用會導致 Siri 開啟 app 卻顯示未篩選的完整清單。搜尋改以 `FindFoodItemsIntent` 回傳結果值提供，不綁 iOS 版本。驗證：`generic/platform=iOS` 建置零警告，實機確認 `.system.open` 可由 Siri 觸發。（決策四：iOS 27 專屬能力以 @available 包覆，部署基準不變）
 
 ## 4. 系統整合表面
 

@@ -11,7 +11,7 @@
 **Goals:**
 
 - 食材的五個核心動作（新增／已使用／丟棄／延長／開啟）可從捷徑與 Spotlight 觸發，不需開啟 app。
-- 食材可被 Siri 以自然語言搜尋與開啟（`.system.searchInApp` / `.system.open`）。
+- 食材可被 Siri 以自然語言開啟（`.system.open`）。
 - Siri 能解析使用者指著畫面說的「這個」，以及到期通知對應的食材。
 - 部署基準維持 iOS 26；iOS 27 專屬能力以 `@available` 包覆，iOS 26 裝置行為不變。
 
@@ -20,6 +20,7 @@
 - 不重寫任何業務邏輯——Intent 一律呼叫 `persistence` 既有方法。
 - 不拉高部署基準至 iOS 27。
 - 不為「新增食材」尋找自然語言路徑——iOS 27 SDK 的 22 個 schema domain 皆無庫存／購物概念，新增僅能經捷徑與 Spotlight 觸發（見 proposal 的前提確認結果）。
+- **不採用 `.system.searchInApp`**（2026-09-11 定案）：其協定 `ShowInAppSearchResultsIntent` 的契約是「開啟 app 並**顯示**搜尋結果」，而首頁沒有搜尋介面。採用會讓 Siri 開啟 app 卻顯示未經篩選的完整清單——使用者問了牛奶卻看到全部食材，比不提供更糟。要正確採用得先為 `home-ui` 補上搜尋介面與 `navigation` 的 `Deeplink.search`，那是獨立的產品決定，不由本 change 夾帶。搜尋改以回傳結果值的 `FindFoodItemsIntent` 提供，捷徑與 Spotlight 立即可用且不綁 iOS 版本，代價是拿不到 Siri 的自由語句搜尋。
 - 不涵蓋 `widget` 的互動化（Widget 目前刻意不含互動，屬另一個未決項目）。
 - 不實作 `OwnershipProvidingEntity`——食熵的資料沒有共享／多人概念，entity 恆為私有。
 - 不做無障礙驗證（憲章明列非目標）。
@@ -55,7 +56,7 @@
 | `MarkFoodWastedIntent` | 無 | 否 | `markWasted(id:)` |
 | `ExtendFoodExpiryIntent` | 無 | 否 | `update(id:name:purchaseDate:expiryDate:imageData:price:)` |
 | `OpenFoodItemIntent` | `.system.open`（iOS 27） | 是 | 經 `navigation` 的 `Deeplink` 進入首頁 |
-| `SearchFoodItemsIntent` | `.system.searchInApp`（iOS 27） | 是 | `fetchActiveFoods()` 後以名稱篩選 |
+| `FindFoodItemsIntent` | 無（見下） | 否 | `fetchActiveFoods()` 後以名稱篩選 |
 
 `OpenIntent` 由框架提供 `openAppWhenRun` 與預設 `perform()`，只需宣告 `var target: FoodItemAppEntity`。
 
