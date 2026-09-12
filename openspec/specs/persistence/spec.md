@@ -192,9 +192,13 @@ code:
 -->
 
 ---
-### Requirement: Read failures yield empty results and write failures fail loudly only in debug
+### Requirement: Read failures yield empty results and write failures reach the caller
 
-The system SHALL return an empty collection when a fetch fails, and SHALL raise a debug-build assertion when a save fails, in both cases without terminating the app.
+The system SHALL return an empty collection when a fetch fails, without terminating the app.
+
+When a save fails, the system SHALL raise a debug-build assertion **and** report the failure to its caller, so that each caller decides what to do. A caller that merely presents data MAY ignore the failure, because the unchanged interface already tells the user nothing happened. A caller that reports its own success to someone else — an assistant action speaking a confirmation, for instance — MUST NOT treat an ignored failure as success.
+
+Re-reading after a failed save SHALL NOT be used to detect it: the context still reports the pending in-memory change, so the read appears to succeed.
 
 #### Scenario: The store cannot be read
 
@@ -206,17 +210,84 @@ The system SHALL return an empty collection when a fetch fails, and SHALL raise 
 - **WHEN** a save fails in a debug build
 - **THEN** an assertion failure surfaces the problem immediately to the developer
 
----
+#### Scenario: A save fails in a release build
 
+- **WHEN** a save fails in a release build
+- **THEN** the failure reaches the caller rather than being discarded, and the app continues running
+
+#### Scenario: A screen ignores a failed save
+
+- **WHEN** an in-app screen's write fails
+- **THEN** the screen continues without an error of its own, because the list it shows is unchanged and conveys that nothing was recorded
 
 
 <!-- @trace
-source: baseline-persistence
-updated: 2026-08-08
+source: add-app-intents
+updated: 2026-09-13
 code:
-  - Sources/Core/Persistence/FoodItemEntity.swift
-  - Sources/Core/Persistence/SwiftDataManager.swift
+  - Tests/FoodEntropyTests/FoodItemLookupTests.swift
+  - Sources/Core/Intents/IntentSnippetView.swift
+  - Tests/FoodEntropyTests/FoodItemActionOutcomeTests.swift
+  - Sources/Features/FoodForm/FoodFormMode.swift
+  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
   - Sources/Core/Image/ImageCompressor.swift
+  - Sources/Core/Intents/FoodEntropyShortcuts.swift
+  - Sources/Core/Persistence/SwiftDataManager.swift
+  - Sources/Core/Intents/FoodItemActionOutcome.swift
+  - CLAUDE.md
+  - Sources/App/PendingDeeplink.swift
+  - Sources/Core/Components/FoodRowView.swift
+  - Tests/FoodEntropyTests/FoodStatusSummaryTests.swift
+  - Sources/Core/Ad/AdConfig.swift
+  - Sources/Core/Components/StatusChartView.swift
+  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
+  - Tests/FoodEntropyTests/FoodItemAppEntityTests.swift
+  - Tests/FoodEntropyTests/FoodItemActionsTests.swift
+  - design/screenshots/README.md
+  - Sources/App/SceneDelegate.swift
+  - docs/privacy/index.html
+  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
+  - project.yml
+  - Sources/Core/Intents/FoodItemAppEntity.swift
+  - Sources/Core/Extensions/CurrencyFormat.swift
+  - docs/index.html
+  - README.md
+  - Sources/Resources/AppShortcuts.xcstrings
+  - Sources/Core/Ad/AdSlotView.swift
+  - Sources/Features/FoodForm/FoodFormViewModel.swift
+  - Sources/Core/Intents/FoodItemLookup.swift
+  - Sources/Core/Intents/FoodItemEntityQuery.swift
+  - Sources/Core/Domain/DayBoundary.swift
+  - Sources/Core/Store/StoreManager.swift
+  - Sources/Core/Intents/FoodItemSpotlightIndex.swift
+  - Tests/FoodEntropyTests/HomeViewModelTests.swift
+  - Sources/Features/Home/HomeView.swift
+  - Sources/Core/Intents/FoodItemSystemIntents.swift
+  - design/screenshots/home.png
+  - Sources/Features/Settings/SettingsView.swift
+  - Sources/Core/Domain/FoodItem.swift
+  - Tests/FoodEntropyTests/DeeplinkTests.swift
+  - Tests/FoodEntropyTests/StatusChartViewTests.swift
+  - Sources/Features/Home/HomeViewModel.swift
+  - design/screenshots/settings.png
+  - Sources/Core/Domain/FoodItemMocks.swift
+  - Sources/Features/Home/HomeViewModel+Models.swift
+  - Sources/Core/Domain/FoodStatusSummary.swift
+  - Sources/Core/Intents/FoodItemIntents.swift
+  - Sources/Resources/Localizable.xcstrings
+  - design/badges/download-on-the-app-store.svg
+  - Sources/Features/Settings/SettingsViewModel.swift
+  - Sources/Core/Intents/FoodItemActions.swift
+  - Sources/Widget/WidgetStore.swift
+  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
+  - design/screenshots/widget.png
+  - Sources/Core/Persistence/FoodItemEntity.swift
+  - Sources/Widget/FoodEntropyWidget.swift
+  - Tests/FoodEntropyTests/DayBoundaryTests.swift
+  - Sources/App/Deeplink.swift
+  - Sources/Features/FoodForm/FoodFormView.swift
+  - design/badges/README.md
+  - Sources/Core/Notification/NotificationService.swift
 -->
 
 ---
@@ -381,4 +452,100 @@ code:
   - Sources/Core/Persistence/SwiftDataManager.swift
   - Sources/Widget/WidgetStore.swift
   - project.yml
+-->
+
+---
+### Requirement: The store is reachable from a process-level accessor
+
+The system SHALL provide a single process-level accessor for the store within the app process, so that entry points without a connected scene reach the same store connection as the running interface. The app's scene SHALL obtain its store from that accessor rather than constructing its own. The accessor SHALL apply the existing sync preference and the existing layered fallback when it first constructs the store.
+
+Within one app process there SHALL be exactly one such store connection, so that a write made by a scene-less entry point is visible to the interface without reopening the store.
+
+#### Scenario: An action runs before any scene connects
+
+- **WHEN** an assistant action performs while the app has no connected scene
+- **THEN** it reaches the store through the process-level accessor and its write succeeds
+
+#### Scenario: A scene-less write is visible to the interface
+
+- **WHEN** an assistant action writes while the app is in the background, and the user then returns to the app
+- **THEN** the interface shows the written result without the store being reopened
+
+#### Scenario: The sync preference is honored once per launch
+
+- **WHEN** the accessor constructs the store for the first time in a process
+- **THEN** it reads the sync preference at that moment, preserving the rule that a changed preference applies on the next launch
+
+#### Scenario: Store construction still degrades in layers
+
+- **WHEN** the accessor constructs the store and the preferred configuration fails
+- **THEN** it falls back through the same layers the app already applies, rather than failing the action
+
+<!-- @trace
+source: add-app-intents
+updated: 2026-09-13
+code:
+  - Tests/FoodEntropyTests/FoodItemLookupTests.swift
+  - Sources/Core/Intents/IntentSnippetView.swift
+  - Tests/FoodEntropyTests/FoodItemActionOutcomeTests.swift
+  - Sources/Features/FoodForm/FoodFormMode.swift
+  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
+  - Sources/Core/Image/ImageCompressor.swift
+  - Sources/Core/Intents/FoodEntropyShortcuts.swift
+  - Sources/Core/Persistence/SwiftDataManager.swift
+  - Sources/Core/Intents/FoodItemActionOutcome.swift
+  - CLAUDE.md
+  - Sources/App/PendingDeeplink.swift
+  - Sources/Core/Components/FoodRowView.swift
+  - Tests/FoodEntropyTests/FoodStatusSummaryTests.swift
+  - Sources/Core/Ad/AdConfig.swift
+  - Sources/Core/Components/StatusChartView.swift
+  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
+  - Tests/FoodEntropyTests/FoodItemAppEntityTests.swift
+  - Tests/FoodEntropyTests/FoodItemActionsTests.swift
+  - design/screenshots/README.md
+  - Sources/App/SceneDelegate.swift
+  - docs/privacy/index.html
+  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
+  - project.yml
+  - Sources/Core/Intents/FoodItemAppEntity.swift
+  - Sources/Core/Extensions/CurrencyFormat.swift
+  - docs/index.html
+  - README.md
+  - Sources/Resources/AppShortcuts.xcstrings
+  - Sources/Core/Ad/AdSlotView.swift
+  - Sources/Features/FoodForm/FoodFormViewModel.swift
+  - Sources/Core/Intents/FoodItemLookup.swift
+  - Sources/Core/Intents/FoodItemEntityQuery.swift
+  - Sources/Core/Domain/DayBoundary.swift
+  - Sources/Core/Store/StoreManager.swift
+  - Sources/Core/Intents/FoodItemSpotlightIndex.swift
+  - Tests/FoodEntropyTests/HomeViewModelTests.swift
+  - Sources/Features/Home/HomeView.swift
+  - Sources/Core/Intents/FoodItemSystemIntents.swift
+  - design/screenshots/home.png
+  - Sources/Features/Settings/SettingsView.swift
+  - Sources/Core/Domain/FoodItem.swift
+  - Tests/FoodEntropyTests/DeeplinkTests.swift
+  - Tests/FoodEntropyTests/StatusChartViewTests.swift
+  - Sources/Features/Home/HomeViewModel.swift
+  - design/screenshots/settings.png
+  - Sources/Core/Domain/FoodItemMocks.swift
+  - Sources/Features/Home/HomeViewModel+Models.swift
+  - Sources/Core/Domain/FoodStatusSummary.swift
+  - Sources/Core/Intents/FoodItemIntents.swift
+  - Sources/Resources/Localizable.xcstrings
+  - design/badges/download-on-the-app-store.svg
+  - Sources/Features/Settings/SettingsViewModel.swift
+  - Sources/Core/Intents/FoodItemActions.swift
+  - Sources/Widget/WidgetStore.swift
+  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
+  - design/screenshots/widget.png
+  - Sources/Core/Persistence/FoodItemEntity.swift
+  - Sources/Widget/FoodEntropyWidget.swift
+  - Tests/FoodEntropyTests/DayBoundaryTests.swift
+  - Sources/App/Deeplink.swift
+  - Sources/Features/FoodForm/FoodFormView.swift
+  - design/badges/README.md
+  - Sources/Core/Notification/NotificationService.swift
 -->

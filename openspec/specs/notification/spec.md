@@ -195,6 +195,8 @@ code:
 
 The system SHALL attach a deeplink value to each notification's payload identifying the destination to open, and SHALL present expiry notifications as a banner with sound even while the app is in the foreground.
 
+On iOS 27 and later the system SHALL additionally attach the entity identifier of the food item the notification is about, so the assistant can resolve a reference made while that notification is on screen. On earlier versions the notification SHALL carry the deeplink payload alone, with no error and no change to how it is presented.
+
 #### Scenario: Tapping a notification opens the intended destination
 
 - **WHEN** the user taps an expiry notification
@@ -205,19 +207,84 @@ The system SHALL attach a deeplink value to each notification's payload identify
 - **WHEN** an expiry notification fires while the user is using the app
 - **THEN** it is still presented as a banner with sound rather than being suppressed
 
----
+#### Scenario: Referring to the item a notification is about
 
+- **WHEN** an expiry notification is on screen on iOS 27 and the user refers to "this" in a request to the assistant
+- **THEN** the assistant resolves the reference to the food item that notification was scheduled for
+
+#### Scenario: The same notification on iOS 26
+
+- **WHEN** an expiry notification is scheduled on iOS 26
+- **THEN** it carries its deeplink payload, omits the entity identifier, and is scheduled and presented exactly as before
 
 
 <!-- @trace
-source: baseline-notification
-updated: 2026-08-08
+source: add-app-intents
+updated: 2026-09-13
 code:
-  - Sources/Core/Notification/NotificationService.swift
+  - Tests/FoodEntropyTests/FoodItemLookupTests.swift
+  - Sources/Core/Intents/IntentSnippetView.swift
+  - Tests/FoodEntropyTests/FoodItemActionOutcomeTests.swift
+  - Sources/Features/FoodForm/FoodFormMode.swift
+  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
+  - Sources/Core/Image/ImageCompressor.swift
+  - Sources/Core/Intents/FoodEntropyShortcuts.swift
+  - Sources/Core/Persistence/SwiftDataManager.swift
+  - Sources/Core/Intents/FoodItemActionOutcome.swift
+  - CLAUDE.md
+  - Sources/App/PendingDeeplink.swift
+  - Sources/Core/Components/FoodRowView.swift
+  - Tests/FoodEntropyTests/FoodStatusSummaryTests.swift
+  - Sources/Core/Ad/AdConfig.swift
+  - Sources/Core/Components/StatusChartView.swift
+  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
+  - Tests/FoodEntropyTests/FoodItemAppEntityTests.swift
+  - Tests/FoodEntropyTests/FoodItemActionsTests.swift
+  - design/screenshots/README.md
   - Sources/App/SceneDelegate.swift
+  - docs/privacy/index.html
+  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
+  - project.yml
+  - Sources/Core/Intents/FoodItemAppEntity.swift
+  - Sources/Core/Extensions/CurrencyFormat.swift
+  - docs/index.html
+  - README.md
+  - Sources/Resources/AppShortcuts.xcstrings
+  - Sources/Core/Ad/AdSlotView.swift
   - Sources/Features/FoodForm/FoodFormViewModel.swift
+  - Sources/Core/Intents/FoodItemLookup.swift
+  - Sources/Core/Intents/FoodItemEntityQuery.swift
+  - Sources/Core/Domain/DayBoundary.swift
+  - Sources/Core/Store/StoreManager.swift
+  - Sources/Core/Intents/FoodItemSpotlightIndex.swift
+  - Tests/FoodEntropyTests/HomeViewModelTests.swift
+  - Sources/Features/Home/HomeView.swift
+  - Sources/Core/Intents/FoodItemSystemIntents.swift
+  - design/screenshots/home.png
+  - Sources/Features/Settings/SettingsView.swift
+  - Sources/Core/Domain/FoodItem.swift
+  - Tests/FoodEntropyTests/DeeplinkTests.swift
+  - Tests/FoodEntropyTests/StatusChartViewTests.swift
   - Sources/Features/Home/HomeViewModel.swift
+  - design/screenshots/settings.png
+  - Sources/Core/Domain/FoodItemMocks.swift
+  - Sources/Features/Home/HomeViewModel+Models.swift
+  - Sources/Core/Domain/FoodStatusSummary.swift
+  - Sources/Core/Intents/FoodItemIntents.swift
+  - Sources/Resources/Localizable.xcstrings
+  - design/badges/download-on-the-app-store.svg
   - Sources/Features/Settings/SettingsViewModel.swift
+  - Sources/Core/Intents/FoodItemActions.swift
+  - Sources/Widget/WidgetStore.swift
+  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
+  - design/screenshots/widget.png
+  - Sources/Core/Persistence/FoodItemEntity.swift
+  - Sources/Widget/FoodEntropyWidget.swift
+  - Tests/FoodEntropyTests/DayBoundaryTests.swift
+  - Sources/App/Deeplink.swift
+  - Sources/Features/FoodForm/FoodFormView.swift
+  - design/badges/README.md
+  - Sources/Core/Notification/NotificationService.swift
 -->
 
 ---

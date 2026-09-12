@@ -259,3 +259,109 @@ code:
   - Sources/Features/FoodForm/FoodFormHostController.swift
   - Sources/Features/Settings/SettingsHostController.swift
 -->
+
+---
+### Requirement: A single food item is a deeplink destination
+
+The system SHALL accept a deeplink that names one food item, and SHALL open that item's detail for editing rather than stopping at the list. The destination SHALL be reachable by the same centralized parsing every other entry point uses, so that no entry point carries navigation logic of its own.
+
+A deeplink naming an item that is no longer active SHALL land on the home list without reporting an error, because an item can legitimately be consumed, discarded, or deleted between the moment a link is offered and the moment it is followed.
+
+#### Scenario: Following a link to an item
+
+- **WHEN** an entry point supplies a deeplink naming an active food item
+- **THEN** the home tab is selected and that item's detail is presented for editing
+
+#### Scenario: Following a link to an item that is gone
+
+- **WHEN** an entry point supplies a deeplink naming an item that has been consumed, discarded, or deleted
+- **THEN** the home tab is selected, no detail is presented, and no error is surfaced
+
+#### Scenario: Following two item links in succession
+
+- **WHEN** a second item deeplink is followed while a detail is already presented
+- **THEN** the second item's detail replaces the first rather than stacking on top of it
+
+#### Scenario: A malformed item link is rejected
+
+- **WHEN** a URL names the item destination but carries no identifier, or one that is not a valid identifier
+- **THEN** the URL resolves to no destination and nothing is navigated
+
+##### Example: item URL parsing
+
+| URL | Resolves to |
+| --- | --- |
+| `foodentropy://home` | the home list |
+| `foodentropy://item/<a valid identifier>` | that item's detail |
+| `foodentropy://item/not-a-uuid` | nothing |
+| `foodentropy://item` | nothing |
+| `https://item/<a valid identifier>` | nothing |
+
+<!-- @trace
+source: add-app-intents
+updated: 2026-09-13
+code:
+  - Tests/FoodEntropyTests/FoodItemLookupTests.swift
+  - Sources/Core/Intents/IntentSnippetView.swift
+  - Tests/FoodEntropyTests/FoodItemActionOutcomeTests.swift
+  - Sources/Features/FoodForm/FoodFormMode.swift
+  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
+  - Sources/Core/Image/ImageCompressor.swift
+  - Sources/Core/Intents/FoodEntropyShortcuts.swift
+  - Sources/Core/Persistence/SwiftDataManager.swift
+  - Sources/Core/Intents/FoodItemActionOutcome.swift
+  - CLAUDE.md
+  - Sources/App/PendingDeeplink.swift
+  - Sources/Core/Components/FoodRowView.swift
+  - Tests/FoodEntropyTests/FoodStatusSummaryTests.swift
+  - Sources/Core/Ad/AdConfig.swift
+  - Sources/Core/Components/StatusChartView.swift
+  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
+  - Tests/FoodEntropyTests/FoodItemAppEntityTests.swift
+  - Tests/FoodEntropyTests/FoodItemActionsTests.swift
+  - design/screenshots/README.md
+  - Sources/App/SceneDelegate.swift
+  - docs/privacy/index.html
+  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
+  - project.yml
+  - Sources/Core/Intents/FoodItemAppEntity.swift
+  - Sources/Core/Extensions/CurrencyFormat.swift
+  - docs/index.html
+  - README.md
+  - Sources/Resources/AppShortcuts.xcstrings
+  - Sources/Core/Ad/AdSlotView.swift
+  - Sources/Features/FoodForm/FoodFormViewModel.swift
+  - Sources/Core/Intents/FoodItemLookup.swift
+  - Sources/Core/Intents/FoodItemEntityQuery.swift
+  - Sources/Core/Domain/DayBoundary.swift
+  - Sources/Core/Store/StoreManager.swift
+  - Sources/Core/Intents/FoodItemSpotlightIndex.swift
+  - Tests/FoodEntropyTests/HomeViewModelTests.swift
+  - Sources/Features/Home/HomeView.swift
+  - Sources/Core/Intents/FoodItemSystemIntents.swift
+  - design/screenshots/home.png
+  - Sources/Features/Settings/SettingsView.swift
+  - Sources/Core/Domain/FoodItem.swift
+  - Tests/FoodEntropyTests/DeeplinkTests.swift
+  - Tests/FoodEntropyTests/StatusChartViewTests.swift
+  - Sources/Features/Home/HomeViewModel.swift
+  - design/screenshots/settings.png
+  - Sources/Core/Domain/FoodItemMocks.swift
+  - Sources/Features/Home/HomeViewModel+Models.swift
+  - Sources/Core/Domain/FoodStatusSummary.swift
+  - Sources/Core/Intents/FoodItemIntents.swift
+  - Sources/Resources/Localizable.xcstrings
+  - design/badges/download-on-the-app-store.svg
+  - Sources/Features/Settings/SettingsViewModel.swift
+  - Sources/Core/Intents/FoodItemActions.swift
+  - Sources/Widget/WidgetStore.swift
+  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
+  - design/screenshots/widget.png
+  - Sources/Core/Persistence/FoodItemEntity.swift
+  - Sources/Widget/FoodEntropyWidget.swift
+  - Tests/FoodEntropyTests/DayBoundaryTests.swift
+  - Sources/App/Deeplink.swift
+  - Sources/Features/FoodForm/FoodFormView.swift
+  - design/badges/README.md
+  - Sources/Core/Notification/NotificationService.swift
+-->
