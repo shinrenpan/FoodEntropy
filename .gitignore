@@ -63,3 +63,7 @@ fastlane/test_output
 # Spectra app data
 .spectra/
 openspec/.vector-search.db*
+
+# Release plumbing: author-specific (own team, certs, ASC account) and unusable
+# by anyone else cloning this repo. Kept local; the traps it encodes are in CLAUDE.md.
+scripts/release_testflight.sh

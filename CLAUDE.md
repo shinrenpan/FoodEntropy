@@ -80,6 +80,31 @@ state what is decided, what is not, and what unblocks it. This keeps everything 
 - iCloud sync is **opt-in, default off, applies on next launch**.
 - Notifications fire at **09:00 on the expiry day**, one per item, permission requested on first save.
 
+## Shipping
+
+Release runs from a local, git-ignored script (`scripts/release_testflight.sh`): `xcodegen` →
+`xcodebuild archive` → `-exportArchive` → `xcrun altool --upload-app`. App Store Connect API key
+identifiers live in shell environment variables (`ASC_KEY_ID`, `ASC_ISSUER_ID`) and the `.p8` stays
+outside the repo, so no credential is ever committed. The script is deliberately not checked in: it
+depends on this author's team, certificates, and ASC account, so it would not run for anyone else.
+
+Three things that cost real time to discover, recorded here because the script that encodes them is
+not in the repo:
+
+- **Homebrew's rsync 3.x breaks `-exportArchive`** with a bare "Copy failed". Force Apple's
+  openrsync by prefixing the invocation with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`.
+- **A CLI `archive` signed with an Apple Development identity rewrites `aps-environment` to
+  `development`**, even when the Release configuration sets `production`. That is the provisioning
+  profile's constraint, not a project misconfiguration — confirm with
+  `xcodebuild -showBuildSettings -configuration Release`, and check the real value on the exported
+  `.ipa` (unzip first; `codesign -d` cannot read a `.ipa` directly).
+- **Build numbers must be unique per marketing version.** Bump `CURRENT_PROJECT_VERSION` in
+  `project.yml` before re-uploading the same version; nothing does it automatically.
+
+Automatic signing suffices here (CloudKit, App Groups, Push). An app with Sign in with Apple cannot
+use cloud signing for export and needs manually minted profiles instead — not a concern for this
+project, noted only because the sibling project it was adapted from does.
+
 ## Out of scope
 
 Deliberate non-goals. Do not propose these as gaps, and do not add tasks or specs for them
