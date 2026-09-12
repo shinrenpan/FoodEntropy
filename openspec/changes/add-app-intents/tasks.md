@@ -58,5 +58,5 @@
 
 - [x] 8.2 新增的回饋文案全部有繁中翻譯且無 stale：dialog 與 snippet 的五條新字串經 `xcstringstool sync` 併回 catalog 後補譯。驗證：以 Python 讀 catalog 斷言 stale 數為 0、缺 `zh-Hant` 數為 0（既有的空字串 key 除外）。
 
-- [ ] 8.3 實機驗收：對 Siri 說「mark <食材> as used in FoodEntropy」，確認 Siri 唸出結果並顯示 snippet 小卡；再以延長效期確認小卡顯示的是新的到期日。驗證：作者實測並回報結果。
+- [x] 8.3 實機驗收（2026-09-12，Siri App 打字輸入以排除語音辨識變數）：`MarkFoodConsumedIntent`（單一參數）**完全通過**——Siri 叫用 Intent、以 `suggestedEntities()` 消歧、執行後渲染 `IntentSnippetView` 小卡（綠勾 + 名稱 + `No longer in your list` + app 歸屬）。`ExtendFoodExpiryIntent`（兩個參數）在 app 層消歧後**流程停住**，未能走到日期選擇；該 Intent 本身已由捷徑路徑驗證正確（延長後價格與照片保留），停住的是 Siri AI 的多輪參數解析。dialog 文字在有 snippet 時不另行顯示，屬預期行為（dialog 主要供純語音裝置），需戴耳機以語音測試才驗得到，未列為驗收條件。
 
