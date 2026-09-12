@@ -52,3 +52,11 @@
 
 - [ ] 7.3 實機驗收：在 iPhone 15 Pro 上以 Spotlight 搜尋食材並點擊結果，確認進入該筆的編輯畫面；再以 Siri「Open <食材> in FoodEntropy」確認同樣抵達 detail；最後對已標記的食材重複一次，確認停在首頁且不報錯。驗證：作者實測並回報結果。
 
+## 8. 動作回報結果（研究後補做）
+
+- [x] 8.1 四個不開 app 的動作執行後有語音與視覺回饋：新增 `FoodItemActionOutcome`（符號、是否離開清單、dialog 文案）與 `IntentSnippetView`，四個 Intent 改回 `ProvidesDialog & ShowsSnippetView`，呈現資料取自已有的 `target` 不額外查庫，延長效期顯示新的到期日。滿足 `Actions that do not open the app report their result`。驗證：`FoodItemActionOutcomeTests` 斷言四種結果的符號互異且「離開清單」旗標正確，`xcodebuild test` 全數通過。（決策十一：不開 app 的動作必須回報結果）
+
+- [x] 8.2 新增的回饋文案全部有繁中翻譯且無 stale：dialog 與 snippet 的五條新字串經 `xcstringstool sync` 併回 catalog 後補譯。驗證：以 Python 讀 catalog 斷言 stale 數為 0、缺 `zh-Hant` 數為 0（既有的空字串 key 除外）。
+
+- [ ] 8.3 實機驗收：對 Siri 說「mark <食材> as used in FoodEntropy」，確認 Siri 唸出結果並顯示 snippet 小卡；再以延長效期確認小卡顯示的是新的到期日。驗證：作者實測並回報結果。
+

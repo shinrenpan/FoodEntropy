@@ -147,6 +147,16 @@
         }
       }
     },
+    "Added %@.": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已新增 %@。"
+          }
+        }
+      }
+    },
     "At least %@ expiring soon": {
       "localizations": {
         "zh-Hant": {
@@ -615,6 +625,26 @@
         }
       }
     },
+    "Marked %@ as discarded.": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已將 %@ 標記為丟棄。"
+          }
+        }
+      }
+    },
+    "Marked %@ as used.": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已將 %@ 標記為已使用。"
+          }
+        }
+      }
+    },
     "Marks a food item as discarded so it leaves your list.": {
       "localizations": {
         "zh-Hant": {
@@ -701,6 +731,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "沒有項目"
+          }
+        }
+      }
+    },
+    "No longer in your list": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已離開清單"
           }
         }
       }
@@ -1041,6 +1081,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "將刪除所有「已使用 / 丟棄」紀錄，浪費統計將歸零。此操作無法復原。"
+          }
+        }
+      }
+    },
+    "Updated the expiry date for %@.": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已更新 %@ 的到期日。"
           }
         }
       }

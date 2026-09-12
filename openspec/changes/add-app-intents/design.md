@@ -138,6 +138,20 @@ schema 的獨家收益是自由語句理解，而那需要 Siri AI——英文�
 
 **導航路徑**：Intent 不自行操作 view controller，而是產生 URL 走 `scene(_:openURLContexts:)`——`navigation` 要求所有進入點收斂到同一份 `Deeplink`，新增 detail 目標正是該檔註釋預留的擴充點。
 
+### 決策十一：不開 app 的動作必須回報結果
+
+**問題**：四個核心動作 `openAppWhenRun = false`，執行完不會把 app 帶到前景。原本一律回 `.result()`——Siri 不說話、畫面不顯示任何東西，使用者說完「mark this as used」後無從判斷成功與否，只能自己開 app 檢查。那等於抵銷了「不必開 app」的價值。
+
+**決定**：四個動作改為同時回 `ProvidesDialog`（給語音）與 `ShowsSnippetView`（給畫面）。dialog 交由 Siri 唸出；snippet 是一張小卡，顯示動作符號、食材名稱，以及一行結果說明。
+
+呈現資料全部取自已有的 `target`（`FoodItemAppEntity` 已帶 `name` 與 `expiryDate`），**不額外查資料庫**。延長效期顯示的是**新的**到期日——使用者要確認的正是改對了沒有。
+
+**分工**：`ProvidesDialog` 管語音、`ShowsSnippetView` 管視覺，兩者分開宣告。純語音裝置（如 AirPods）只會得到 dialog，因此 dialog 本身必須自成完整句子，不能依賴 snippet 補充資訊。
+
+**`FindFoodItemsIntent` 不加 dialog**：它是查詢而非動作，結果本身就是回傳值（捷徑會直接顯示）。加上 dialog 還會引入「找到 1 個項目」的單複數問題，而 String Catalog 的複數變體對這個收益不值得。
+
+**不重用 `FoodRowView` 當 snippet**：那是清單列，帶滑動操作的觸控區與列高假設，且由 `widget` target 一併編譯。snippet 只需要「動作 + 食材 + 一行結果」，另寫一個更小的 view 更誠實。
+
 ## Implementation Contract
 
 **行為**：

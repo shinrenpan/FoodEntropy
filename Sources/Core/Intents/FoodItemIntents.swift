@@ -1,5 +1,6 @@
 import AppIntents
 import Foundation
+import SwiftUI
 
 // 四個核心動作（見 app-intents）。
 //
@@ -34,14 +35,19 @@ struct AddFoodItemIntent: AppIntent {
     }
 
     @MainActor
-    func perform() async throws -> some IntentResult & ReturnsValue<FoodItemAppEntity> {
+    func perform() async throws -> some IntentResult & ReturnsValue<FoodItemAppEntity> & ProvidesDialog & ShowsSnippetView {
         let item = try FoodItemActions(manager: .shared).add(
             name: name,
             purchaseDate: purchaseDate ?? .now,
             expiryDate: expiryDate,
             price: price
         )
-        return .result(value: FoodItemAppEntity(item: item))
+        // 不開 app 的動作若不回話也不顯示任何東西，使用者無從確認成功（見決策十一）。
+        return .result(
+            value: FoodItemAppEntity(item: item),
+            dialog: FoodItemActionOutcome.added.dialog(name: item.name),
+            view: IntentSnippetView(outcome: .added, name: item.name, expiryDate: item.expiryDate)
+        )
     }
 }
 
@@ -60,9 +66,12 @@ struct MarkFoodConsumedIntent: AppIntent {
     }
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         try FoodItemActions(manager: .shared).markConsumed(id: target.id)
-        return .result()
+        return .result(
+            dialog: FoodItemActionOutcome.consumed.dialog(name: target.name),
+            view: IntentSnippetView(outcome: .consumed, name: target.name, expiryDate: target.expiryDate)
+        )
     }
 }
 
@@ -81,9 +90,12 @@ struct MarkFoodWastedIntent: AppIntent {
     }
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         try FoodItemActions(manager: .shared).markWasted(id: target.id)
-        return .result()
+        return .result(
+            dialog: FoodItemActionOutcome.wasted.dialog(name: target.name),
+            view: IntentSnippetView(outcome: .wasted, name: target.name, expiryDate: target.expiryDate)
+        )
     }
 }
 
@@ -105,8 +117,12 @@ struct ExtendFoodExpiryIntent: AppIntent {
     }
 
     @MainActor
-    func perform() async throws -> some IntentResult {
+    func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         try FoodItemActions(manager: .shared).extendExpiry(id: target.id, to: newExpiryDate)
-        return .result()
+        // 顯示的是**新的**到期日——使用者要確認的正是改對了沒有。
+        return .result(
+            dialog: FoodItemActionOutcome.extended.dialog(name: target.name),
+            view: IntentSnippetView(outcome: .extended, name: target.name, expiryDate: newExpiryDate)
+        )
     }
 }

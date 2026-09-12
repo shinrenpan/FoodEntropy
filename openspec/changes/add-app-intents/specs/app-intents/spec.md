@@ -124,6 +124,34 @@ Whether the assistant actually resolves such a reference is outside this project
 - **WHEN** the home list renders with annotations present
 - **THEN** its layout and appearance are identical to the unannotated rendering
 
+### Requirement: Actions that do not open the app report their result
+
+Every action that completes without bringing the app to the foreground SHALL report what it did, both as spoken dialog and as a visual snippet. The spoken dialog SHALL be a complete sentence on its own, because a voice-only device receives the dialog and never the snippet.
+
+The snippet SHALL identify the food item by name and SHALL state the resulting condition: an item that left the list SHALL NOT show a remaining-days figure, and an item still in the list SHALL show its expiry date. The report SHALL be built from values the action already holds, without an additional read of stored data.
+
+A query action that returns its matches as values SHALL NOT provide dialog, because its result is the returned value itself.
+
+#### Scenario: Marking an item used without opening the app
+
+- **WHEN** the user marks a food item as used through the assistant
+- **THEN** the assistant speaks a sentence naming that item, and shows a snippet naming it and stating that it left the list
+
+#### Scenario: Extending an expiry reports the new date
+
+- **WHEN** the user extends a food item's expiry date
+- **THEN** the snippet shows the new expiry date, not the previous one
+
+#### Scenario: A voice-only device receives a complete sentence
+
+- **WHEN** an action runs on a device that can speak but not display
+- **THEN** the spoken dialog alone conveys which item changed and how
+
+#### Scenario: Finding items stays silent
+
+- **WHEN** the find action returns its matches
+- **THEN** no dialog is spoken, because the returned values are the result
+
 ### Requirement: Assistant phrases and action titles are localized
 
 The system SHALL route every user-visible action title, parameter summary, and spoken phrase through the string catalog, with English as the source language and a Traditional Chinese translation present for each. Each spoken phrase SHALL include the application name token.
