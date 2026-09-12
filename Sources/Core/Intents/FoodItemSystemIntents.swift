@@ -1,6 +1,5 @@
 import AppIntents
 import Foundation
-import UIKit
 
 // 系統 schema 相關的動作（見 app-intents、決策四）。
 //
@@ -24,13 +23,14 @@ struct OpenFoodItemIntent: OpenIntent {
     @Parameter(title: "Food Item")
     var target: FoodItemAppEntity
 
-    /// 把目標轉回 URL，交給既有的 URL 進入點處理，而非另闢導航路徑——
-    /// `navigation` 要求所有進入點收斂到同一份 `Deeplink`。
+    /// 放入待處理的 `Deeplink`，由 `SceneDelegate` 在 scene 連上或回到前景時取用。
+    ///
+    /// 刻意**不用** `UIApplication.shared.open(url)`：Siri 觸發時 app 不在前景，
+    /// 非前景 app 呼叫 open 會被系統擋掉（2026-09-12 實機確認：Spotlight 可、
+    /// Siri 不可）。`openAppWhenRun` 會把 app 帶到前景，所以一定有取用時機。
     @MainActor
     func perform() async throws -> some IntentResult {
-        if let url = Deeplink.foodItem(target.id).url {
-            await UIApplication.shared.open(url)
-        }
+        PendingDeeplink.set(.foodItem(target.id))
         return .result()
     }
 }

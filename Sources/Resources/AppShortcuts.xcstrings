@@ -120,13 +120,15 @@
         }
       }
     },
-    "Open ${target} in ${applicationName}": {
+    "Show ${target} in ${applicationName}": {
       "extractionState": "extracted_with_value",
       "localizations": {
         "en": {
           "stringSet": {
             "state": "new",
             "values": [
+              "Show ${target} in ${applicationName}",
+              "Go to ${target} in ${applicationName}",
               "Open ${target} in ${applicationName}",
               "Open a food item in ${applicationName}"
             ]
@@ -136,6 +138,7 @@
           "stringSet": {
             "state": "translated",
             "values": [
+              "在${applicationName}顯示${target}",
               "在${applicationName}開啟${target}",
               "在${applicationName}開啟食材"
             ]

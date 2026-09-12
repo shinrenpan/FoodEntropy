@@ -50,7 +50,7 @@
 
 - [x] 7.2 開啟動作在 iOS 26 與 27 皆可用：`OpenFoodItemIntent` 改為直接 conform `OpenIntent` 並自訂 `perform()` 產生 deeplink URL，移除 `.system.open` schema 與 `@available(iOS 27.0, *)`，`appShortcuts` 內的 `if #available` 分支一併移除。滿足 `Opening a food item presents that item`。驗證：`generic/platform=iOS` 建置零警告，且該型別與其捷徑項目不再帶版本條件。
 
-- [ ] 7.3 實機驗收：在 iPhone 15 Pro 上以 Spotlight 搜尋食材並點擊結果，確認進入該筆的編輯畫面；再以 Siri「Open <食材> in FoodEntropy」確認同樣抵達 detail；最後對已標記的食材重複一次，確認停在首頁且不報錯。驗證：作者實測並回報結果。
+- [x] 7.3 實機驗收（2026-09-12）：Spotlight 點食材進 detail 在**未執行／背景／前景三種狀態全部通過**；已標記的食材搜不到，符合預期。Siri 的「開啟某食材」**不通過**——Siri 明示 app 不支援 in-app search 與開啟特定項目，經三種動詞（show／go to／open）驗證與動詞無關，根因記於「決策十二：Siri 的自由語句需要兩個 system schema 成組，而前提是首頁搜尋介面」，該路徑改由後續獨立 change 處理。
 
 ## 8. 動作回報結果（研究後補做）
 

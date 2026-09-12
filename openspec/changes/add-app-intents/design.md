@@ -138,6 +138,27 @@ schema 的獨家收益是自由語句理解，而那需要 Siri AI——英文�
 
 **導航路徑**：Intent 不自行操作 view controller，而是產生 URL 走 `scene(_:openURLContexts:)`——`navigation` 要求所有進入點收斂到同一份 `Deeplink`，新增 detail 目標正是該檔註釋預留的擴充點。
 
+### 決策十二：Siri 的自由語句需要兩個 system schema 成組，而前提是首頁搜尋介面
+
+**實機發現（2026-09-12）**，用 Siri App 打字測試（排除語音辨識變數）：
+
+| 輸入 | Siri 回應 |
+| --- | --- |
+| `show Test Milk in FoodEntropy` | 「I can't search for "Test Milk" in FoodEntropy because **the app doesn't support in-app search**.」 |
+| `go to Test Milk in FoodEntropy` | 開啟 app 但停在首頁（Siri 內建動詞接手） |
+| `open Test Milk in FoodEntropy` | 「I can't open "Test Milk" directly because FoodEntropy **doesn't support searching or opening specific items** within the app」 |
+
+**結論**：Siri 要開啟「某一筆」，得先能「找到」那一筆；找到靠 `.system.searchInApp`。兩個 schema 實質上是一組，單獨採用 `.system.open` 沒有作用。
+
+這同時解釋了先前所有觀察：
+- 尚未移除 `.system.open` 時（2026-09-11 22:57）同樣失敗——有「開啟」但沒有「搜尋」。
+- `MarkFoodConsumedIntent` 叫得到且跳出 entity 清單——它走**固定語句**，不需要自由搜尋，消歧由本專案的 `EntityQuery` 提供。
+- Spotlight 點擊食材進 detail 完全正常——那條路不經過 Siri 的搜尋理解。
+
+**對決策十的影響**：拿掉 `.system.open` 沒有額外損失。它單獨存在本來就無法讓 Siri 開啟特定食材，而換到的是 Spotlight 點擊在 iOS 26 也能進 detail。決策十維持。
+
+**要取得 Siri 自由語句的唯一路徑**：先為 `home-ui` 補上搜尋介面、為 `navigation` 補上 `.search(String)` 目標，然後兩個 schema 一起採用。那是獨立的產品決定，不由本 change 夾帶——且搜尋功能本身對庫存清單有獨立價值，並非只為 Siri 而做。
+
 ### 決策十一：不開 app 的動作必須回報結果
 
 **問題**：四個核心動作 `openAppWhenRun = false`，執行完不會把 app 帶到前景。原本一律回 `.result()`——Siri 不說話、畫面不顯示任何東西，使用者說完「mark this as used」後無從判斷成功與否，只能自己開 app 檢查。那等於抵銷了「不必開 app」的價值。

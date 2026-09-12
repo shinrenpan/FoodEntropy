@@ -51,12 +51,35 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
            let deeplink = Deeplink(url: url) {
             handle(deeplink)
         }
+
+        // 進入點 4：App Intents 放下的待處理目標（冷啟動時 scene 尚未存在）。
+        drainPendingDeeplink()
+
+        // app 已在前景時 App Intents 才放目標的情況（例如從 app 內下拉 Spotlight）
+        // 沒有生命週期轉換可依附，靠通知補上。
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(pendingDeeplinkDidSet),
+            name: PendingDeeplink.didSetNotification,
+            object: nil
+        )
     }
 
     // 進前景時對帳通知排程（處理跨日、64 則上限、外部變動）。
     func sceneDidBecomeActive(_ scene: UIScene) {
+        // Siri 觸發 Intent 後 app 被帶到前景，目標在此取用。
+        drainPendingDeeplink()
         guard let manager else { return }
         Task { await NotificationService.shared.reconcile(activeFoods: manager.fetchActiveFoods()) }
+    }
+
+    @objc private func pendingDeeplinkDidSet() {
+        drainPendingDeeplink()
+    }
+
+    private func drainPendingDeeplink() {
+        guard let deeplink = PendingDeeplink.take() else { return }
+        handle(deeplink)
     }
 
     // 進入點 1：前景 / 背景 URL Scheme

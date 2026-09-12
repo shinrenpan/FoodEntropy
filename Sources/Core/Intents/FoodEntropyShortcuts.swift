@@ -66,6 +66,11 @@ struct FoodEntropyShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: OpenFoodItemIntent(),
             phrases: [
+                // `open` 與 Siri 內建的「開啟 app」動詞撞車——實測 Siri 會先解成
+                // 自己的 app 啟動動作，回「我可以開 app，但無法在裡面開啟 X」，
+                // 我們的語句沒機會被比對（2026-09-12）。故把不撞車的動詞排前面。
+                "Show \(\.$target) in \(.applicationName)",
+                "Go to \(\.$target) in \(.applicationName)",
                 "Open \(\.$target) in \(.applicationName)",
                 "Open a food item in \(.applicationName)",
             ],
