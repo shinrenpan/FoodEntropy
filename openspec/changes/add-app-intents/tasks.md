@@ -60,3 +60,9 @@
 
 - [x] 8.3 實機驗收（2026-09-12，Siri App 打字輸入以排除語音辨識變數）：`MarkFoodConsumedIntent`（單一參數）**完全通過**——Siri 叫用 Intent、以 `suggestedEntities()` 消歧、執行後渲染 `IntentSnippetView` 小卡（綠勾 + 名稱 + `No longer in your list` + app 歸屬）。`ExtendFoodExpiryIntent`（兩個參數）在 app 層消歧後**流程停住**，未能走到日期選擇；該 Intent 本身已由捷徑路徑驗證正確（延長後價格與照片保留），停住的是 Siri AI 的多輪參數解析。dialog 文字在有 snippet 時不另行顯示，屬預期行為（dialog 主要供純語音裝置），需戴耳機以語音測試才驗得到，未列為驗收條件。
 
+## 9. 寫入失敗不得回報成功（送審前修正）
+
+- [x] 9.1 Release 下的寫入失敗會傳到呼叫端而非被吞掉：`SwiftDataManager.save()` 與 `create` / `update` / `markConsumed` / `markWasted` / `delete` / `deleteResolvedFoods` 改為 `throws`，DEBUG 的 `assertionFailure` 保留，app 內呼叫端以 `try?` 明示忽略以維持既有行為。滿足 `Read failures yield empty results and write failures fail loudly only in debug`（本 change 一併更名為 `Read failures yield empty results and write failures reach the caller`）。驗證：`generic/platform=iOS` 建置零 error 零 warning（編譯器強制所有呼叫點表態），既有 106 測試全通過。（決策十三：寫入失敗必須回報呼叫端）
+
+- [x] 9.2 助理動作在寫入失敗時回報本地化錯誤而非確認：`FoodItemActions` 以 `writing` 包裝資料層呼叫，將錯誤轉為 `FoodItemActionError.writeFailed`，訊息經 String Catalog 提供中英文。滿足 `Actions fail loudly when the target no longer exists` 擴充後的寫入失敗情境。驗證：catalog stale 數為 0、缺 `zh-Hant` 數為 0；`xcodebuild test` 全通過。
+

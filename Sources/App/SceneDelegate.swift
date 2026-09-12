@@ -157,7 +157,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if ProcessInfo.processInfo.environment["SEED_MOCKS"] == "1",
            manager.fetchActiveFoods().isEmpty {
             for mock in FoodItem.mocks {
-                manager.create(
+                _ = try? manager.create(
                     name: mock.name,
                     purchaseDate: mock.purchaseDate,
                     expiryDate: mock.expiryDate,
@@ -167,11 +167,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
             // 給首頁的浪費統計一些已處理紀錄（4 吃掉、1 丟棄 → 浪費率 20%）
             for name in ["已吃-優格", "已吃-吐司", "已吃-香蕉", "已吃-起司"] {
-                let f = manager.create(name: name, purchaseDate: .now, expiryDate: .now)
-                manager.markConsumed(id: f.id)
+                let f = try? manager.create(name: name, purchaseDate: .now, expiryDate: .now)
+                if let f { try? manager.markConsumed(id: f.id) }
             }
-            let wastedFood = manager.create(name: "丟棄-菠菜", purchaseDate: .now, expiryDate: .now)
-            manager.markWasted(id: wastedFood.id)
+            if let wastedFood = try? manager.create(name: "丟棄-菠菜", purchaseDate: .now, expiryDate: .now) {
+                try? manager.markWasted(id: wastedFood.id)
+            }
         }
         #endif
         return manager

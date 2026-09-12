@@ -138,7 +138,7 @@ final class SwiftDataManager {
         expiryDate: Date,
         imageData: Data? = nil,
         price: Double? = nil
-    ) -> FoodItem {
+    ) throws -> FoodItem {
         let entity = FoodItemEntity(
             name: name,
             purchaseDate: purchaseDate,
@@ -147,7 +147,7 @@ final class SwiftDataManager {
             price: price
         )
         context.insert(entity)
-        save()
+        try save()
         return entity.toDomain()
     }
 
@@ -162,41 +162,41 @@ final class SwiftDataManager {
         expiryDate: Date,
         imageData: Data?,
         price: Double?
-    ) {
+    ) throws {
         guard let entity = entity(for: id) else { return }
         entity.name = name
         entity.purchaseDate = purchaseDate
         entity.expiryDate = expiryDate
         entity.imageData = imageData
         entity.price = price
-        save()
+        try save()
     }
 
     // MARK: - Status transitions
 
-    func markConsumed(id: UUID) { resolve(id: id, to: .consumed) }
+    func markConsumed(id: UUID) throws { try resolve(id: id, to: .consumed) }
 
-    func markWasted(id: UUID) { resolve(id: id, to: .wasted) }
+    func markWasted(id: UUID) throws { try resolve(id: id, to: .wasted) }
 
     /// Hard delete（誤加 / 打錯用，不留紀錄）。
-    func delete(id: UUID) {
+    func delete(id: UUID) throws {
         guard let entity = entity(for: id) else { return }
         context.delete(entity)
-        save()
+        try save()
     }
 
     // MARK: - Private
 
-    private func resolve(id: UUID, to status: RecordStatus) {
+    private func resolve(id: UUID, to status: RecordStatus) throws {
         guard let entity = entity(for: id) else { return }
         entity.statusRaw = status.rawValue
         entity.resolvedAt = .now
         entity.imageData = nil   // 已離開清單，圖片不再需要 → 剝離以省本機 / iCloud 空間
-        save()
+        try save()
     }
 
     /// 清除所有已處理（consumed / wasted）紀錄。供設定「清除歷史統計」。
-    func deleteResolvedFoods() {
+    func deleteResolvedFoods() throws {
         let activeRaw = RecordStatus.active.rawValue
         let descriptor = FetchDescriptor<FoodItemEntity>(
             predicate: #Predicate { $0.statusRaw != activeRaw }
@@ -205,7 +205,7 @@ final class SwiftDataManager {
         for entity in entities {
             context.delete(entity)
         }
-        save()
+        try save()
     }
 
     private func entity(for id: UUID) -> FoodItemEntity? {
@@ -216,7 +216,15 @@ final class SwiftDataManager {
         return try? context.fetch(descriptor).first
     }
 
-    private func save() {
+    /// 寫入失敗時丟出。
+    ///
+    /// 過去是 `assertionFailure` 後吞掉——而它在 **Release 是 no-op**，
+    /// 等於靜默失敗。App Intents 會據此對使用者回報成功（Siri 唸出「已標記」
+    /// 而資料沒落地），比 app 內更糟：app 內至少看得到清單沒變。
+    ///
+    /// 事後重新查詢無法代替錯誤傳遞——`context.save()` 失敗時，同一個 context
+    /// 仍會回傳記憶體中未落地的變更，驗證會誤判成功。
+    private func save() throws {
         do {
             try context.save()
             // Widget 讀的是同一份 store，但 iOS 不會主動通知它資料變了。
@@ -232,7 +240,8 @@ final class SwiftDataManager {
             // 同一個出口再廣播給畫面（見 app-intents 決策八）。
             NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
         } catch {
-            assertionFailure("SwiftDataManager save failed: \(error)")
+            assertionFailure("SwiftDataManager save failed: \(error)")   // DEBUG 仍立即現形
+            throw error
         }
     }
 }

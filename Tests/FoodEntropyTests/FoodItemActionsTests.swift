@@ -40,7 +40,7 @@ struct FoodItemActionsTests {
     @Test("標記已使用後離開 active 清單")
     func markConsumedRemovesFromActive() throws {
         let (actions, manager) = try makeActions()
-        let item = manager.create(name: "Bread", purchaseDate: date(2026, 9, 1), expiryDate: date(2026, 9, 5))
+        let item = try manager.create(name: "Bread", purchaseDate: date(2026, 9, 1), expiryDate: date(2026, 9, 5))
         try actions.markConsumed(id: item.id)
         #expect(manager.fetchActiveFoods().isEmpty)
         #expect(manager.fetchResolvedFoods().first?.status == .consumed)
@@ -49,7 +49,7 @@ struct FoodItemActionsTests {
     @Test("標記丟棄後離開 active 清單")
     func markWastedRemovesFromActive() throws {
         let (actions, manager) = try makeActions()
-        let item = manager.create(name: "Spinach", purchaseDate: date(2026, 9, 1), expiryDate: date(2026, 9, 5))
+        let item = try manager.create(name: "Spinach", purchaseDate: date(2026, 9, 1), expiryDate: date(2026, 9, 5))
         try actions.markWasted(id: item.id)
         #expect(manager.fetchActiveFoods().isEmpty)
         #expect(manager.fetchResolvedFoods().first?.status == .wasted)
@@ -63,7 +63,7 @@ struct FoodItemActionsTests {
     func extendPreservesOtherValues() throws {
         let (actions, manager) = try makeActions()
         let photo = Data([0xFF, 0xD8, 0xFF])
-        let item = manager.create(
+        let item = try manager.create(
             name: "Milk",
             purchaseDate: date(2026, 9, 11),
             expiryDate: date(2026, 9, 20),
@@ -89,8 +89,8 @@ struct FoodItemActionsTests {
     @Test("對已刪除的食材動作會丟錯且不寫入")
     func actingOnDeletedItemThrows() throws {
         let (actions, manager) = try makeActions()
-        let item = manager.create(name: "Milk", purchaseDate: date(2026, 9, 11), expiryDate: date(2026, 9, 20))
-        manager.delete(id: item.id)
+        let item = try manager.create(name: "Milk", purchaseDate: date(2026, 9, 11), expiryDate: date(2026, 9, 20))
+        try manager.delete(id: item.id)
 
         #expect(throws: FoodItemActionError.itemNotFound) { try actions.markConsumed(id: item.id) }
         #expect(throws: FoodItemActionError.itemNotFound) { try actions.markWasted(id: item.id) }
@@ -104,7 +104,7 @@ struct FoodItemActionsTests {
     @Test("對已標記丟棄的食材再標記已使用會丟錯，原狀態不變")
     func actingOnResolvedItemThrows() throws {
         let (actions, manager) = try makeActions()
-        let item = manager.create(name: "Spinach", purchaseDate: date(2026, 9, 1), expiryDate: date(2026, 9, 5))
+        let item = try manager.create(name: "Spinach", purchaseDate: date(2026, 9, 1), expiryDate: date(2026, 9, 5))
         try actions.markWasted(id: item.id)
 
         #expect(throws: FoodItemActionError.itemNotFound) { try actions.markConsumed(id: item.id) }

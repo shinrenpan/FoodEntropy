@@ -378,7 +378,7 @@ private extension HomeView {
 #Preview("有資料") {
     let manager = try! SwiftDataManager(inMemory: true)
     for mock in FoodItem.mocks {
-        manager.create(
+        _ = try? manager.create(
             name: mock.name,
             purchaseDate: mock.purchaseDate,
             expiryDate: mock.expiryDate,

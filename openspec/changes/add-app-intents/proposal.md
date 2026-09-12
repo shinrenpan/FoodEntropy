@@ -73,7 +73,7 @@ Siri AI 的門檻：**僅英文**（10 月加法／日／韓／葡／西，**繁
 
 ### Modified Capabilities
 
-- `persistence`：新增 process 層級的 `SwiftDataManager` 取用契約，供無 scene 的 App Intents 執行路徑使用；原本「由 `SceneDelegate` 建立」的單一來源不再成立。
+- `persistence`：新增 process 層級的 `SwiftDataManager` 取用契約，供無 scene 的 App Intents 執行路徑使用；原本「由 `SceneDelegate` 建立」的單一來源不再成立。另外把寫入失敗從「僅 DEBUG assertion 後吞掉」改為回報呼叫端——Release 下靜默失敗會讓助理動作對使用者回報成功。
 - `notification`：到期通知的內容契約新增 entity 標註，使 Siri 能將通知對應到食材。
 - `navigation`：新增「單筆食材」的 deeplink 目標，供 Spotlight 點擊結果與助理的開啟動作共用；原本僅有首頁一個目標。
 

@@ -110,7 +110,7 @@ extension FoodFormViewModel {
         let name = state.name.trimmingCharacters(in: .whitespacesAndNewlines)
         switch mode {
         case .add:
-            manager.create(
+            _ = try? manager.create(
                 name: name,
                 purchaseDate: state.purchaseDate,
                 expiryDate: state.expiryDate,
@@ -118,7 +118,7 @@ extension FoodFormViewModel {
                 price: state.price
             )
         case let .edit(item):
-            manager.update(
+            try? manager.update(
                 id: item.id,
                 name: name,
                 purchaseDate: state.purchaseDate,

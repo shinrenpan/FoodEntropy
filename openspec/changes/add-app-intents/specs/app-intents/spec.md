@@ -170,6 +170,8 @@ The system SHALL route every user-visible action title, parameter summary, and s
 
 The system SHALL surface an error when an action names a food item that no longer exists or has already left the active list, rather than reporting success. The error message SHALL be localized.
 
+The system SHALL likewise surface a localized error when the change cannot be stored, and SHALL NOT speak or display a confirmation in that case. Reporting success for a change that was not stored is worse here than in the app's own interface: the app shows an unchanged list, whereas an assistant states that the change was made.
+
 #### Scenario: Acting on a deleted item
 
 - **WHEN** an action targets a food item that has been deleted
@@ -179,3 +181,8 @@ The system SHALL surface an error when an action names a food item that no longe
 
 - **WHEN** an action marks an item consumed that was already marked wasted
 - **THEN** the action reports a localized error rather than silently succeeding
+
+#### Scenario: The change cannot be stored
+
+- **WHEN** an action's write fails
+- **THEN** the action reports a localized error, and no confirmation is spoken or displayed

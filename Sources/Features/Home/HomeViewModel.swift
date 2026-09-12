@@ -73,11 +73,11 @@ extension HomeViewModel {
             onRoute?(.toEdit(item))
 
         case let .consumeDidTap(item):
-            manager.markConsumed(id: item.id)
+            try? manager.markConsumed(id: item.id)
             await reloadAndReschedule()
 
         case let .wasteDidTap(item):
-            manager.markWasted(id: item.id)
+            try? manager.markWasted(id: item.id)
             await reloadAndReschedule()
 
         case let .deleteDidTap(item):
@@ -85,7 +85,7 @@ extension HomeViewModel {
 
         case .deleteConfirmed:
             if let item = state.pendingDeleteItem {
-                manager.delete(id: item.id)
+                try? manager.delete(id: item.id)
             }
             state.pendingDeleteItem = nil
             await reloadAndReschedule()
@@ -98,7 +98,7 @@ extension HomeViewModel {
 
         case let .extendCommitted(newExpiry):
             if let item = state.extendingItem {
-                manager.update(
+                try? manager.update(
                     id: item.id,
                     name: item.name,
                     purchaseDate: item.purchaseDate,
@@ -117,7 +117,7 @@ extension HomeViewModel {
             state.showClearHistoryConfirm = true
 
         case .clearHistoryConfirmed:
-            manager.deleteResolvedFoods()
+            try? manager.deleteResolvedFoods()
             state.showClearHistoryConfirm = false
             await reload()   // 統計歸零、清除鈕收起
         }

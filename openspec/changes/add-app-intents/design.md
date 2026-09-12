@@ -173,6 +173,20 @@ schema 的獨家收益是自由語句理解，而那需要 Siri AI——英文�
 
 **不重用 `FoodRowView` 當 snippet**：那是清單列，帶滑動操作的觸控區與列高假設，且由 `widget` target 一併編譯。snippet 只需要「動作 + 食材 + 一行結果」，另寫一個更小的 view 更誠實。
 
+### 決策十三：寫入失敗必須回報呼叫端
+
+**問題**：`SwiftDataManager.save()` 原本在 `catch` 裡只呼叫 `assertionFailure` 便吞掉錯誤。`assertionFailure` 在 **Release 是 no-op**，因此正式版的寫入失敗完全無聲。
+
+這個缺陷早於本 change，但本 change 讓它的後果升級：app 內失敗時使用者看得到清單沒變，而 **Siri 會唸出「已將牛奶標記為已使用」並顯示綠勾小卡**，資料卻沒落地。這同時違反本 capability 自己的 `Actions fail loudly when the target no longer exists`——對未發生的變更回報成功，性質相同。
+
+**決定**：`save()` 與六個寫入方法改為 `throws`。`FoodItemActions` 將資料層錯誤包成本地化的 `FoodItemActionError.writeFailed`；app 內的呼叫端以 `try?` 明示忽略，行為與今日完全一致。
+
+**為什麼不用「事後重新查詢驗證」**：那是我第一個想到、且不需改任何簽名的作法，但它**行不通**——`context.save()` 失敗時，同一個 `ModelContext` 仍會回傳記憶體中未落地的變更，重新查詢會誤判成功。
+
+**為什麼不用「記下最後一次錯誤」的狀態旗標**：那能避免改動六十個呼叫點，但呼叫端可以忘記檢查（audit 的 Confused Developer 視角），而且新的呼叫端不會被任何機制提醒。改成 `throws` 讓編譯器強制每個呼叫點表態，代價是一次性的機械式修改。
+
+**in-app 仍然靜默是刻意的**：ViewModel 的 `try?` 維持既有行為。要不要在 app 內也提示，屬於獨立的 UX 決定，不由本 change 夾帶——`persistence` 的 delta spec 已明文記下這個分界。
+
 ## Implementation Contract
 
 **行為**：

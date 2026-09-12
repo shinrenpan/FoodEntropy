@@ -13,7 +13,7 @@ struct SwiftDataManagerTests {
     @Test("create 後 fetchActiveFoods 取得該筆")
     func createThenFetch() throws {
         let m = try makeManager()
-        let created = m.create(name: "牛奶", purchaseDate: d0, expiryDate: d0)
+        let created = try m.create(name: "牛奶", purchaseDate: d0, expiryDate: d0)
         let items = m.fetchActiveFoods()
         #expect(items.count == 1)
         #expect(items.first?.id == created.id)
@@ -26,8 +26,8 @@ struct SwiftDataManagerTests {
         let m = try makeManager()
         let later = d0.addingTimeInterval(86_400 * 5)
         let sooner = d0.addingTimeInterval(86_400 * 1)
-        m.create(name: "晚", purchaseDate: d0, expiryDate: later)
-        m.create(name: "早", purchaseDate: d0, expiryDate: sooner)
+        try m.create(name: "晚", purchaseDate: d0, expiryDate: later)
+        try m.create(name: "早", purchaseDate: d0, expiryDate: sooner)
         let names = m.fetchActiveFoods().map(\.name)
         #expect(names == ["早", "晚"])
     }
@@ -35,19 +35,19 @@ struct SwiftDataManagerTests {
     @Test("markConsumed / markWasted 後移出 active 清單並記錄 resolvedAt")
     func resolveRemovesFromActive() throws {
         let m = try makeManager()
-        let a = m.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        let b = m.create(name: "B", purchaseDate: d0, expiryDate: d0)
-        m.markConsumed(id: a.id)
-        m.markWasted(id: b.id)
+        let a = try m.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let b = try m.create(name: "B", purchaseDate: d0, expiryDate: d0)
+        try m.markConsumed(id: a.id)
+        try m.markWasted(id: b.id)
         #expect(m.fetchActiveFoods().isEmpty)
     }
 
     @Test("update 修改欄位")
     func updateMutatesFields() throws {
         let m = try makeManager()
-        let item = m.create(name: "舊", purchaseDate: d0, expiryDate: d0)
+        let item = try m.create(name: "舊", purchaseDate: d0, expiryDate: d0)
         let newExpiry = d0.addingTimeInterval(86_400 * 3)
-        m.update(id: item.id, name: "新", purchaseDate: d0, expiryDate: newExpiry, imageData: nil, price: nil)
+        try m.update(id: item.id, name: "新", purchaseDate: d0, expiryDate: newExpiry, imageData: nil, price: nil)
         let updated = m.fetchActiveFoods().first
         #expect(updated?.name == "新")
         #expect(updated?.expiryDate == newExpiry)
@@ -56,16 +56,16 @@ struct SwiftDataManagerTests {
     @Test("delete 為 hard delete，不留紀錄")
     func deleteRemoves() throws {
         let m = try makeManager()
-        let item = m.create(name: "誤加", purchaseDate: d0, expiryDate: d0)
-        m.delete(id: item.id)
+        let item = try m.create(name: "誤加", purchaseDate: d0, expiryDate: d0)
+        try m.delete(id: item.id)
         #expect(m.fetchActiveFoods().isEmpty)
     }
 
     @Test("標記已使用時剝離圖片")
     func resolveStripsImage() throws {
         let m = try makeManager()
-        let item = m.create(name: "有圖", purchaseDate: d0, expiryDate: d0, imageData: Data([0x01, 0x02]))
-        m.markConsumed(id: item.id)
+        let item = try m.create(name: "有圖", purchaseDate: d0, expiryDate: d0, imageData: Data([0x01, 0x02]))
+        try m.markConsumed(id: item.id)
         let resolved = m.fetchResolvedFoods()
         #expect(resolved.count == 1)
         #expect(resolved.first?.imageData == nil)
@@ -95,23 +95,23 @@ struct SwiftDataManagerTests {
     }
 
     @Test("makeResilient 正常情境回傳可用 manager")
-    func makeResilientReturnsUsable() {
+    func makeResilientReturnsUsable() throws {
         // 走真實磁碟 store（可能有殘留資料）→ 用「包含」斷言，並清掉自己建的那筆避免污染。
         let m = SwiftDataManager.makeResilient(cloudKitEnabled: false)
-        let item = m.create(name: "測試", purchaseDate: d0, expiryDate: d0)
+        let item = try m.create(name: "測試", purchaseDate: d0, expiryDate: d0)
         #expect(m.fetchActiveFoods().contains { $0.id == item.id })
-        m.delete(id: item.id)
+        try m.delete(id: item.id)
     }
 
     @Test("deleteResolvedFoods 清空已處理、不動 active")
     func deleteResolvedClearsHistory() throws {
         let m = try makeManager()
-        let keep = m.create(name: "現存", purchaseDate: d0, expiryDate: d0)
-        let a = m.create(name: "吃了", purchaseDate: d0, expiryDate: d0)
-        let b = m.create(name: "丟了", purchaseDate: d0, expiryDate: d0)
-        m.markConsumed(id: a.id)
-        m.markWasted(id: b.id)
-        m.deleteResolvedFoods()
+        let keep = try m.create(name: "現存", purchaseDate: d0, expiryDate: d0)
+        let a = try m.create(name: "吃了", purchaseDate: d0, expiryDate: d0)
+        let b = try m.create(name: "丟了", purchaseDate: d0, expiryDate: d0)
+        try m.markConsumed(id: a.id)
+        try m.markWasted(id: b.id)
+        try m.deleteResolvedFoods()
         #expect(m.fetchResolvedFoods().isEmpty)
         #expect(m.fetchActiveFoods().map(\.id) == [keep.id])   // active 不受影響
     }
@@ -139,13 +139,13 @@ struct SwiftDataManagerTests {
     @Test("create 保存 price；update 可設值亦可清回 nil")
     func managerPersistsPrice() throws {
         let m = try makeManager()
-        let item = m.create(name: "牛奶", purchaseDate: d0, expiryDate: d0, price: 60)
+        let item = try m.create(name: "牛奶", purchaseDate: d0, expiryDate: d0, price: 60)
         #expect(m.fetchActiveFoods().first?.price == 60)
 
-        m.update(id: item.id, name: "牛奶", purchaseDate: d0, expiryDate: d0, imageData: nil, price: 75)
+        try m.update(id: item.id, name: "牛奶", purchaseDate: d0, expiryDate: d0, imageData: nil, price: 75)
         #expect(m.fetchActiveFoods().first?.price == 75)
 
-        m.update(id: item.id, name: "牛奶", purchaseDate: d0, expiryDate: d0, imageData: nil, price: nil)
+        try m.update(id: item.id, name: "牛奶", purchaseDate: d0, expiryDate: d0, imageData: nil, price: nil)
         #expect(m.fetchActiveFoods().first?.price == nil)
     }
 
@@ -154,14 +154,14 @@ struct SwiftDataManagerTests {
     @Test("標記已使用／丟棄時保留 price，但仍剝離圖片")
     func resolveKeepsPriceButStripsImage() throws {
         let m = try makeManager()
-        let item = m.create(
+        let item = try m.create(
             name: "有圖有價",
             purchaseDate: d0,
             expiryDate: d0,
             imageData: Data([0x01, 0x02]),
             price: 250
         )
-        m.markWasted(id: item.id)
+        try m.markWasted(id: item.id)
 
         let resolved = m.fetchResolvedFoods()
         #expect(resolved.count == 1)

@@ -217,6 +217,16 @@
         }
       }
     },
+    "Couldn't save the change. Please try again.": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法儲存變更，請再試一次。"
+          }
+        }
+      }
+    },
     "Count": {
       "localizations": {
         "zh-Hant": {

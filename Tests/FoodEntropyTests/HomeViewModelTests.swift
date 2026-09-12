@@ -43,7 +43,7 @@ struct HomeViewModelTests {
     @Test
     func `onAppear 從 manager 載入 active`() async throws {
         let (vm, manager) = try makeVM()
-        manager.create(name: "牛奶", purchaseDate: d0, expiryDate: d0)
+        try manager.create(name: "牛奶", purchaseDate: d0, expiryDate: d0)
         await vm.doAction(.view(.onAppear))
         #expect(vm.state.items.count == 1)
         #expect(vm.state.items.first?.name == "牛奶")
@@ -52,12 +52,12 @@ struct HomeViewModelTests {
     @Test
     func `loaded 計算浪費統計`() async throws {
         let (vm, manager) = try makeVM()
-        let a = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        let b = manager.create(name: "B", purchaseDate: d0, expiryDate: d0)
-        let c = manager.create(name: "C", purchaseDate: d0, expiryDate: d0)
-        manager.markConsumed(id: a.id)
-        manager.markConsumed(id: b.id)
-        manager.markWasted(id: c.id)
+        let a = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let b = try manager.create(name: "B", purchaseDate: d0, expiryDate: d0)
+        let c = try manager.create(name: "C", purchaseDate: d0, expiryDate: d0)
+        try manager.markConsumed(id: a.id)
+        try manager.markConsumed(id: b.id)
+        try manager.markWasted(id: c.id)
         await vm.doAction(.dataResponse(.loaded(active: [], resolved: manager.fetchResolvedFoods())))
         #expect(vm.state.consumedCount == 2)
         #expect(vm.state.wastedCount == 1)
@@ -67,8 +67,8 @@ struct HomeViewModelTests {
     @Test
     func `清除歷史統計刪除已處理並歸零`() async throws {
         let (vm, manager) = try makeVM()
-        let a = manager.create(name: "吃了", purchaseDate: d0, expiryDate: d0)
-        manager.markConsumed(id: a.id)
+        let a = try manager.create(name: "吃了", purchaseDate: d0, expiryDate: d0)
+        try manager.markConsumed(id: a.id)
         await vm.doAction(.view(.onAppear))
         #expect(vm.state.hasHistory == true)
 
@@ -84,7 +84,7 @@ struct HomeViewModelTests {
     @Test
     func `deleteDidTap 設定 pendingDeleteItem 不刪除`() async throws {
         let (vm, manager) = try makeVM()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
         await vm.doAction(.view(.onAppear))
         await vm.doAction(.view(.deleteDidTap(item)))
         #expect(vm.state.pendingDeleteItem == item)
@@ -94,7 +94,7 @@ struct HomeViewModelTests {
     @Test
     func `deleteCancelled 清除 pendingDeleteItem`() async throws {
         let (vm, manager) = try makeVM()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
         await vm.doAction(.view(.deleteDidTap(item)))
         await vm.doAction(.view(.deleteCancelled))
         #expect(vm.state.pendingDeleteItem == nil)
@@ -103,7 +103,7 @@ struct HomeViewModelTests {
     @Test
     func `deleteConfirmed 刪除並重載`() async throws {
         let (vm, manager) = try makeVM()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
         await vm.doAction(.view(.onAppear))
         await vm.doAction(.view(.deleteDidTap(item)))
         await vm.doAction(.view(.deleteConfirmed))
@@ -114,7 +114,7 @@ struct HomeViewModelTests {
     @Test
     func `consumeDidTap 移出清單`() async throws {
         let (vm, manager) = try makeVM()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
         await vm.doAction(.view(.onAppear))
         await vm.doAction(.view(.consumeDidTap(item)))
         #expect(vm.state.items.isEmpty)
@@ -123,7 +123,7 @@ struct HomeViewModelTests {
     @Test
     func `wasteDidTap 移出清單`() async throws {
         let (vm, manager) = try makeVM()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
         await vm.doAction(.view(.onAppear))
         await vm.doAction(.view(.wasteDidTap(item)))
         #expect(vm.state.items.isEmpty)
@@ -132,7 +132,7 @@ struct HomeViewModelTests {
     @Test
     func `extendDidTap 設定 extendingItem`() async throws {
         let (vm, manager) = try makeVM()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
         await vm.doAction(.view(.extendDidTap(item)))
         #expect(vm.state.extendingItem == item)
     }
@@ -140,7 +140,7 @@ struct HomeViewModelTests {
     @Test
     func `extendCommitted 更新到期日並清除 extendingItem`() async throws {
         let (vm, manager) = try makeVM()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
         await vm.doAction(.view(.onAppear))
         await vm.doAction(.view(.extendDidTap(item)))
         let newExpiry = d0.addingTimeInterval(86_400 * 5)

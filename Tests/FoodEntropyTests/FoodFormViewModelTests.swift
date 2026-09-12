@@ -23,7 +23,7 @@ struct FoodFormViewModelTests {
     @Test
     func `edit 模式帶入既有食材值`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "牛奶", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let item = try manager.create(name: "牛奶", purchaseDate: d0, expiryDate: day(3, from: d0))
         let vm = makeVM(.edit(item), manager)
         #expect(vm.state.name == "牛奶")
         #expect(vm.state.purchaseDate == d0)
@@ -53,7 +53,7 @@ struct FoodFormViewModelTests {
     @Test
     func `購買日改到晚於到期日時頂推到期日`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
         let vm = makeVM(.edit(item), manager)
         await vm.doAction(.view(.purchaseDateChanged(day(5, from: d0))))
         #expect(vm.state.purchaseDate == day(5, from: d0))
@@ -63,7 +63,7 @@ struct FoodFormViewModelTests {
     @Test
     func `購買日仍早於到期日時不動到期日`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
         let vm = makeVM(.edit(item), manager)
         await vm.doAction(.view(.purchaseDateChanged(day(1, from: d0))))
         #expect(vm.state.expiryDate == day(3, from: d0))   // 不變
@@ -87,7 +87,7 @@ struct FoodFormViewModelTests {
     @Test
     func `edit 儲存後 manager 更新既有筆`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "舊", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let item = try manager.create(name: "舊", purchaseDate: d0, expiryDate: day(3, from: d0))
         let vm = makeVM(.edit(item), manager)
         vm.state.name = "新"
         await vm.doAction(.view(.saveDidTap))
@@ -110,7 +110,7 @@ struct FoodFormViewModelTests {
     @Test
     func `未變更時返回不跳確認`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
         let vm = makeVM(.edit(item), manager)
         await vm.doAction(.view(.dismissDidTap))
         #expect(vm.state.showDiscardConfirm == false)
@@ -119,7 +119,7 @@ struct FoodFormViewModelTests {
     @Test
     func `有變更時返回跳確認`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
         let vm = makeVM(.edit(item), manager)
         vm.state.name = "改了"
         await vm.doAction(.view(.dismissDidTap))
@@ -159,7 +159,7 @@ struct FoodFormViewModelTests {
     @Test
     func `edit 模式帶入既有價格`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "牛奶", purchaseDate: d0, expiryDate: day(3, from: d0), price: 60)
+        let item = try manager.create(name: "牛奶", purchaseDate: d0, expiryDate: day(3, from: d0), price: 60)
         let vm = makeVM(.edit(item), manager)
         #expect(vm.state.price == 60)
     }
@@ -167,7 +167,7 @@ struct FoodFormViewModelTests {
     @Test
     func `僅改價格也算未儲存變更`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
         let vm = makeVM(.edit(item), manager)
         vm.state.price = 120
         await vm.doAction(.view(.dismissDidTap))
@@ -187,7 +187,7 @@ struct FoodFormViewModelTests {
     @Test
     func `編輯既有食材補填價格`() async throws {
         let manager = try makeManager()
-        let item = manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
         let vm = makeVM(.edit(item), manager)
         vm.state.price = 88
         await vm.doAction(.view(.saveDidTap))

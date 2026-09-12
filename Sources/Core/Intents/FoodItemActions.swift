@@ -32,25 +32,27 @@ struct FoodItemActions {
         // 保護，故在此比照——否則會靜默建出一筆「買進前就過期」的紀錄。
         guard expiryDate >= purchaseDate else { throw FoodItemActionError.expiryBeforePurchase }
 
-        return manager.create(
-            name: trimmed,
-            purchaseDate: purchaseDate,
-            expiryDate: expiryDate,
-            imageData: nil,
-            price: price
-        )
+        return try writing {
+            try manager.create(
+                name: trimmed,
+                purchaseDate: purchaseDate,
+                expiryDate: expiryDate,
+                imageData: nil,
+                price: price
+            )
+        }
     }
 
     // MARK: - 狀態轉換
 
     func markConsumed(id: UUID) throws {
         let item = try requireActive(id: id)
-        manager.markConsumed(id: item.id)
+        try writing { try manager.markConsumed(id: item.id) }
     }
 
     func markWasted(id: UUID) throws {
         let item = try requireActive(id: id)
-        manager.markWasted(id: item.id)
+        try writing { try manager.markWasted(id: item.id) }
     }
 
     // MARK: - 延長效期
@@ -62,14 +64,16 @@ struct FoodItemActions {
         guard newExpiryDate >= item.purchaseDate else {
             throw FoodItemActionError.expiryBeforePurchase
         }
-        manager.update(
-            id: item.id,
-            name: item.name,
-            purchaseDate: item.purchaseDate,
-            expiryDate: newExpiryDate,
-            imageData: item.imageData,
-            price: item.price
-        )
+        try writing {
+            try manager.update(
+                id: item.id,
+                name: item.name,
+                purchaseDate: item.purchaseDate,
+                expiryDate: newExpiryDate,
+                imageData: item.imageData,
+                price: item.price
+            )
+        }
     }
 
     // MARK: - 讀取
@@ -83,6 +87,19 @@ struct FoodItemActions {
     }
 
     // MARK: - Private
+
+    /// 把資料層的寫入錯誤換成本地化訊息。
+    ///
+    /// SwiftData 丟出的是未本地化的系統錯誤，直接傳給 Siri 會讓使用者看到
+    /// 一段看不懂的英文。原始錯誤在 `SwiftDataManager.save()` 的
+    /// `assertionFailure` 已於 DEBUG 現形，此處只負責對使用者說人話。
+    private func writing<T>(_ body: () throws -> T) throws -> T {
+        do {
+            return try body()
+        } catch {
+            throw FoodItemActionError.writeFailed
+        }
+    }
 
     /// 目標必須仍在 active 清單。已刪除或已 resolved 都視為找不到——
     /// 對已丟棄的食材再標記「已使用」不該悄悄成功。
@@ -102,6 +119,9 @@ enum FoodItemActionError: Error, CustomLocalizedStringResourceConvertible {
     case itemNotFound
     case emptyName
     case expiryBeforePurchase
+    /// 資料沒能寫進去。**不得**回報成功——Siri 會唸出確認句，
+    /// 使用者會以為動作生效了（見 app-intents 決策十三）。
+    case writeFailed
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
@@ -111,6 +131,8 @@ enum FoodItemActionError: Error, CustomLocalizedStringResourceConvertible {
             "The food item needs a name."
         case .expiryBeforePurchase:
             "The expiry date cannot be earlier than the purchase date."
+        case .writeFailed:
+            "Couldn't save the change. Please try again."
         }
     }
 }

@@ -25,3 +25,39 @@ Within one app process there SHALL be exactly one such store connection, so that
 
 - **WHEN** the accessor constructs the store and the preferred configuration fails
 - **THEN** it falls back through the same layers the app already applies, rather than failing the action
+
+## MODIFIED Requirements
+
+### Requirement: Read failures yield empty results and write failures fail loudly only in debug
+
+The system SHALL return an empty collection when a fetch fails, without terminating the app.
+
+When a save fails, the system SHALL raise a debug-build assertion **and** report the failure to its caller, so that each caller decides what to do. A caller that merely presents data MAY ignore the failure, because the unchanged interface already tells the user nothing happened. A caller that reports its own success to someone else — an assistant action speaking a confirmation, for instance — MUST NOT treat an ignored failure as success.
+
+Re-reading after a failed save SHALL NOT be used to detect it: the context still reports the pending in-memory change, so the read appears to succeed.
+
+#### Scenario: The store cannot be read
+
+- **WHEN** a fetch fails at runtime
+- **THEN** the caller receives an empty collection and the app continues running
+
+#### Scenario: A save fails during development
+
+- **WHEN** a save fails in a debug build
+- **THEN** an assertion failure surfaces the problem immediately to the developer
+
+#### Scenario: A save fails in a release build
+
+- **WHEN** a save fails in a release build
+- **THEN** the failure reaches the caller rather than being discarded, and the app continues running
+
+#### Scenario: A screen ignores a failed save
+
+- **WHEN** an in-app screen's write fails
+- **THEN** the screen continues without an error of its own, because the list it shows is unchanged and conveys that nothing was recorded
+
+## RENAMED Requirements
+
+- FROM: `### Requirement: Read failures yield empty results and write failures fail loudly only in debug`
+- TO: `### Requirement: Read failures yield empty results and write failures reach the caller`
+
