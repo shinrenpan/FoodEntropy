@@ -191,6 +191,8 @@ The system SHALL accept a deeplink that names one food item, and SHALL open that
 
 A deeplink naming an item that is no longer active SHALL land on the home list without reporting an error, because an item can legitimately be consumed, discarded, or deleted between the moment a link is offered and the moment it is followed.
 
+Arriving at the item SHALL NOT depend on what was on screen when the deeplink was followed. When any screen is already presented above the home list, the system SHALL return to the home list **and** present the item's detail — returning to the list alone is a failure, not a partial success, because the user asked for an item and silently receives nothing.
+
 #### Scenario: Following a link to an item
 
 - **WHEN** an entry point supplies a deeplink naming an active food item
@@ -206,10 +208,24 @@ A deeplink naming an item that is no longer active SHALL land on the home list w
 - **WHEN** a second item deeplink is followed while a detail is already presented
 - **THEN** the second item's detail replaces the first rather than stacking on top of it
 
+#### Scenario: Following an item link from any other screen
+
+- **WHEN** an item deeplink is followed while a screen other than a food item detail is presented above the home list
+- **THEN** that screen is removed and the item's detail is presented, rather than the stack coming to rest on the home list with nothing presented
+
 #### Scenario: A malformed item link is rejected
 
 - **WHEN** a URL names the item destination but carries no identifier, or one that is not a valid identifier
 - **THEN** the URL resolves to no destination and nothing is navigated
+
+##### Example: where the stack ends up
+
+| On screen when the link is followed | Resulting stack |
+| --- | --- |
+| home list | home list, then the item's detail |
+| another item's detail | home list, then the requested item's detail |
+| settings | home list, then the requested item's detail |
+| any of the above, item no longer active | home list only |
 
 ##### Example: item URL parsing
 

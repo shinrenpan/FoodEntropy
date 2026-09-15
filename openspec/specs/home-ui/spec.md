@@ -428,4 +428,4 @@ The home screen SHALL emit this navigation as an intent for its host to execute,
 #### Scenario: A deeplink arriving while settings is open
 
 - **WHEN** a food item deeplink arrives while the user is on the settings screen
-- **THEN** settings is removed from the stack, rather than the item's form appearing on top of settings
+- **THEN** settings is removed from the stack and the item's form is shown, rather than the form appearing on top of settings or the stack coming to rest on the home screen
