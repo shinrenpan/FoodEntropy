@@ -71,6 +71,9 @@ original pre-Spectra design documents remain available in the git history.
 - [x] Medium home-screen widget, sharing the app's presentation code (v1.2.0)
 - [x] Shortcuts / Siri / Spotlight via App Intents (v1.3.0)
 - [x] Capability specs (15 capabilities; the original 13 backfilled from v1.0.0)
+- [x] Home screen rebuilt as a stack of five cards, Settings moved into its navigation
+      bar, and each bucket's working list opened from its own card
+      (v1.4.0 — built and tested, not yet submitted)
 
 Pending work lives in [`openspec/changes/`](./openspec/changes/) as change proposals —
 each one states what is decided, what is not, and what unblocks it.
