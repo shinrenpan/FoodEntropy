@@ -2,7 +2,7 @@
 
 ## Purpose
 
-One 320x50 banner at the top of the home list — the app's only revenue source and only third-party dependency. Every choice here trades revenue for a minimal privacy footprint: non-personalised requests, no IDFA, no ATT prompt, EU excluded. The missing ATT prompt is deliberate and must not be "fixed": ATT is required only when tracking, and prompting without it risks rejection under Guideline 5.1.2. Two failure modes are silent — using the production ad unit during development is invalid traffic that can get the AdMob account suspended (hence the compile-time split), and app-ads.txt verification depends on a field outside this repo: the crawler derives the host to fetch from the App Store listing's marketing URL, so an empty marketing URL reports as "file not found" no matter how correctly the file is published.
+One 320x50 banner pinned above the home screen's card stack — the app's only revenue source and only third-party dependency. Every choice here trades revenue for a minimal privacy footprint: non-personalised requests, no IDFA, no ATT prompt, EU excluded. The missing ATT prompt is deliberate and must not be "fixed": ATT is required only when tracking, and prompting without it risks rejection under Guideline 5.1.2. Two failure modes are silent — using the production ad unit during development is invalid traffic that can get the AdMob account suspended (hence the compile-time split), and app-ads.txt verification depends on a field outside this repo: the crawler derives the host to fetch from the App Store listing's marketing URL, so an empty marketing URL reports as "file not found" no matter how correctly the file is published.
 
 ## Requirements
 

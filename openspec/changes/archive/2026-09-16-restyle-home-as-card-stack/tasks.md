@@ -31,6 +31,8 @@
 - [x] 4.2b 修正 `AppRouter` 的返回行為：來源以 push 抵達且堆疊深度大於一時先 pop，只有在堆疊根部才考慮收起整個呈現式堆疊。交付行為：sheet 內的表單返回時退回清單，sheet 不關閉。驗證：新增測試 `在呈現式堆疊內返回是 pop 而非收掉整個堆疊` 與 `呈現式堆疊的根畫面返回仍是收掉整個堆疊` 皆通過。
 - [x] 4.3 依 requirement「The screen reloads on appearing and reconciles reminders after data changes」驗證資料同步：在清單中標記一筆已使用，確認清單即時更新；關閉清單後確認首頁卡片的數量與金額同步。交付行為：清單內的動作不需重開即反映，首頁關閉後反映。驗證：兩個時點各截一張圖，數字與動作前不同。
 
+- [x] 4.4 依 requirement「Deeplink parsing is centralised in one enum」與「A single food item is a deeplink destination」的新措辭，確認兩者不再以「home list」描述首頁——首頁已不是清單。另更新沒有 delta 機制的敘述：`home-ui` 與 `advertising` 的 Purpose、以及 `openspec/specs/README.md` 的 capability map。交付行為：規格全份對首頁的描述與卡片堆疊一致。驗證：主 spec 套用後，以 `home list` 與「分桶清單」搜尋 `openspec/specs/` 無過時命中。
+
 ## 5. 在地化與收尾
 
 - [x] 5.1 修正底部新增按鈕下緣間距的註解：數值維持現值，但原註解所述理由（與 tab bar 拉開距離）在 tab bar 移除後已不存在。交付行為：註解與實際理由一致。驗證：搜尋該檔案不再出現 tab bar 字樣。

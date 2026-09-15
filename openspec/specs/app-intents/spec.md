@@ -466,14 +466,21 @@ code:
 ---
 ### Requirement: On-screen food items are annotated for assistant resolution
 
-The system SHALL annotate each food row on the home list with its entity identifier, so that an assistant capable of reading the screen can resolve a reference to what the user is looking at. The annotation SHALL NOT change any visual presentation, and SHALL NOT delay the system's request for the on-screen payload.
+The system SHALL annotate each food row it displays with its entity identifier, so that an assistant capable of reading the screen can resolve a reference to what the user is looking at. The annotation SHALL NOT change any visual presentation, and SHALL NOT delay the system's request for the on-screen payload.
+
+The annotation belongs to the rows themselves, wherever they are shown. A screen that shows summaries rather than rows SHALL carry no annotation, because it has no food item to name.
 
 Whether the assistant actually resolves such a reference is outside this project's control and SHALL NOT be treated as an acceptance criterion: the capability reaches users only on a supported device, in a supported language, and in a supported region, and it was unavailable for this project's primary audience when the annotation shipped. The requirement covers only what the app provides.
 
 #### Scenario: Annotation is attached to food rows only
 
-- **WHEN** the home list renders its summary chart, its waste statistics, and its food rows
-- **THEN** only the food rows carry an entity identifier, because rows that represent no food item cannot supply one and delay the payload request until it times out
+- **WHEN** a screen renders food rows alongside anything that is not a food row
+- **THEN** only the food rows carry an entity identifier, because elements that represent no food item cannot supply one and delay the payload request until it times out
+
+#### Scenario: A screen of summaries carries no annotation
+
+- **WHEN** the user is looking at a screen that shows only per-bucket summaries and statistics
+- **THEN** nothing on it is annotated, since no single food item is on display
 
 #### Scenario: The payload request completes within the system deadline
 
@@ -482,78 +489,8 @@ Whether the assistant actually resolves such a reference is outside this project
 
 #### Scenario: Annotation has no visual effect
 
-- **WHEN** the home list renders with annotations present
+- **WHEN** a list of food rows renders with annotations present
 - **THEN** its layout and appearance are identical to the unannotated rendering
-
-
-<!-- @trace
-source: add-app-intents
-updated: 2026-09-13
-code:
-  - Tests/FoodEntropyTests/FoodItemLookupTests.swift
-  - Sources/Core/Intents/IntentSnippetView.swift
-  - Tests/FoodEntropyTests/FoodItemActionOutcomeTests.swift
-  - Sources/Features/FoodForm/FoodFormMode.swift
-  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
-  - Sources/Core/Image/ImageCompressor.swift
-  - Sources/Core/Intents/FoodEntropyShortcuts.swift
-  - Sources/Core/Persistence/SwiftDataManager.swift
-  - Sources/Core/Intents/FoodItemActionOutcome.swift
-  - CLAUDE.md
-  - Sources/App/PendingDeeplink.swift
-  - Sources/Core/Components/FoodRowView.swift
-  - Tests/FoodEntropyTests/FoodStatusSummaryTests.swift
-  - Sources/Core/Ad/AdConfig.swift
-  - Sources/Core/Components/StatusChartView.swift
-  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
-  - Tests/FoodEntropyTests/FoodItemAppEntityTests.swift
-  - Tests/FoodEntropyTests/FoodItemActionsTests.swift
-  - design/screenshots/README.md
-  - Sources/App/SceneDelegate.swift
-  - docs/privacy/index.html
-  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
-  - project.yml
-  - Sources/Core/Intents/FoodItemAppEntity.swift
-  - Sources/Core/Extensions/CurrencyFormat.swift
-  - docs/index.html
-  - README.md
-  - Sources/Resources/AppShortcuts.xcstrings
-  - Sources/Core/Ad/AdSlotView.swift
-  - Sources/Features/FoodForm/FoodFormViewModel.swift
-  - Sources/Core/Intents/FoodItemLookup.swift
-  - Sources/Core/Intents/FoodItemEntityQuery.swift
-  - Sources/Core/Domain/DayBoundary.swift
-  - Sources/Core/Store/StoreManager.swift
-  - Sources/Core/Intents/FoodItemSpotlightIndex.swift
-  - Tests/FoodEntropyTests/HomeViewModelTests.swift
-  - Sources/Features/Home/HomeView.swift
-  - Sources/Core/Intents/FoodItemSystemIntents.swift
-  - design/screenshots/home.png
-  - Sources/Features/Settings/SettingsView.swift
-  - Sources/Core/Domain/FoodItem.swift
-  - Tests/FoodEntropyTests/DeeplinkTests.swift
-  - Tests/FoodEntropyTests/StatusChartViewTests.swift
-  - Sources/Features/Home/HomeViewModel.swift
-  - design/screenshots/settings.png
-  - Sources/Core/Domain/FoodItemMocks.swift
-  - Sources/Features/Home/HomeViewModel+Models.swift
-  - Sources/Core/Domain/FoodStatusSummary.swift
-  - Sources/Core/Intents/FoodItemIntents.swift
-  - Sources/Resources/Localizable.xcstrings
-  - design/badges/download-on-the-app-store.svg
-  - Sources/Features/Settings/SettingsViewModel.swift
-  - Sources/Core/Intents/FoodItemActions.swift
-  - Sources/Widget/WidgetStore.swift
-  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
-  - design/screenshots/widget.png
-  - Sources/Core/Persistence/FoodItemEntity.swift
-  - Sources/Widget/FoodEntropyWidget.swift
-  - Tests/FoodEntropyTests/DayBoundaryTests.swift
-  - Sources/App/Deeplink.swift
-  - Sources/Features/FoodForm/FoodFormView.swift
-  - design/badges/README.md
-  - Sources/Core/Notification/NotificationService.swift
--->
 
 ---
 ### Requirement: Actions that do not open the app report their result
