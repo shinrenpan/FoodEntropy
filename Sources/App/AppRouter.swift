@@ -31,7 +31,7 @@ extension UIViewController {
 // MARK: - AppRouter
 
 // 唯一導航中樞（mvvmc-navigation）。Stateless：不持有 nav / window / VC，
-// 一律從 source.navigationController / tabBarController 動態取得。
+// 一律從 source.navigationController 動態取得。
 @MainActor
 final class AppRouter: NSObject {
     static let shared = AppRouter()
@@ -124,14 +124,6 @@ final class AppRouter: NSObject {
         let nav = UINavigationController(rootViewController: destination)
         nav.modalPresentationStyle = .fullScreen
         rootVC.present(nav, animated: animated)
-    }
-
-    func tab(_ index: Int, from source: UIViewController) {
-        guard let tabBar = source.tabBarController else {
-            assertionFailure("AppRouter.tab(): source VC 沒有 tabBarController，請確認 rootViewController 為 UITabBarController")
-            return
-        }
-        tabBar.selectedIndex = index
     }
 }
 

@@ -41,6 +41,19 @@ struct HomeView: View {
             )
         }
         .listStyle(.insetGrouped)
+        .navigationTitle("Home")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            // 設定不再是並列的 tab，改為從這裡推入（見 home-ui）。
+            // 走 ViewAction → Router → HostController，不在 HostController 直接掛 bar button。
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    Task { await viewModel.doAction(.view(.settingsDidTap)) }
+                } label: {
+                    Label("Settings", systemImage: "gearshape")
+                }
+            }
+        }
         .safeAreaInset(edge: .top, spacing: 0) {
             // 廣告釘在清單頂：AdSlotView 自帶不透明底 + 收合邏輯（無廣告自行消失）。
             if !viewModel.state.adsRemoved {

@@ -6,8 +6,6 @@ import UserNotifications
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
-    private static let homeTabIndex = 0
-
     // 持有 manager 供前景時對帳通知排程。
     private var manager: SwiftDataManager?
 
@@ -40,7 +38,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowScene)
         window.backgroundColor = .systemBackground   // 防止自訂轉場期間露出黑底
-        window.rootViewController = makeRootTabBarController(manager: manager, store: store)
+        window.rootViewController = makeRootNavigationController(manager: manager, store: store)
         window.makeKeyAndVisible()
         self.window = window
 
@@ -92,27 +90,27 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // MARK: - Deeplink 處理
 
     private func handle(_ deeplink: Deeplink) {
-        guard let tabBarController = window?.rootViewController as? UITabBarController else { return }
-        tabBarController.selectedIndex = Self.homeTabIndex
+        guard let nav = window?.rootViewController as? UINavigationController else { return }
 
         switch deeplink {
         case .home:
-            break   // 切到首頁 Tab 即是全部
+            // 沒有分頁可切，回到 stack 根部即是「首頁」。
+            nav.popToRootViewController(animated: false)
         case let .foodItem(id):
-            showFoodItem(id: id, in: tabBarController)
+            showFoodItem(id: id, in: nav)
         }
     }
 
     // Spotlight 點擊食材結果與 Siri 的「開啟某食材」都走這裡（見 app-intents）。
     // 找不到就停在首頁——食材可能已被標記或刪除，那不是錯誤，只是目標不在了。
-    private func showFoodItem(id: UUID, in tabBarController: UITabBarController) {
+    private func showFoodItem(id: UUID, in nav: UINavigationController) {
         guard let manager,
               let item = manager.fetchActiveFoods().first(where: { $0.id == id }),
-              let nav = tabBarController.selectedViewController as? UINavigationController,
               let home = nav.viewControllers.first
         else { return }
 
         // 連續開啟不同食材時，先回到首頁再推——否則會疊出一長串編輯頁。
+        // 設定頁也在同一個 stack，所以這段一併負責把它收掉（見 remove-tab-bar 的 design）。
         if nav.viewControllers.count > 1 {
             nav.popToRootViewController(animated: false)
         }
@@ -121,29 +119,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // MARK: - 導航裝配（Phase 2）
 
-    // 兩 Tab 裝配（分析已於 v1.0.0 併入首頁，見 app-shell）。
-    private func makeRootTabBarController(manager: SwiftDataManager, store: StoreManager) -> UITabBarController {
-        let homeTitle = String(localized: "Home")
-        let settingsTitle = String(localized: "Settings")
-
+    // 單一 navigation stack，root 為首頁；設定由首頁推入（見 app-shell / home-ui）。
+    // 標題由各自的 SwiftUI View 設定，組裝點只負責結構。
+    private func makeRootNavigationController(manager: SwiftDataManager, store: StoreManager) -> UINavigationController {
         let home = HomeHostController(manager: manager, store: store)
-        home.navigationItem.title = homeTitle
-
-        let settings = SettingsHostController(store: store)
-        settings.navigationItem.title = settingsTitle
-
-        let tabBarController = UITabBarController()
-        tabBarController.viewControllers = [
-            wrapInTab(home, title: homeTitle, systemImage: "list.bullet"),
-            wrapInTab(settings, title: settingsTitle, systemImage: "gearshape"),
-        ]
-        #if DEBUG
-        // 開發用：以 INITIAL_TAB=<index> 啟動時定位初始分頁。
-        if let raw = ProcessInfo.processInfo.environment["INITIAL_TAB"], let index = Int(raw) {
-            tabBarController.selectedIndex = index
-        }
-        #endif
-        return tabBarController
+        return UINavigationController(rootViewController: home)
     }
 
     // Composition root：取用 process 層級的共用連線（見 persistence）。
@@ -178,15 +158,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return manager
     }
 
-    private func wrapInTab(
-        _ root: UIViewController,
-        title: String,
-        systemImage: String
-    ) -> UINavigationController {
-        let nav = UINavigationController(rootViewController: root)
-        nav.tabBarItem = UITabBarItem(title: title, image: UIImage(systemName: systemImage), selectedImage: nil)
-        return nav
-    }
 }
 
 // MARK: - UNUserNotificationCenterDelegate

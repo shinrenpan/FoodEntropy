@@ -25,6 +25,8 @@ struct SettingsView: View {
                 send: handleAboutAction
             )
         }
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             Task { await viewModel.doAction(.view(.onAppear)) }
         }

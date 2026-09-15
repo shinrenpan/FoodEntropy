@@ -48,6 +48,7 @@ extension HomeViewModel {
     enum ViewAction: Sendable {
         case onAppear
         case addDidTap
+        case settingsDidTap             // 導覽列右上角齒輪
         case rowDidTap(FoodItem)
         case consumeDidTap(FoodItem)
         case wasteDidTap(FoodItem)
@@ -68,6 +69,9 @@ extension HomeViewModel {
 
         case .addDidTap:
             onRoute?(.toAdd)
+
+        case .settingsDidTap:
+            onRoute?(.toSettings)
 
         case let .rowDidTap(item):
             onRoute?(.toEdit(item))
@@ -143,6 +147,8 @@ extension HomeViewModel {
     enum Router: Sendable {
         case toAdd
         case toEdit(FoodItem)
+        // 設定不再是並列的 tab，改為推入同一個 stack（見 home-ui）。
+        case toSettings
     }
 }
 

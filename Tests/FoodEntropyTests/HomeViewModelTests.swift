@@ -222,4 +222,32 @@ struct HomeViewModelTests {
         await vm.doAction(.dataResponse(.loaded(active: [], resolved: [wastedNoPrice])))
         #expect(vm.state.wastedCost == nil)
     }
+
+    // MARK: - 導航（remove-tab-bar）
+
+    @Test
+    func `齒輪點擊發出前往設定意圖`() async throws {
+        let (vm, _) = try makeVM()
+        let recorder = HomeRouteRecorder()
+        vm.onRoute = { [recorder] route in recorder.record(route) }
+        await vm.doAction(.view(.settingsDidTap))
+        #expect(recorder.toSettingsCount == 1)
+    }
+}
+
+// MARK: - 導航記錄器
+
+@MainActor
+private final class HomeRouteRecorder {
+    private(set) var toSettingsCount = 0
+    private(set) var toAddCount = 0
+    private(set) var toEditCount = 0
+
+    func record(_ route: HomeViewModel.Router) {
+        switch route {
+        case .toAdd: toAddCount += 1
+        case .toEdit: toEditCount += 1
+        case .toSettings: toSettingsCount += 1
+        }
+    }
 }
