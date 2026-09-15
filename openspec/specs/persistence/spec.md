@@ -196,7 +196,13 @@ code:
 
 The system SHALL return an empty collection when a fetch fails, without terminating the app.
 
-When a save fails, the system SHALL raise a debug-build assertion **and** report the failure to its caller, so that each caller decides what to do. A caller that merely presents data MAY ignore the failure, because the unchanged interface already tells the user nothing happened. A caller that reports its own success to someone else — an assistant action speaking a confirmation, for instance — MUST NOT treat an ignored failure as success.
+When a save fails, the system SHALL raise a debug-build assertion **and** report the failure to its caller, so that each caller decides what to do.
+
+Whether a caller is permitted to ignore that failure SHALL be decided by one test: what the interface looks like afterwards.
+
+- A caller whose interface stays visible and unchanged after a failed write SHALL be permitted to ignore the failure, because the unchanged interface already tells the user nothing happened.
+- A caller that dismisses, closes, or replaces its own interface once a write succeeds SHALL NOT ignore the failure, because that dismissal is the app's signal that the write happened. Such a caller SHALL keep its interface in place and tell the user the write did not happen.
+- A caller that reports its own success to someone else — an assistant action speaking a confirmation, for instance — SHALL NOT treat an ignored failure as success.
 
 Re-reading after a failed save SHALL NOT be used to detect it: the context still reports the pending in-memory change, so the read appears to succeed.
 
@@ -215,80 +221,23 @@ Re-reading after a failed save SHALL NOT be used to detect it: the context still
 - **WHEN** a save fails in a release build
 - **THEN** the failure reaches the caller rather than being discarded, and the app continues running
 
-#### Scenario: A screen ignores a failed save
+#### Scenario: A screen that stays put ignores a failed save
 
-- **WHEN** an in-app screen's write fails
-- **THEN** the screen continues without an error of its own, because the list it shows is unchanged and conveys that nothing was recorded
+- **WHEN** a write fails on a screen that remains on display with the same content afterwards
+- **THEN** the screen continues without an error of its own, because the unchanged content conveys that nothing was recorded
 
+#### Scenario: A screen that closes on success cannot ignore a failed save
 
-<!-- @trace
-source: add-app-intents
-updated: 2026-09-13
-code:
-  - Tests/FoodEntropyTests/FoodItemLookupTests.swift
-  - Sources/Core/Intents/IntentSnippetView.swift
-  - Tests/FoodEntropyTests/FoodItemActionOutcomeTests.swift
-  - Sources/Features/FoodForm/FoodFormMode.swift
-  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
-  - Sources/Core/Image/ImageCompressor.swift
-  - Sources/Core/Intents/FoodEntropyShortcuts.swift
-  - Sources/Core/Persistence/SwiftDataManager.swift
-  - Sources/Core/Intents/FoodItemActionOutcome.swift
-  - CLAUDE.md
-  - Sources/App/PendingDeeplink.swift
-  - Sources/Core/Components/FoodRowView.swift
-  - Tests/FoodEntropyTests/FoodStatusSummaryTests.swift
-  - Sources/Core/Ad/AdConfig.swift
-  - Sources/Core/Components/StatusChartView.swift
-  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
-  - Tests/FoodEntropyTests/FoodItemAppEntityTests.swift
-  - Tests/FoodEntropyTests/FoodItemActionsTests.swift
-  - design/screenshots/README.md
-  - Sources/App/SceneDelegate.swift
-  - docs/privacy/index.html
-  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
-  - project.yml
-  - Sources/Core/Intents/FoodItemAppEntity.swift
-  - Sources/Core/Extensions/CurrencyFormat.swift
-  - docs/index.html
-  - README.md
-  - Sources/Resources/AppShortcuts.xcstrings
-  - Sources/Core/Ad/AdSlotView.swift
-  - Sources/Features/FoodForm/FoodFormViewModel.swift
-  - Sources/Core/Intents/FoodItemLookup.swift
-  - Sources/Core/Intents/FoodItemEntityQuery.swift
-  - Sources/Core/Domain/DayBoundary.swift
-  - Sources/Core/Store/StoreManager.swift
-  - Sources/Core/Intents/FoodItemSpotlightIndex.swift
-  - Tests/FoodEntropyTests/HomeViewModelTests.swift
-  - Sources/Features/Home/HomeView.swift
-  - Sources/Core/Intents/FoodItemSystemIntents.swift
-  - design/screenshots/home.png
-  - Sources/Features/Settings/SettingsView.swift
-  - Sources/Core/Domain/FoodItem.swift
-  - Tests/FoodEntropyTests/DeeplinkTests.swift
-  - Tests/FoodEntropyTests/StatusChartViewTests.swift
-  - Sources/Features/Home/HomeViewModel.swift
-  - design/screenshots/settings.png
-  - Sources/Core/Domain/FoodItemMocks.swift
-  - Sources/Features/Home/HomeViewModel+Models.swift
-  - Sources/Core/Domain/FoodStatusSummary.swift
-  - Sources/Core/Intents/FoodItemIntents.swift
-  - Sources/Resources/Localizable.xcstrings
-  - design/badges/download-on-the-app-store.svg
-  - Sources/Features/Settings/SettingsViewModel.swift
-  - Sources/Core/Intents/FoodItemActions.swift
-  - Sources/Widget/WidgetStore.swift
-  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
-  - design/screenshots/widget.png
-  - Sources/Core/Persistence/FoodItemEntity.swift
-  - Sources/Widget/FoodEntropyWidget.swift
-  - Tests/FoodEntropyTests/DayBoundaryTests.swift
-  - Sources/App/Deeplink.swift
-  - Sources/Features/FoodForm/FoodFormView.swift
-  - design/badges/README.md
-  - Sources/Core/Notification/NotificationService.swift
--->
+- **WHEN** a write fails on a screen that would have closed itself had the write succeeded
+- **THEN** the screen stays open and reports the failure, because closing would tell the user the write happened
+
+##### Example: applying the test to this app's writing callers
+
+| Caller                              | Interface after a failed write | Ignoring permitted |
+| ----------------------------------- | ------------------------------ | ------------------ |
+| Item list row actions               | same list, item still present  | yes                |
+| Item entry form                     | would have closed on success   | no                 |
+| Assistant action spoken back to user | confirmation would be spoken  | no                 |
 
 ---
 ### Requirement: Schema evolution is additive only
