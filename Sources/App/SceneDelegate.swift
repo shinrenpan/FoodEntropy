@@ -95,7 +95,9 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         switch deeplink {
         case .home:
             // 沒有分頁可切，回到 stack 根部即是「首頁」。
-            nav.popToRootViewController(animated: false)
+            // 經由 AppRouter 而非直接操作 stack：導航一律收在中樞（見 navigation）。
+            guard let top = nav.topViewController else { return }
+            AppRouter.shared.backToRoot(from: top, animated: false)
         case let .foodItem(id):
             showFoodItem(id: id, in: nav)
         }
@@ -104,17 +106,22 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Spotlight 點擊食材結果與 Siri 的「開啟某食材」都走這裡（見 app-intents）。
     // 找不到就停在首頁——食材可能已被標記或刪除，那不是錯誤，只是目標不在了。
     private func showFoodItem(id: UUID, in nav: UINavigationController) {
+        guard let home = nav.viewControllers.first else { return }
         guard let manager,
-              let item = manager.fetchActiveFoods().first(where: { $0.id == id }),
-              let home = nav.viewControllers.first
-        else { return }
-
-        // 連續開啟不同食材時，先回到首頁再推——否則會疊出一長串編輯頁。
-        // 設定頁也在同一個 stack，所以這段一併負責把它收掉（見 remove-tab-bar 的 design）。
-        if nav.viewControllers.count > 1 {
-            nav.popToRootViewController(animated: false)
+              let item = manager.fetchActiveFoods().first(where: { $0.id == id })
+        else {
+            // 目標不在了（已使用／丟棄／刪除）。回到首頁清單而非停在原畫面：
+            // 使用者點的是「開啟某食材」，把他留在別的畫面等於那一下沒有作用
+            // （見 navigation 的「Following a link to an item that is gone」）。
+            AppRouter.shared.backToRoot(from: nav.topViewController ?? home, animated: false)
+            return
         }
-        AppRouter.shared.to(FoodFormHostController(mode: .edit(item), manager: manager), from: home)
+
+        // 回到首頁再呈現目標，交給 AppRouter 以單次 stack 設定完成。
+        // 不可在此自行 pop 再 push：UIKit 會丟棄前一次導航尚未落定期間的 push，
+        // 使用者被彈回首頁而目標從未出現（見 fix-deeplink-dropped-push）。
+        // 這也讓設定頁與既有的編輯表單一併被收掉，不必在此判斷 stack 深度。
+        AppRouter.shared.resetTo(FoodFormHostController(mode: .edit(item), manager: manager), from: home, animated: false)
     }
 
     // MARK: - 導航裝配（Phase 2）

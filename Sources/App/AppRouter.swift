@@ -22,7 +22,10 @@ private final class TransitionStyleBox {
 private nonisolated(unsafe) var appTransitionStyleKey: UInt8 = 0
 
 extension UIViewController {
-    fileprivate var appTransitionStyle: AppRouter.TransitionStyle {
+    // internal 而非 fileprivate：導航的返回行為取決於這個標記，
+    // 而「以 resetTo 抵達的畫面其返回行為是否與 push 一致」必須測得到。
+    // 仍限於本模組內，未對外公開。
+    var appTransitionStyle: AppRouter.TransitionStyle {
         get { (objc_getAssociatedObject(self, &appTransitionStyleKey) as? TransitionStyleBox)?.style ?? .push }
         set { objc_setAssociatedObject(self, &appTransitionStyleKey, TransitionStyleBox(newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
@@ -47,17 +50,49 @@ final class AppRouter: NSObject {
             assertionFailure("AppRouter.to(): source VC 沒有 navigationController，請確認 rootViewController 為 UINavigationController")
             return
         }
-        if nav.delegate !== self {
-            nav.delegate = self
-            nav.interactivePopGestureRecognizer?.isEnabled = true
-            nav.interactivePopGestureRecognizer?.delegate = self
-            if #available(iOS 26, *) {
-                nav.interactiveContentPopGestureRecognizer?.isEnabled = true
-                nav.interactiveContentPopGestureRecognizer?.delegate = self
-            }
-        }
+        attach(to: nav)
         destination.appTransitionStyle = style
         nav.pushViewController(destination, animated: animated)
+    }
+
+    /// 回到 stack 根部並呈現目標，以**單次** stack 設定完成。
+    ///
+    /// 不可拆成「先 pop 回根、再 push」兩次呼叫：UIKit 會丟棄前一次導航
+    /// 尚未落定期間的 push，結果是 pop 生效、push 消失——使用者被彈回
+    /// 首頁而目標從未出現，且沒有任何錯誤徵兆（見 fix-deeplink-dropped-push）。
+    ///
+    /// 只有 deeplink 需要這條路徑：它是唯一會在「畫面上可能是任何東西」
+    /// 的情況下觸發導航的入口，其餘導航都由當前畫面自己發起。
+    func resetTo(
+        _ destination: UIViewController,
+        from source: UIViewController,
+        style: TransitionStyle = .push,
+        animated: Bool = true
+    ) {
+        guard let nav = source.navigationController else {
+            assertionFailure("AppRouter.resetTo(): source VC 沒有 navigationController，請確認 rootViewController 為 UINavigationController")
+            return
+        }
+        guard let root = nav.viewControllers.first else {
+            assertionFailure("AppRouter.resetTo(): navigation stack 是空的，沒有可回歸的根部")
+            return
+        }
+        attach(to: nav)
+        destination.appTransitionStyle = style
+        nav.setViewControllers([root, destination], animated: animated)
+    }
+
+    /// 轉場與返回手勢的接管設定。`to` 與 `resetTo` 共用，
+    /// 否則以 `resetTo` 抵達的畫面其返回行為會與其他畫面不一致。
+    private func attach(to nav: UINavigationController) {
+        guard nav.delegate !== self else { return }
+        nav.delegate = self
+        nav.interactivePopGestureRecognizer?.isEnabled = true
+        nav.interactivePopGestureRecognizer?.delegate = self
+        if #available(iOS 26, *) {
+            nav.interactiveContentPopGestureRecognizer?.isEnabled = true
+            nav.interactiveContentPopGestureRecognizer?.delegate = self
+        }
     }
 
     func back(from source: UIViewController, animated: Bool = true) {
