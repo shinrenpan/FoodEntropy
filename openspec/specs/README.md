@@ -10,8 +10,8 @@ v1.0.0 早於 Spectra 導入，其 capability 已全數以 `baseline-*` change �
 
 ## Foundation
 
-- **`app-shell`** ✅ — UIKit 生命週期進入點、SceneDelegate composition root、store 三層降級、兩 Tab root、平台外框、XcodeGen 與 MVVMC 資料夾慣例。其他所有 capability 都跑在它之上。
-- **`navigation`** ✅ — push-based `AppRouter`、轉場記憶與 `back()` 分流、互動手勢條件、`onRoute` 模式、集中式 `Deeplink`。跑在 `app-shell` 裝配的 tab bar 與各 Tab 的 navigation stack 上。
+- **`app-shell`** ✅ — UIKit 生命週期進入點、SceneDelegate composition root、store 三層降級、單一 navigation stack root、平台外框、XcodeGen 與 MVVMC 資料夾慣例。其他所有 capability 都跑在它之上。
+- **`navigation`** ✅ — push-based `AppRouter`、轉場記憶與 `back()` 分流、互動手勢條件、`onRoute` 模式、集中式 `Deeplink`。跑在 `app-shell` 裝配的單一 navigation stack 上。
 
 ## Domain rules（跨畫面共用——不併入任何單一畫面）
 

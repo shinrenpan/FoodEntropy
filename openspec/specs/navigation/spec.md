@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The push-based `AppRouter` and the centralised `Deeplink` routing that sit on top of the tab bar `app-shell` assembles. Push is deliberate, not incidental: Home has no `@Query` and refreshes by re-fetching in its appearance callback, which a pop provides for free — do not convert this to present-based navigation without replacing that refresh mechanism. The router stays stateless by recording each destination's arrival transition on the destination itself, which is what lets `back` resolve pop-versus-dismiss without any caller ever branching on it.
+The push-based `AppRouter` and the centralised `Deeplink` routing that sit on top of the single navigation stack `app-shell` assembles. Push is deliberate, not incidental: Home has no `@Query` and refreshes by re-fetching in its appearance callback, which a pop provides for free — do not convert this to present-based navigation without replacing that refresh mechanism. The router stays stateless by recording each destination's arrival transition on the destination itself, which is what lets `back` resolve pop-versus-dismiss without any caller ever branching on it.
 
 ## Requirements
 
@@ -44,59 +44,12 @@ The system SHALL implement `AppRouter` as a `@MainActor` singleton that holds no
 #### Scenario: Navigating derives the stack from the caller
 
 - **WHEN** a HostController asks `AppRouter` to navigate to a destination
-- **THEN** the router uses that source's own navigation controller, so the destination lands in the stack belonging to the tab the user is currently on
+- **THEN** the router uses that source's own navigation controller, so the destination lands on the app's one stack without the caller naming it
 
 #### Scenario: Navigating from a controller outside any stack fails loudly in debug
 
 - **WHEN** a navigation call is made from a source that has no navigation controller
 - **THEN** no navigation occurs and a debug-build assertion failure signals the misuse
-
----
-
-
-
-<!-- @trace
-source: baseline-navigation
-updated: 2026-08-08
-code:
-  - Sources/App/AppRouter.swift
-  - Sources/App/Deeplink.swift
-  - Sources/App/SceneDelegate.swift
-  - Sources/Features/Home/HomeHostController.swift
-  - Sources/Features/FoodForm/FoodFormHostController.swift
-  - Sources/Features/Settings/SettingsHostController.swift
--->
-
----
-### Requirement: Default navigation is a push onto the current tab's stack
-
-The system SHALL default to a push transition when navigating to another screen, so that returning from that screen pops back and triggers the previous screen's appearance callback.
-
-#### Scenario: Adding a food item and returning refreshes the list
-
-- **WHEN** the user opens the add form from Home, saves, and the form closes
-- **THEN** Home is revealed by a pop and its list reflects the newly added item
-
-#### Scenario: The form hides the tab bar while it is on screen
-
-- **WHEN** the form is pushed
-- **THEN** the tab bar is hidden for the duration of that screen and restored when it is popped
-
----
-
-
-
-<!-- @trace
-source: baseline-navigation
-updated: 2026-08-08
-code:
-  - Sources/App/AppRouter.swift
-  - Sources/App/Deeplink.swift
-  - Sources/App/SceneDelegate.swift
-  - Sources/Features/Home/HomeHostController.swift
-  - Sources/Features/FoodForm/FoodFormHostController.swift
-  - Sources/Features/Settings/SettingsHostController.swift
--->
 
 ---
 ### Requirement: The arrival transition is recorded on the destination so back resolves pop versus dismiss
@@ -175,26 +128,10 @@ The system SHALL allow the interactive pop gesture only when the navigation stac
 - **WHEN** the user swipes from the screen edge on a screen that arrived by a custom transition
 - **THEN** the gesture does not begin, so a cancelled swipe cannot leave the screen mid-transition
 
-#### Scenario: Swiping back at the root of a stack is refused
+#### Scenario: Swiping back at the root of the stack is refused
 
-- **WHEN** the user swipes from the screen edge on the root screen of a tab's stack
+- **WHEN** the user swipes from the screen edge on the home screen, which is the root of the stack
 - **THEN** the gesture does not begin
-
----
-
-
-
-<!-- @trace
-source: baseline-navigation
-updated: 2026-08-08
-code:
-  - Sources/App/AppRouter.swift
-  - Sources/App/Deeplink.swift
-  - Sources/App/SceneDelegate.swift
-  - Sources/Features/Home/HomeHostController.swift
-  - Sources/Features/FoodForm/FoodFormHostController.swift
-  - Sources/Features/Settings/SettingsHostController.swift
--->
 
 ---
 ### Requirement: Leaving the app is not routed through AppRouter
@@ -227,15 +164,15 @@ code:
 
 The system SHALL parse every incoming URL through a single `Deeplink` enum initialiser that accepts only this app's URL scheme and returns nothing for an unrecognised host, and SHALL route every entry point — cold-launch URL, foreground URL, and notification tap — through that same enum and a single handler.
 
-#### Scenario: Tapping an expiry notification opens the Home tab
+#### Scenario: Tapping an expiry notification opens the home list
 
 - **WHEN** the user taps an expiry notification, whether the app was terminated, backgrounded, or in the foreground
-- **THEN** the app opens and the Home tab is selected
+- **THEN** the app opens and the stack comes to rest on the home list
 
-#### Scenario: A notification without a deeplink payload still lands on Home
+#### Scenario: A notification without a deeplink payload still lands on the home list
 
 - **WHEN** a notification is tapped whose payload carries no deeplink value
-- **THEN** the app falls back to the Home destination rather than ignoring the tap
+- **THEN** the app falls back to the home destination rather than ignoring the tap
 
 #### Scenario: An unrecognised URL is ignored
 
@@ -247,19 +184,6 @@ The system SHALL parse every incoming URL through a single `Deeplink` enum initi
 - **WHEN** the app is launched from a terminated state by a deeplink URL
 - **THEN** the destination is applied after the window has been made key and visible, so the routing acts on an assembled interface
 
-
-<!-- @trace
-source: baseline-navigation
-updated: 2026-08-08
-code:
-  - Sources/App/AppRouter.swift
-  - Sources/App/Deeplink.swift
-  - Sources/App/SceneDelegate.swift
-  - Sources/Features/Home/HomeHostController.swift
-  - Sources/Features/FoodForm/FoodFormHostController.swift
-  - Sources/Features/Settings/SettingsHostController.swift
--->
-
 ---
 ### Requirement: A single food item is a deeplink destination
 
@@ -270,12 +194,12 @@ A deeplink naming an item that is no longer active SHALL land on the home list w
 #### Scenario: Following a link to an item
 
 - **WHEN** an entry point supplies a deeplink naming an active food item
-- **THEN** the home tab is selected and that item's detail is presented for editing
+- **THEN** the stack returns to the home list and that item's detail is presented for editing
 
 #### Scenario: Following a link to an item that is gone
 
 - **WHEN** an entry point supplies a deeplink naming an item that has been consumed, discarded, or deleted
-- **THEN** the home tab is selected, no detail is presented, and no error is surfaced
+- **THEN** the stack returns to the home list, no detail is presented, and no error is surfaced
 
 #### Scenario: Following two item links in succession
 
@@ -297,71 +221,22 @@ A deeplink naming an item that is no longer active SHALL land on the home list w
 | `foodentropy://item` | nothing |
 | `https://item/<a valid identifier>` | nothing |
 
-<!-- @trace
-source: add-app-intents
-updated: 2026-09-13
-code:
-  - Tests/FoodEntropyTests/FoodItemLookupTests.swift
-  - Sources/Core/Intents/IntentSnippetView.swift
-  - Tests/FoodEntropyTests/FoodItemActionOutcomeTests.swift
-  - Sources/Features/FoodForm/FoodFormMode.swift
-  - Sources/Features/FoodForm/FoodFormViewModel+Models.swift
-  - Sources/Core/Image/ImageCompressor.swift
-  - Sources/Core/Intents/FoodEntropyShortcuts.swift
-  - Sources/Core/Persistence/SwiftDataManager.swift
-  - Sources/Core/Intents/FoodItemActionOutcome.swift
-  - CLAUDE.md
-  - Sources/App/PendingDeeplink.swift
-  - Sources/Core/Components/FoodRowView.swift
-  - Tests/FoodEntropyTests/FoodStatusSummaryTests.swift
-  - Sources/Core/Ad/AdConfig.swift
-  - Sources/Core/Components/StatusChartView.swift
-  - Tests/FoodEntropyTests/CurrencyFormatTests.swift
-  - Tests/FoodEntropyTests/FoodItemAppEntityTests.swift
-  - Tests/FoodEntropyTests/FoodItemActionsTests.swift
-  - design/screenshots/README.md
-  - Sources/App/SceneDelegate.swift
-  - docs/privacy/index.html
-  - Tests/FoodEntropyTests/FoodFormViewModelTests.swift
-  - project.yml
-  - Sources/Core/Intents/FoodItemAppEntity.swift
-  - Sources/Core/Extensions/CurrencyFormat.swift
-  - docs/index.html
-  - README.md
-  - Sources/Resources/AppShortcuts.xcstrings
-  - Sources/Core/Ad/AdSlotView.swift
-  - Sources/Features/FoodForm/FoodFormViewModel.swift
-  - Sources/Core/Intents/FoodItemLookup.swift
-  - Sources/Core/Intents/FoodItemEntityQuery.swift
-  - Sources/Core/Domain/DayBoundary.swift
-  - Sources/Core/Store/StoreManager.swift
-  - Sources/Core/Intents/FoodItemSpotlightIndex.swift
-  - Tests/FoodEntropyTests/HomeViewModelTests.swift
-  - Sources/Features/Home/HomeView.swift
-  - Sources/Core/Intents/FoodItemSystemIntents.swift
-  - design/screenshots/home.png
-  - Sources/Features/Settings/SettingsView.swift
-  - Sources/Core/Domain/FoodItem.swift
-  - Tests/FoodEntropyTests/DeeplinkTests.swift
-  - Tests/FoodEntropyTests/StatusChartViewTests.swift
-  - Sources/Features/Home/HomeViewModel.swift
-  - design/screenshots/settings.png
-  - Sources/Core/Domain/FoodItemMocks.swift
-  - Sources/Features/Home/HomeViewModel+Models.swift
-  - Sources/Core/Domain/FoodStatusSummary.swift
-  - Sources/Core/Intents/FoodItemIntents.swift
-  - Sources/Resources/Localizable.xcstrings
-  - design/badges/download-on-the-app-store.svg
-  - Sources/Features/Settings/SettingsViewModel.swift
-  - Sources/Core/Intents/FoodItemActions.swift
-  - Sources/Widget/WidgetStore.swift
-  - Tests/FoodEntropyTests/SwiftDataManagerTests.swift
-  - design/screenshots/widget.png
-  - Sources/Core/Persistence/FoodItemEntity.swift
-  - Sources/Widget/FoodEntropyWidget.swift
-  - Tests/FoodEntropyTests/DayBoundaryTests.swift
-  - Sources/App/Deeplink.swift
-  - Sources/Features/FoodForm/FoodFormView.swift
-  - design/badges/README.md
-  - Sources/Core/Notification/NotificationService.swift
--->
+---
+### Requirement: Default navigation is a push onto the single navigation stack
+
+The system SHALL default to a push transition when navigating to another screen, so that returning from that screen pops back and triggers the previous screen's appearance callback. There SHALL be one navigation stack for the whole app, and a pushed screen SHALL cover the full height the root screen occupied.
+
+#### Scenario: Adding a food item and returning refreshes the list
+
+- **WHEN** the user opens the add form from the home screen, saves, and the form closes
+- **THEN** the home screen is revealed by a pop and its list reflects the newly added item
+
+#### Scenario: A pushed screen owns the full screen
+
+- **WHEN** any screen is pushed
+- **THEN** no persistent bottom bar remains beneath it, because the root carries none
+
+#### Scenario: Returning from settings refreshes the list
+
+- **WHEN** the user opens settings from the home screen and then taps back
+- **THEN** the home screen is revealed by a pop and reloads its data, the same way it does when returning from the form

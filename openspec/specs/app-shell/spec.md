@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The UIKit-lifecycle shell every other capability runs inside: the `AppDelegate` + `SceneDelegate` entry point, the single composition root that builds and injects the app's stateful managers, the resilient store-creation chain that keeps a failed `ModelContainer` from becoming a launch crash loop, the two-tab root structure `navigation` operates on, and the platform envelope (iPhone-only, portrait, iOS 26+). SwiftUI starts below this layer, inside `UIHostingController`. Do not replace this with a SwiftUI `@main App` — MVVMC's router needs a real UIKit scene lifecycle, and the screenshot-mode escape hatch must never leave `#if DEBUG`, or the paid ad-removal entitlement becomes free.
+The UIKit-lifecycle shell every other capability runs inside: the `AppDelegate` + `SceneDelegate` entry point, the single composition root that builds and injects the app's stateful managers, the resilient store-creation chain that keeps a failed `ModelContainer` from becoming a launch crash loop, the single navigation stack `navigation` operates on, and the platform envelope (iPhone-only, portrait, iOS 26+). SwiftUI starts below this layer, inside `UIHostingController`. Do not replace this with a SwiftUI `@main App` — MVVMC's router needs a real UIKit scene lifecycle, and the screenshot-mode escape hatch must never leave `#if DEBUG`, or the paid ad-removal entitlement becomes free.
 
 ## Requirements
 
@@ -36,26 +36,17 @@ code:
 
 The system SHALL create `SwiftDataManager` and `StoreManager` exactly once per scene, inside `SceneDelegate`, and SHALL inject them into HostControllers, which pass them down to their ViewModels. HostControllers and ViewModels SHALL NOT construct either manager themselves, and neither manager SHALL be exposed as a global singleton.
 
-#### Scenario: Both tabs share one manager and one store instance
+A HostController SHALL be permitted to construct another HostController — the home screen builds the settings screen when opening it — provided it passes along the managers it was itself given rather than creating new ones. The composition root owns the managers' lifetime; it does not own every screen's construction.
 
-- **WHEN** the root tab bar controller is assembled with a Home tab and a Settings tab
-- **THEN** both HostControllers receive the same `StoreManager` instance, so an ad-removal entitlement observed by Settings is the same entitlement Home reads
+#### Scenario: Every screen shares one manager and one store instance
 
-#### Scenario: A purchase made in Settings takes effect on Home
+- **WHEN** the home screen is assembled and it later builds the settings screen
+- **THEN** both receive the same `StoreManager` instance, so an ad-removal entitlement observed by settings is the same entitlement the home screen reads
 
-- **WHEN** the user completes the "remove ads" purchase on the Settings tab and switches to the Home tab
-- **THEN** the Home tab reflects the ad-removed state without an app restart, because both tabs observe one shared store
+#### Scenario: A purchase made in settings takes effect on the home screen
 
-
-
-<!-- @trace
-source: baseline-app-shell
-updated: 2026-08-08
-code:
-  - Sources/App/AppDelegate.swift
-  - Sources/App/SceneDelegate.swift
-  - project.yml
--->
+- **WHEN** the user completes the "remove ads" purchase in settings and returns to the home screen
+- **THEN** the home screen reflects the ad-removed state without an app restart, because both observe one shared store
 
 ---
 ### Requirement: Store creation degrades rather than failing the launch
@@ -84,56 +75,19 @@ code:
 -->
 
 ---
-### Requirement: The root is a two-tab controller with per-tab navigation stacks
-
-The system SHALL use a `UITabBarController` as the window's root view controller, containing exactly two tabs — Home and Settings — and SHALL wrap each tab's root in its own `UINavigationController`. Tab titles SHALL come from the String Catalog.
-
-#### Scenario: Launch shows both tabs with Home selected
-
-- **WHEN** the app finishes launching
-- **THEN** a tab bar with a Home tab and a Settings tab is shown, with Home selected
-
-#### Scenario: Navigation depth is preserved per tab
-
-- **WHEN** the user pushes a screen inside the Home tab and then switches to the Settings tab and back
-- **THEN** the Home tab is still showing the pushed screen, because each tab owns a separate navigation stack
-
-
-
-<!-- @trace
-source: baseline-app-shell
-updated: 2026-08-08
-code:
-  - Sources/App/AppDelegate.swift
-  - Sources/App/SceneDelegate.swift
-  - project.yml
--->
-
----
 ### Requirement: Debug-only environment switches are excluded from Release builds
 
-The system SHALL confine every environment-variable escape hatch — including the screenshot mode that pre-grants the ad-removal entitlement, the mock-seeding switch, and the initial-tab override — to `#if DEBUG` compilation blocks, so that no such code path exists in a Release build.
+The system SHALL confine every environment-variable escape hatch — including the screenshot mode that pre-grants the ad-removal entitlement and the mock-seeding switch — to `#if DEBUG` compilation blocks, so that no such code path exists in a Release build.
 
 #### Scenario: A Release build ignores the screenshot-mode entitlement override
 
 - **WHEN** a Release build is launched with the screenshot-mode environment variable set
 - **THEN** the ad-removal entitlement is determined solely by StoreKit, and ads are shown to a user who has not purchased removal
 
-#### Scenario: A Release build ignores mock seeding and tab override
+#### Scenario: A Release build ignores mock seeding
 
-- **WHEN** a Release build is launched with the mock-seeding or initial-tab environment variables set
-- **THEN** no mock data is created and the app opens on the Home tab
-
-
-
-<!-- @trace
-source: baseline-app-shell
-updated: 2026-08-08
-code:
-  - Sources/App/AppDelegate.swift
-  - Sources/App/SceneDelegate.swift
-  - project.yml
--->
+- **WHEN** a Release build is launched with the mock-seeding environment variable set
+- **THEN** no mock data is created and the app opens on the home screen
 
 ---
 ### Requirement: The window uses an opaque semantic background colour
@@ -259,3 +213,18 @@ code:
   - project.yml
   - Sources/Core/Components/StatusChartView.swift
 -->
+
+---
+### Requirement: The root is a single navigation controller hosting the home screen
+
+The system SHALL use a `UINavigationController` as the window's root view controller, with the home screen as its root view controller, and SHALL NOT place a tab bar at the root. Every other in-app screen SHALL be reached by pushing onto that one stack. Navigation bar titles SHALL come from the String Catalog.
+
+#### Scenario: Launch shows the home screen with no tab bar
+
+- **WHEN** the app finishes launching
+- **THEN** the home screen is shown as the root of a navigation stack, and no tab bar occupies the bottom of the screen
+
+#### Scenario: Every screen shares one navigation stack
+
+- **WHEN** the user opens settings from the home screen and then opens a food item from a deeplink
+- **THEN** both screens resolve against the same navigation stack, and the deeplink returns to the home screen before pushing the item rather than stacking on top of settings

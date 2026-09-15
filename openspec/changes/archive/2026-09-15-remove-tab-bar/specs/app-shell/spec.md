@@ -24,6 +24,22 @@ The system SHALL use a `UINavigationController` as the window's root view contro
 
 ## MODIFIED Requirements
 
+### Requirement: SceneDelegate is the single composition root
+
+The system SHALL create `SwiftDataManager` and `StoreManager` exactly once per scene, inside `SceneDelegate`, and SHALL inject them into HostControllers, which pass them down to their ViewModels. HostControllers and ViewModels SHALL NOT construct either manager themselves, and neither manager SHALL be exposed as a global singleton.
+
+A HostController SHALL be permitted to construct another HostController — the home screen builds the settings screen when opening it — provided it passes along the managers it was itself given rather than creating new ones. The composition root owns the managers' lifetime; it does not own every screen's construction.
+
+#### Scenario: Every screen shares one manager and one store instance
+
+- **WHEN** the home screen is assembled and it later builds the settings screen
+- **THEN** both receive the same `StoreManager` instance, so an ad-removal entitlement observed by settings is the same entitlement the home screen reads
+
+#### Scenario: A purchase made in settings takes effect on the home screen
+
+- **WHEN** the user completes the "remove ads" purchase in settings and returns to the home screen
+- **THEN** the home screen reflects the ad-removed state without an app restart, because both observe one shared store
+
 ### Requirement: Debug-only environment switches are excluded from Release builds
 
 The system SHALL confine every environment-variable escape hatch — including the screenshot mode that pre-grants the ad-removal entitlement and the mock-seeding switch — to `#if DEBUG` compilation blocks, so that no such code path exists in a Release build.
