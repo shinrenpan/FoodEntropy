@@ -193,4 +193,85 @@ struct FoodFormViewModelTests {
         await vm.doAction(.view(.saveDidTap))
         #expect(manager.fetchActiveFoods().first?.price == 88)
     }
+
+    // MARK: - 儲存進行中（fix-form-save-reliability）
+
+    @Test
+    func `儲存進行中再次觸發不寫入`() async throws {
+        let manager = try makeManager()
+        let vm = makeVM(.add, manager)
+        vm.state.name = "牛奶"
+        vm.state.isSaving = true          // 模擬前一次儲存尚未結束
+        await vm.doAction(.view(.saveDidTap))
+        #expect(manager.fetchActiveFoods().isEmpty)
+    }
+
+    @Test
+    func `儲存結束後清除進行中狀態`() async throws {
+        let manager = try makeManager()
+        let vm = makeVM(.add, manager)
+        vm.state.name = "牛奶"
+        await vm.doAction(.view(.saveDidTap))
+        #expect(vm.state.isSaving == false)
+    }
+
+    @Test
+    func `儲存鈕可用條件`() async throws {
+        let vm = try makeVM(.add, makeManager())
+        #expect(vm.state.canSubmit == false)      // 名稱空
+        vm.state.name = "牛奶"
+        #expect(vm.state.canSubmit == true)
+        vm.state.isSaving = true
+        #expect(vm.state.canSubmit == false)      // 名稱有值但儲存中
+        #expect(vm.state.isSaveEnabled == true)   // isSaveEnabled 語意不變，仍只看名稱
+    }
+
+    // MARK: - 儲存結果（fix-form-save-reliability）
+
+    @Test
+    func `儲存失敗 response 使表單留在畫面`() async throws {
+        let vm = try makeVM(.add, makeManager())
+        let recorder = RouteRecorder()
+        vm.onRoute = { [recorder] route in recorder.record(route) }
+        vm.state.isSaving = true
+        await vm.doAction(.dataResponse(.saveFailed))
+        #expect(recorder.closeCount == 0)        // 不得關閉——關閉就是謊報成功
+        #expect(vm.state.showSaveFailure == true)
+        #expect(vm.state.isSaving == false)      // 可原地重試
+    }
+
+    @Test
+    func `儲存成功 response 關閉表單`() async throws {
+        let vm = try makeVM(.add, makeManager())
+        let recorder = RouteRecorder()
+        vm.onRoute = { [recorder] route in recorder.record(route) }
+        vm.state.isSaving = true
+        await vm.doAction(.dataResponse(.saveSucceeded))
+        #expect(recorder.closeCount == 1)
+        #expect(vm.state.showSaveFailure == false)
+        #expect(vm.state.isSaving == false)
+    }
+
+    @Test
+    func `失敗警示不算未儲存變更`() async throws {
+        let manager = try makeManager()
+        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: day(3, from: d0))
+        let vm = makeVM(.edit(item), manager)
+        await vm.doAction(.dataResponse(.saveFailed))
+        await vm.doAction(.view(.dismissDidTap))
+        #expect(vm.state.showDiscardConfirm == false)   // UI 狀態不得混進 dirty 比對
+    }
+}
+
+// MARK: - 導航記錄器
+
+@MainActor
+private final class RouteRecorder {
+    private(set) var closeCount = 0
+
+    func record(_ route: FoodFormViewModel.Router) {
+        switch route {
+        case .close: closeCount += 1
+        }
+    }
 }

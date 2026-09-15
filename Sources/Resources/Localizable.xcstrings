@@ -217,6 +217,16 @@
         }
       }
     },
+    "Couldn't Save": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法儲存"
+          }
+        }
+      }
+    },
     "Couldn't save the change. Please try again.": {
       "localizations": {
         "zh-Hant": {
@@ -1151,6 +1161,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "浪費率"
+          }
+        }
+      }
+    },
+    "Your entry is still here. Please try saving again.": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入的內容還在，請再試一次儲存。"
           }
         }
       }

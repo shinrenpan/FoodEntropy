@@ -84,7 +84,7 @@ struct FoodFormView: View {
                 Button("Save") {
                     Task { await viewModel.doAction(.view(.saveDidTap)) }
                 }
-                .disabled(!viewModel.state.isSaveEnabled)
+                .disabled(!viewModel.state.canSubmit)   // 名稱為空，或儲存進行中
             }
         }
         .photosPicker(isPresented: $showLibrary, selection: $librarySelection, matching: .images)
@@ -105,6 +105,13 @@ struct FoodFormView: View {
             Button("Keep Editing", role: .cancel) {
                 Task { await viewModel.doAction(.view(.discardCancelled)) }
             }
+        }
+        // 寫入失敗：表單留在原地，輸入原樣保留（見 food-form-ui）。
+        // 不提供「重試」鈕——重試就是再按一次儲存，多一個鈕只是同一動作的第二個入口。
+        .alert("Couldn't Save", isPresented: $bVM.state.showSaveFailure) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Your entry is still here. Please try saving again.")
         }
     }
 
