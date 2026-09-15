@@ -18,6 +18,17 @@ struct FoodRowView: View {
                     .foregroundStyle(expiryColor(status))
             }
             Spacer(minLength: 0)
+            // 價格：尾端次要資訊，字級低於名稱與到期描述——它輔助判斷
+            //（同樣快過期時先吃貴的），但這一列的主角是「這是什麼、多久壞」。
+            // 沒有記錄價格時整個不渲染：不補零、也不補對齊用的符號。
+            // 零是假話（真相是使用者沒填），而清單的列各自成行，
+            // 尾端有無數值在 iOS 是常態，補符號只是噪音（見 home-ui）。
+            if let price = item.price {
+                Text(price.currencyText())
+                    .font(.subheadline)
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+            }
             Circle()
                 .fill(expiryColor(status))
                 .frame(width: 10, height: 10)

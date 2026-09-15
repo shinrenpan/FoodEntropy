@@ -64,6 +64,7 @@ extension HomeViewModel {
             // 任何一次點擊都會被丟進 modal（見 home-ui 的卡片點擊 requirement）。
             let wasSelected = state.selectedCard == card
             state.selectedCard = card
+            state.hasChosenCard = true
             // 已在最前面、是分桶卡、且該桶非空時才開清單。
             // 摘要卡與空桶點幾次都不開，卡面上也不會有開啟提示。
             guard wasSelected,
@@ -133,8 +134,9 @@ extension HomeViewModel {
             state.upcomingExpiryCost = summary.upcomingExpiryCost
             state.wastedCost = FoodStatusSummary.sumPrices(windowed.filter { $0.status == .wasted })
             state.expiredCost = FoodStatusSummary.sumPrices(summary.expired)
-            // 選中的分桶若已空，移到最急迫的非空桶——否則使用者盯著一張沒有內容的卡。
-            if let bucket = state.selectedCard.bucket, state.items(in: bucket).isEmpty {
+            // 初始那一張依緊急度挑選；使用者一旦自己選過，重載就不再更動他的選擇。
+            // 空桶是正當的選擇，不該因為「沒有內容」而被收回（見 home-ui）。
+            if !state.hasChosenCard {
                 state.selectedCard = state.mostUrgentNonEmptyCard
             }
 

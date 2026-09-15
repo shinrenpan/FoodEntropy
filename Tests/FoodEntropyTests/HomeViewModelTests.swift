@@ -222,7 +222,51 @@ struct HomeViewModelTests {
     }
 
     @Test
-    func `選中的分桶變空時自動移到最急迫的非空桶`() async throws {
+    func `使用者選過卡之後重載不更動選取`() async throws {
+        let (vm, _) = try makeVM()
+        await loadAllBuckets(vm)
+        await vm.doAction(.view(.cardDidTap(.fresh)))
+        await loadAllBuckets(vm)   // 再載入一次（等同從設定頁返回 / 回到前景 / 資料變動）
+        #expect(vm.state.selectedCard == .fresh)
+    }
+
+    @Test
+    func `選中空桶後重載仍維持該桶`() async throws {
+        let (vm, _) = try makeVM()
+        // 只有 fresh 有內容 → 過期桶為空，但使用者刻意選它
+        let fresh = FoodItem.mocks.filter { $0.expiryStatus() == .fresh }
+        await vm.doAction(.dataResponse(.loaded(active: fresh, resolved: [])))
+        await vm.doAction(.view(.cardDidTap(.expired)))
+        #expect(vm.state.selectedCard == .expired)
+        await vm.doAction(.dataResponse(.loaded(active: fresh, resolved: [])))
+        // 空桶是正當的選擇——重載不該把它搶走（見 home-ui）
+        #expect(vm.state.selectedCard == .expired)
+    }
+
+    @Test
+    func `未選過卡時載入落在最急迫的非空桶`() async throws {
+        let (vm, _) = try makeVM()
+        // 沒有任何點擊：只有 nearExpiry 與 fresh 有內容 → 應落在 nearExpiry
+        let notExpired = FoodItem.mocks.filter { $0.expiryStatus() != .expired }
+        await vm.doAction(.dataResponse(.loaded(active: notExpired, resolved: [])))
+        #expect(vm.state.selectedCard == .nearExpiry)
+    }
+
+    @Test
+    func `選中的桶在停留期間變空仍維持選中`() async throws {
+        let (vm, _) = try makeVM()
+        await loadAllBuckets(vm)
+        await vm.doAction(.view(.cardDidTap(.expired)))
+        // 過期桶被清空（例如在清單中處置了最後一筆）
+        let notExpired = FoodItem.mocks.filter { $0.expiryStatus() != .expired }
+        await vm.doAction(.dataResponse(.loaded(active: notExpired, resolved: [])))
+        #expect(vm.state.selectedCard == .expired)
+    }
+
+    @Test
+    // 直接賦值 state 而非走 cardDidTap → hasChosenCard 仍為偽，
+    // 因此測到的是「使用者還沒自己選過」那條路徑。
+    func `未選過卡時分桶變空會移到最急迫的非空桶`() async throws {
         let (vm, _) = try makeVM()
         await loadAllBuckets(vm)
         vm.state.selectedCard = .expired

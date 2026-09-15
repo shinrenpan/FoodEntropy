@@ -26,6 +26,12 @@ extension HomeViewModel {
         // 卡片堆疊（restyle-home-as-card-stack）
         /// 目前完整顯示的那張卡。其餘卡片只露出頂緣。
         var selectedCard: HomeCard = .expired
+        /// 使用者是否已自行選過卡片。
+        ///
+        /// 自動挑選只在「還沒選過」時生效——它決定的是初始那一張，不是持續的修正。
+        /// 少了這個旗標就分不出「剛剛變空」與「原本就空、使用者刻意選的」，
+        /// 而空桶是正當的選擇：使用者要看它，重載不該把它搶走（見 home-ui）。
+        var hasChosenCard: Bool = false
 
         func items(in bucket: ExpiryStatus) -> [FoodItem] {
             switch bucket {
