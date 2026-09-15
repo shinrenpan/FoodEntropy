@@ -34,10 +34,13 @@ private extension HomeHostController {
         switch router {
         case .toAdd:
             AppRouter.shared.to(FoodFormHostController(mode: .add, manager: manager), from: self)
-        case let .toEdit(item):
-            AppRouter.shared.to(FoodFormHostController(mode: .edit(item), manager: manager), from: self)
         case .toSettings:
             AppRouter.shared.to(SettingsHostController(store: store), from: self)
+        case let .toBucketList(bucket):
+            // 包一層導覽控制器：清單內點食材要能把表單推在 sheet 自己的堆疊上
+            // （見 navigation 的「push 落在呼叫者所屬的堆疊」）。
+            let list = BucketListHostController(bucket: bucket, manager: manager)
+            AppRouter.shared.sheet(UINavigationController(rootViewController: list), from: self)
         }
     }
 }

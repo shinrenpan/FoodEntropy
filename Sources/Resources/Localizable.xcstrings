@@ -317,6 +317,16 @@
         }
       }
     },
+    "Done": {
+      "localizations": {
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
     "Edit Food": {
       "localizations": {
         "zh-Hant": {

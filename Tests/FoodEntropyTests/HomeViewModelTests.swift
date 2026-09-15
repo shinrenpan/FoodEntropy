@@ -6,11 +6,7 @@ import Testing
 struct HomeViewModelTests {
     private func makeVM(adsRemoved: Bool = false) throws -> (HomeViewModel, SwiftDataManager) {
         let manager = try SwiftDataManager(inMemory: true)
-        let vm = HomeViewModel(
-            manager: manager,
-            store: StoreManager(adsRemoved: adsRemoved),
-            notifications: NotificationService(active: false)
-        )
+        let vm = HomeViewModel(manager: manager, store: StoreManager(adsRemoved: adsRemoved))
         return (vm, manager)
     }
 
@@ -81,78 +77,11 @@ struct HomeViewModelTests {
         #expect(manager.fetchResolvedFoods().isEmpty)
     }
 
-    @Test
-    func `deleteDidTap 設定 pendingDeleteItem 不刪除`() async throws {
-        let (vm, manager) = try makeVM()
-        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        await vm.doAction(.view(.onAppear))
-        await vm.doAction(.view(.deleteDidTap(item)))
-        #expect(vm.state.pendingDeleteItem == item)
-        #expect(vm.state.items.count == 1)   // 尚未刪除
-    }
-
-    @Test
-    func `deleteCancelled 清除 pendingDeleteItem`() async throws {
-        let (vm, manager) = try makeVM()
-        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        await vm.doAction(.view(.deleteDidTap(item)))
-        await vm.doAction(.view(.deleteCancelled))
-        #expect(vm.state.pendingDeleteItem == nil)
-    }
-
-    @Test
-    func `deleteConfirmed 刪除並重載`() async throws {
-        let (vm, manager) = try makeVM()
-        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        await vm.doAction(.view(.onAppear))
-        await vm.doAction(.view(.deleteDidTap(item)))
-        await vm.doAction(.view(.deleteConfirmed))
-        #expect(vm.state.pendingDeleteItem == nil)
-        #expect(vm.state.items.isEmpty)
-    }
-
-    @Test
-    func `consumeDidTap 移出清單`() async throws {
-        let (vm, manager) = try makeVM()
-        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        await vm.doAction(.view(.onAppear))
-        await vm.doAction(.view(.consumeDidTap(item)))
-        #expect(vm.state.items.isEmpty)
-    }
-
-    @Test
-    func `wasteDidTap 移出清單`() async throws {
-        let (vm, manager) = try makeVM()
-        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        await vm.doAction(.view(.onAppear))
-        await vm.doAction(.view(.wasteDidTap(item)))
-        #expect(vm.state.items.isEmpty)
-    }
-
-    @Test
-    func `extendDidTap 設定 extendingItem`() async throws {
-        let (vm, manager) = try makeVM()
-        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        await vm.doAction(.view(.extendDidTap(item)))
-        #expect(vm.state.extendingItem == item)
-    }
-
-    @Test
-    func `extendCommitted 更新到期日並清除 extendingItem`() async throws {
-        let (vm, manager) = try makeVM()
-        let item = try manager.create(name: "A", purchaseDate: d0, expiryDate: d0)
-        await vm.doAction(.view(.onAppear))
-        await vm.doAction(.view(.extendDidTap(item)))
-        let newExpiry = d0.addingTimeInterval(86_400 * 5)
-        await vm.doAction(.view(.extendCommitted(newExpiry)))
-        #expect(vm.state.extendingItem == nil)
-        #expect(vm.state.items.first?.expiryDate == newExpiry)
-    }
-
     // MARK: - 金額（add-price-tracking）
 
     /// mocks 價格分佈：已過期優格 -2 天 45、雞蛋 0 天 90、豆腐 +3 天 35、
     /// 高麗菜 +10 天無價、鮮奶 +1 天無價。nearExpiry 且有價 = 90 + 35 = 125。
+
     @Test
     func `前瞻金額只計 nearExpiry 且已記錄價格者`() async throws {
         let (vm, _) = try makeVM()
@@ -233,6 +162,75 @@ struct HomeViewModelTests {
         await vm.doAction(.view(.settingsDidTap))
         #expect(recorder.toSettingsCount == 1)
     }
+    // MARK: - 卡片堆疊（restyle-home-as-card-stack）
+
+    /// 讓三個分桶都有內容，以便分辨「空桶不開清單」與「非空桶才開」。
+    private func loadAllBuckets(_ vm: HomeViewModel) async {
+        await vm.doAction(.dataResponse(.loaded(active: FoodItem.mocks, resolved: [])))
+    }
+
+    private func recording(_ vm: HomeViewModel) -> HomeRouteRecorder {
+        let recorder = HomeRouteRecorder()
+        vm.onRoute = { [recorder] route in recorder.record(route) }
+        return recorder
+    }
+
+    @Test
+    func `點未選中的卡只改變選中身分`() async throws {
+        let (vm, _) = try makeVM()
+        await loadAllBuckets(vm)
+        let recorder = recording(vm)
+        vm.state.selectedCard = .current
+        await vm.doAction(.view(.cardDidTap(.nearExpiry)))
+        #expect(vm.state.selectedCard == .nearExpiry)
+        #expect(recorder.toBucketListCount == 0)   // 第一次點只移到前面，不開清單
+    }
+
+    @Test
+    func `點已選中的非空分桶卡才發出前往清單的意圖`() async throws {
+        let (vm, _) = try makeVM()
+        await loadAllBuckets(vm)
+        let recorder = recording(vm)
+        vm.state.selectedCard = .nearExpiry
+        await vm.doAction(.view(.cardDidTap(.nearExpiry)))
+        #expect(recorder.toBucketListCount == 1)
+        #expect(recorder.lastBucket == .nearExpiry)
+    }
+
+    @Test
+    func `點已選中的摘要卡不發出前往清單的意圖`() async throws {
+        let (vm, _) = try makeVM()
+        await loadAllBuckets(vm)
+        let recorder = recording(vm)
+        for card in [HomeCard.current, .waste] {
+            vm.state.selectedCard = card
+            await vm.doAction(.view(.cardDidTap(card)))
+        }
+        #expect(recorder.toBucketListCount == 0)
+    }
+
+    @Test
+    func `點已選中但為空的分桶卡不發出前往清單的意圖`() async throws {
+        let (vm, _) = try makeVM()
+        // 只有 fresh 有內容 → expired 與 nearExpiry 皆為空桶
+        let fresh = FoodItem.mocks.filter { $0.expiryStatus() == .fresh }
+        await vm.doAction(.dataResponse(.loaded(active: fresh, resolved: [])))
+        let recorder = recording(vm)
+        vm.state.selectedCard = .expired
+        await vm.doAction(.view(.cardDidTap(.expired)))
+        #expect(recorder.toBucketListCount == 0)
+    }
+
+    @Test
+    func `選中的分桶變空時自動移到最急迫的非空桶`() async throws {
+        let (vm, _) = try makeVM()
+        await loadAllBuckets(vm)
+        vm.state.selectedCard = .expired
+        // 重新載入一份不含過期項的資料 → 過期桶變空
+        let notExpired = FoodItem.mocks.filter { $0.expiryStatus() != .expired }
+        await vm.doAction(.dataResponse(.loaded(active: notExpired, resolved: [])))
+        #expect(vm.state.selectedCard == .nearExpiry)
+    }
 }
 
 // MARK: - 導航記錄器
@@ -241,13 +239,16 @@ struct HomeViewModelTests {
 private final class HomeRouteRecorder {
     private(set) var toSettingsCount = 0
     private(set) var toAddCount = 0
-    private(set) var toEditCount = 0
+    private(set) var toBucketListCount = 0
+    private(set) var lastBucket: ExpiryStatus?
 
     func record(_ route: HomeViewModel.Router) {
         switch route {
         case .toAdd: toAddCount += 1
-        case .toEdit: toEditCount += 1
         case .toSettings: toSettingsCount += 1
+        case let .toBucketList(bucket):
+            toBucketListCount += 1
+            lastBucket = bucket
         }
     }
 }

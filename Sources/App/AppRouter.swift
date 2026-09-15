@@ -96,6 +96,18 @@ final class AppRouter: NSObject {
     }
 
     func back(from source: UIViewController, animated: Bool = true) {
+        // 堆疊裡還有前一個畫面 → pop，且這一步必須先判斷。
+        //
+        // 被 push 到「呈現式堆疊」上的畫面（例如分桶清單 sheet 內的編輯表單）
+        // 自己的樣式是 .push，若直接往上採用 nav 的樣式（.sheet），返回會變成
+        // 收掉整個 sheet 而不是回到前一頁。下方那段 fallback 是為「整個 nav 被
+        // 呈現出來、而 source 是它的根畫面」寫的，對疊在根上面的畫面不成立。
+        if source.appTransitionStyle == .push,
+           let nav = source.navigationController,
+           nav.viewControllers.count > 1 {
+            nav.popViewController(animated: animated)
+            return
+        }
         let style = source.appTransitionStyle != .push
             ? source.appTransitionStyle
             : source.navigationController?.appTransitionStyle ?? .push

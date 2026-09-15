@@ -80,4 +80,37 @@ struct AppRouterTests {
         #expect(reset.appTransitionStyle == pushed.appTransitionStyle)
         #expect(reset.appTransitionStyle == .push)
     }
+
+    // MARK: - back：呈現式堆疊內的 pop（restyle-home-as-card-stack）
+
+    // 分桶清單以 sheet 呈現，編輯表單 push 在它自己的堆疊上。
+    // 離開表單必須回到清單，不是收掉整個 sheet。
+    @Test
+    func `在呈現式堆疊內返回是 pop 而非收掉整個堆疊`() async throws {
+        let root = UIViewController()
+        let nav = UINavigationController(rootViewController: root)
+        nav.loadViewIfNeeded()
+        // 模擬「整個 nav 是被 sheet 呈現出來的」
+        nav.appTransitionStyle = .sheet
+
+        let pushed = UIViewController()
+        AppRouter.shared.to(pushed, from: root, animated: false)
+        #expect(nav.viewControllers.count == 2)
+
+        AppRouter.shared.back(from: pushed, animated: false)
+        // 回到清單：堆疊只剩根，而不是整個 nav 被 dismiss
+        #expect(nav.viewControllers.count == 1)
+        #expect(nav.viewControllers.first === root)
+    }
+
+    @Test
+    func `呈現式堆疊的根畫面返回仍是收掉整個堆疊`() async throws {
+        let root = UIViewController()
+        let nav = UINavigationController(rootViewController: root)
+        nav.loadViewIfNeeded()
+        nav.appTransitionStyle = .sheet
+        // 根畫面沒有前一頁可退 → 維持既有行為（收掉整個 nav），不應 pop
+        AppRouter.shared.back(from: root, animated: false)
+        #expect(nav.viewControllers.count == 1)
+    }
 }

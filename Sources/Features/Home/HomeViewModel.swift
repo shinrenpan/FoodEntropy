@@ -16,22 +16,16 @@ final class HomeViewModel {
     private let manager: SwiftDataManager
 
     @ObservationIgnored
-    private let notifications: NotificationService
-
-    @ObservationIgnored
     private let store: StoreManager
 
     @ObservationIgnored
     var onRoute: (@MainActor (Router) -> Void)?
 
-    init(
-        manager: SwiftDataManager,
-        store: StoreManager,
-        notifications: NotificationService = .shared
-    ) {
+    // 首頁不再持有 NotificationService：會改動 active 清單的動作全部移到
+    // 分桶清單畫面，而清除歷史依規格不重建排程（見 home-ui）。
+    init(manager: SwiftDataManager, store: StoreManager) {
         self.manager = manager
         self.store = store
-        self.notifications = notifications
     }
 
     func doAction(_ action: Action) async {
@@ -49,15 +43,7 @@ extension HomeViewModel {
         case onAppear
         case addDidTap
         case settingsDidTap             // 導覽列右上角齒輪
-        case rowDidTap(FoodItem)
-        case consumeDidTap(FoodItem)
-        case wasteDidTap(FoodItem)
-        case deleteDidTap(FoodItem)        // 顯示刪除確認
-        case deleteConfirmed
-        case deleteCancelled
-        case extendDidTap(FoodItem)        // 顯示延長 date picker
-        case extendCommitted(Date)
-        case extendCancelled
+        case cardDidTap(HomeCard)       // 點卡片：移到最前面；已在最前面的非空分桶卡才開清單
         case clearHistoryDidTap            // 清除歷史統計 → 顯示確認
         case clearHistoryConfirmed
     }
@@ -73,49 +59,20 @@ extension HomeViewModel {
         case .settingsDidTap:
             onRoute?(.toSettings)
 
-        case let .rowDidTap(item):
-            onRoute?(.toEdit(item))
-
-        case let .consumeDidTap(item):
-            try? manager.markConsumed(id: item.id)
-            await reloadAndReschedule()
-
-        case let .wasteDidTap(item):
-            try? manager.markWasted(id: item.id)
-            await reloadAndReschedule()
-
-        case let .deleteDidTap(item):
-            state.pendingDeleteItem = item
-
-        case .deleteConfirmed:
-            if let item = state.pendingDeleteItem {
-                try? manager.delete(id: item.id)
-            }
-            state.pendingDeleteItem = nil
-            await reloadAndReschedule()
-
-        case .deleteCancelled:
-            state.pendingDeleteItem = nil
-
-        case let .extendDidTap(item):
-            state.extendingItem = item
-
-        case let .extendCommitted(newExpiry):
-            if let item = state.extendingItem {
-                try? manager.update(
-                    id: item.id,
-                    name: item.name,
-                    purchaseDate: item.purchaseDate,
-                    expiryDate: newExpiry,
-                    imageData: item.imageData,
-                    price: item.price   // 延長效期只改到期日，其餘欄位原樣帶回
-                )
-            }
-            state.extendingItem = nil
-            await reloadAndReschedule()
-
-        case .extendCancelled:
-            state.extendingItem = nil
+        case let .cardDidTap(card):
+            // 第一次點只把卡移到最前面。否則使用者無法單純瀏覽這疊卡——
+            // 任何一次點擊都會被丟進 modal（見 home-ui 的卡片點擊 requirement）。
+            let wasSelected = state.selectedCard == card
+            state.selectedCard = card
+            // 已在最前面、是分桶卡、且該桶非空時才開清單。
+            // 摘要卡與空桶點幾次都不開，卡面上也不會有開啟提示。
+            guard wasSelected,
+                  let bucket = card.bucket,
+                  !state.items(in: bucket).isEmpty
+            else { return }
+            // 呈現清單是導航，不是狀態：由 HostController 以 AppRouter 執行
+            // （見 navigation 的「ViewModel 發出意圖、HostController 執行」）。
+            onRoute?(.toBucketList(bucket))
 
         case .clearHistoryDidTap:
             state.showClearHistoryConfirm = true
@@ -134,11 +91,6 @@ extension HomeViewModel {
         await doAction(.dataResponse(.loaded(active: active, resolved: resolved)))
     }
 
-    // 資料變動後：重載 + 以當前 active 重建通知排程（DEBUG 用 10 秒立即驗證）。
-    private func reloadAndReschedule() async {
-        await reload()
-        await notifications.reconcile(activeFoods: state.items, immediateTestFire: true)
-    }
 }
 
 // MARK: - Router
@@ -146,9 +98,10 @@ extension HomeViewModel {
 extension HomeViewModel {
     enum Router: Sendable {
         case toAdd
-        case toEdit(FoodItem)
         // 設定不再是並列的 tab，改為推入同一個 stack（見 home-ui）。
         case toSettings
+        // 分桶清單是獨立畫面：首頁改成卡片堆疊後不再渲染食材列（見 home-ui）。
+        case toBucketList(ExpiryStatus)
     }
 }
 
@@ -179,6 +132,12 @@ extension HomeViewModel {
             // 兩者皆以 nil 表示「無可計算」——畫面據此整行不渲染，而非顯示 0。
             state.upcomingExpiryCost = summary.upcomingExpiryCost
             state.wastedCost = FoodStatusSummary.sumPrices(windowed.filter { $0.status == .wasted })
+            state.expiredCost = FoodStatusSummary.sumPrices(summary.expired)
+            // 選中的分桶若已空，移到最急迫的非空桶——否則使用者盯著一張沒有內容的卡。
+            if let bucket = state.selectedCard.bucket, state.items(in: bucket).isEmpty {
+                state.selectedCard = state.mostUrgentNonEmptyCard
+            }
+
         }
     }
 }
