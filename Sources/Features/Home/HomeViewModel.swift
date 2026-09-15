@@ -49,6 +49,8 @@ extension HomeViewModel {
         case onAppear
         case addDidTap
         case settingsDidTap             // 導覽列右上角齒輪
+        case cardDidTap(HomeCard)        // SPIKE v7：點卡片 → 移到前面，分桶卡再開 sheet
+        case bucketSheetDismissed        // SPIKE v7：關閉分桶清單 sheet
         case rowDidTap(FoodItem)
         case consumeDidTap(FoodItem)
         case wasteDidTap(FoodItem)
@@ -72,6 +74,18 @@ extension HomeViewModel {
 
         case .settingsDidTap:
             onRoute?(.toSettings)
+
+        case let .cardDidTap(card):
+            // 第一次點只把卡移到最前面，不開清單——否則使用者沒辦法單純
+            // 瀏覽這疊卡，任何一次點擊都會被丟進 modal。
+            // 已經在最前面的分桶卡再點一次才開，卡面上的 › 是那一步的提示。
+            let wasSelected = state.selectedCard == card
+            state.selectedCard = card
+            guard wasSelected, let bucket = card.bucket, !state.items(in: bucket).isEmpty else { return }
+            state.sheetBucket = bucket
+
+        case .bucketSheetDismissed:
+            state.sheetBucket = nil
 
         case let .rowDidTap(item):
             onRoute?(.toEdit(item))
@@ -179,6 +193,15 @@ extension HomeViewModel {
             // 兩者皆以 nil 表示「無可計算」——畫面據此整行不渲染，而非顯示 0。
             state.upcomingExpiryCost = summary.upcomingExpiryCost
             state.wastedCost = FoodStatusSummary.sumPrices(windowed.filter { $0.status == .wasted })
+            state.expiredCost = FoodStatusSummary.sumPrices(summary.expired)
+            // 選中的分桶若已空，移到最急迫的非空桶——否則使用者盯著一個空卡。
+            if let bucket = state.selectedCard.bucket, state.items(in: bucket).isEmpty {
+                state.selectedCard = switch state.mostUrgentNonEmptyBucket {
+                case .expired: .expired
+                case .nearExpiry: .nearExpiry
+                case .fresh: .fresh
+                }
+            }
         }
     }
 }
