@@ -140,9 +140,18 @@ private extension HomeView {
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(minHeight: isSelected ? nil : collapsedHeight, alignment: .top)
             .background {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(gradient)
+                surface
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    // 卡緣細線：深色模式下陰影是黑的、等於不存在，
+                    // 重疊的兩張卡要靠這條線才分得開。淺色模式下它也讓邊緣更俐落。
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 20)
+                            .strokeBorder(edgeStroke, lineWidth: 0.5)
+                    }
+                    // 兩道陰影：向下那道把整疊卡撐離背景，向上那道畫出「這張壓在前一張上」
+                    // 的那條交界——只有向下的話，交界會被下一張卡自己蓋掉而看不見。
                     .shadow(color: .black.opacity(0.22), radius: isSelected ? 12 : 6, y: 4)
+                    .shadow(color: .black.opacity(0.16), radius: 4, y: -2)
             }
             // 開啟提示屬於整張卡，不是標題列裡那個數字的附屬品——整張卡都可點，
             // 所以比照 iOS 的 disclosure indicator 貼在卡片右緣垂直置中。
@@ -175,7 +184,7 @@ private extension HomeView {
                         .monospacedDigit()
                 }
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(foreground)
             .padding(.horizontal, 18)
             .padding(.vertical, 18)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -185,8 +194,7 @@ private extension HomeView {
 
         @ViewBuilder private func content() -> some View {
             switch card {
-            // 摘要卡的內容包在淺色面板裡：圓形圖與統計是深色前景，
-            // 直接畫在飽和色卡面上會失去可讀性（見 home-ui）。
+            // 摘要卡是中性卡面，圓形圖與統計直接畫在上面即可讀。
             case .current:
                 panel {
                     StatusChartView(
@@ -213,13 +221,18 @@ private extension HomeView {
             }
         }
 
+        // 摘要卡的內容直接畫在石墨卡面上。先前包一層白色面板是為了讓深色前景的
+        // 圖表在飽和色卡面上仍可讀；卡面改石墨之後那層補丁就不需要了。
+        //
+        // 卡面固定深色，內容的語意色（.primary / .secondary / .tertiary）因此必須
+        // 以深色方案解析——否則淺色模式下會是黑字壓在石墨上。只罩在內容上，不罩整張卡：
+        // 分桶卡的漸層取自會隨方案調整的效期色，整張罩住會連帶改掉淺色模式的卡面顏色。
         @ViewBuilder private func panel<Content: View>(@ViewBuilder _ inner: () -> Content) -> some View {
             inner()
-                .padding(14)
+                .environment(\.colorScheme, .dark)
                 .frame(maxWidth: .infinity, minHeight: Self.selectedContentHeight, alignment: .topLeading)
-                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
-                .padding(.horizontal, 10)
-                .padding(.bottom, 10)
+                .padding(.horizontal, 18)
+                .padding(.bottom, 18)
         }
 
         // 卡面永遠是兩個真實事實：金額（損失多少）與時間（多久壞）。
@@ -278,21 +291,50 @@ private extension HomeView {
             return "\(days) days left"
         }
 
-        private var gradient: LinearGradient {
-            let base: Color = switch card {
-            case .current: .blue
-            case .waste: .indigo
-            case .expired: expiryColor(.expired)
-            case .nearExpiry: expiryColor(.nearExpiry)
-            case .fresh: expiryColor(.fresh)
+        /// 卡面。摘要卡不帶色相、分桶卡帶效期色。
+        ///
+        /// 摘要卡刻意不帶顏色：紅橘綠是「急迫度」的語意，摘要卡沒有急迫度可言，
+        /// 給它藍或靛只是「不是那三個」——不帶意義的顏色會讓整套色彩語意失效，
+        /// 也正是讓畫面看起來沒被設計過的主因（見 home-ui 的「顏色只承載急迫度」）。
+        @ViewBuilder private var surface: some View {
+            switch card {
+            case .current, .waste:
+                summaryGradient
+            case .expired, .nearExpiry, .fresh:
+                bucketGradient
             }
-            // 必須完全不透明：卡片互相疊壓，半透明會讓下層的文字透出來。
-            return LinearGradient(
-                colors: [base, base.mix(with: .black, by: 0.3)],
+        }
+
+        /// 摘要卡的石墨卡面。兩種色彩方案共用同一組值，不隨背景翻轉。
+        ///
+        /// 跟著背景走的中性色（`secondarySystemGroupedBackground`）在深色模式下
+        /// 與純黑背景只差一階，那兩張卡會融進背景而不再像卡。固定深色則兩種模式
+        /// 都明確是一張卡，也讓五張卡共用同一套白字處理。
+        private var summaryGradient: LinearGradient {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.24, green: 0.26, blue: 0.30),
+                    Color(red: 0.13, green: 0.14, blue: 0.17),
+                ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         }
+
+        private var bucketGradient: LinearGradient {
+            let base = expiryColor(card.bucket ?? .fresh)
+            // 兩端都混一點黑：純色兩端太亮會讀成色票，壓一點才有材質感。
+            // 必須完全不透明——卡片互相疊壓，半透明會讓下層文字透出來。
+            return LinearGradient(
+                colors: [base.mix(with: .black, by: 0.12), base.mix(with: .black, by: 0.4)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        /// 五張卡都是深色卡面，故一律白字、一律提亮的白色卡緣細線。
+        private let foreground: Color = .white
+        private let edgeStroke: Color = .white.opacity(0.14)
 
         private var title: LocalizedStringKey {
             switch card {
