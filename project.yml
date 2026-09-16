@@ -67,7 +67,7 @@ targets:
     info:
       path: Sources/App/Info.plist
       properties:
-        CFBundleDisplayName: 食熵
+        CFBundleDisplayName: FoodEntropy    # base 為 en（與 CFBundleDevelopmentRegion 一致）；中文名在 InfoPlist.xcstrings
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         # 僅用標準 HTTPS（AdMob / CloudKit）等豁免加密 → 免每次上傳被問匯出合規。
@@ -86,8 +86,8 @@ targets:
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         # 相機 / 相簿權限（食材 Form 拍照選圖用）
-        NSCameraUsageDescription: 需要相機權限，用來拍攝食材照片。
-        NSPhotoLibraryUsageDescription: 需要相簿權限，用來選擇食材照片。
+        NSCameraUsageDescription: FoodEntropy needs camera access to take photos of your food items.
+        NSPhotoLibraryUsageDescription: FoodEntropy needs photo library access to choose photos for your food items.
         # AdMob：非個人化廣告、不跳 ATT（不追蹤、不用 IDFA），故不需 NSUserTrackingUsageDescription。
         # 正式 App ID（AdMob 後台的食熵 iOS App）；App ID 兩環境共用，測試/正式差異在「廣告單元 ID」（見 AdConfig）。
         GADApplicationIdentifier: ca-app-pub-9003896396180654~4290057776
