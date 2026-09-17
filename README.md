@@ -60,7 +60,7 @@ original pre-Spectra design documents remain available in the git history.
 
 ## Status
 
-**v1.3.0 on the App Store.**
+**v1.4.0 on the App Store.**
 
 - [x] Data layer (SwiftData model + manager, CloudKit-safe schema)
 - [x] Core screens (Home with statistics / Form / Settings)
@@ -72,8 +72,7 @@ original pre-Spectra design documents remain available in the git history.
 - [x] Shortcuts / Siri / Spotlight via App Intents (v1.3.0)
 - [x] Capability specs (15 capabilities; the original 13 backfilled from v1.0.0)
 - [x] Home screen rebuilt as a stack of five cards, Settings moved into its navigation
-      bar, and each bucket's working list opened from its own card
-      (v1.4.0 — built and tested, not yet submitted)
+      bar, and each bucket's working list opened from its own card (v1.4.0)
 
 Pending work lives in [`openspec/changes/`](./openspec/changes/) as change proposals —
 each one states what is decided, what is not, and what unblocks it.
@@ -83,7 +82,7 @@ each one states what is decided, what is not, and what unblocks it.
 The App Store screenshots — Home, the home-screen widget, and Settings.
 
 <p>
-  <img src="./design/screenshots/home.png" alt="Home — expiry ring, waste stats, and the expiring items list" width="30%">
+  <img src="./design/screenshots/home.png" alt="Home — the card stack: waste stats, one card per expiry bucket, and the current-status card with the expiry ring" width="30%">
   <img src="./design/screenshots/widget.png" alt="Medium home-screen widget showing the same expiry ring" width="30%">
   <img src="./design/screenshots/settings.png" alt="Settings — remove ads, iCloud sync, notifications" width="30%">
 </p>
