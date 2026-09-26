@@ -1,7 +1,7 @@
 # ==============================================================
 # Spectra 專案設定 — openspec/config.yaml
 # 負責「AI 產生 artifact 時的背景與規則」。
-# 行為開關（locale / tdd / parallel_tasks / worktree…）在 .spectra.yaml，不在這裡。
+# 行為開關（spec_dir / locale / tdd / audit）在 .spectra.yaml，不在這裡。
 # 另有「全域」設定在 ~/Library/Application Support/openspec/，由 `spectra config` 指令管，跨專案。
 # ==============================================================
 
