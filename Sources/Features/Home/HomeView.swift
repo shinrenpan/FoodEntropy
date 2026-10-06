@@ -429,11 +429,13 @@ private extension HomeView {
 
 
         // 綠（吃掉）/ 紅（丟棄）比例條
+        // y 軸隱藏，label 不會顯示：用 verbatim 免得編譯器把 "" 抽進 String Catalog
+        // （字面值會被當 LocalizedStringKey 抽出，成為永遠無法翻譯的空 key）。
         @ViewBuilder private func proportionBar() -> some View {
             Chart {
-                BarMark(x: .value("Used", consumed), y: .value("", "resolved"))
+                BarMark(x: .value("Used", consumed), y: .value(Text(verbatim: ""), "resolved"))
                     .foregroundStyle(.green)
-                BarMark(x: .value("Discarded", wasted), y: .value("", "resolved"))
+                BarMark(x: .value("Discarded", wasted), y: .value(Text(verbatim: ""), "resolved"))
                     .foregroundStyle(.red)
             }
             .chartXAxis(.hidden)
