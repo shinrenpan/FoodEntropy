@@ -30,7 +30,7 @@ final class SettingsHostController: UIHostingController<SettingsView> {
     // 避免在尺寸變化中途改動 stack。規則須與 HomeRootView 的分割條件一致。
     override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        guard #available(iOS 27.1, *), size.width > size.height else { return }
+        guard size.width > size.height else { return }
         coordinator.animate(alongsideTransition: nil) { [weak self] _ in
             guard let self else { return }
             AppRouter.shared.back(from: self, animated: false)
