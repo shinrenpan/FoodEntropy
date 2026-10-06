@@ -24,6 +24,13 @@ struct BannerAdView: UIViewRepresentable {
 
     func updateUIView(_ uiView: BannerView, context: Context) {}
 
+    // 尺寸只看外層提案，不採用 BannerView 自報的 intrinsic size。後者在轉向時會變
+    //（實測出現過 480x32），沒有這個實作時 SwiftUI 拿它當理想尺寸，ArrangementView
+    // 依理想尺寸分欄就被帶偏，整個首頁欄位偏移（iPhone Duo 實測）。
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: BannerView, context: Context) -> CGSize? {
+        CGSize(width: proposal.width ?? AdSizeBanner.size.width, height: AdSizeBanner.size.height)
+    }
+
     /// 取當前 key window 的 rootViewController（BannerView 呈現全螢幕點擊需要）。
     private static func keyRootViewController() -> UIViewController? {
         UIApplication.shared.connectedScenes

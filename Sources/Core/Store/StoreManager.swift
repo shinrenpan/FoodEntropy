@@ -6,8 +6,18 @@ import StoreKit
 final class StoreManager {
     static let removeAdsProductID = "com.shinrenpan.FoodEntropy.removeads"
 
+    /// `adsRemoved` 改變時發出。首頁與設定頁可能同時在畫面上（iPhone Duo 並排），
+    /// 也可能由 `Transaction.updates`（退款、他機購買）在背景改變，讀取端不能只靠
+    /// 自己的生命週期重讀（比照 `SwiftDataManager.didChangeNotification`）。
+    static let didChangeNotification = Notification.Name("StoreManager.didChange")
+
     /// 是否已持有「移除廣告」entitlement（退款 / 撤銷會反映）。
-    private(set) var adsRemoved: Bool
+    private(set) var adsRemoved: Bool {
+        didSet {
+            guard adsRemoved != oldValue else { return }
+            NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
+        }
+    }
 
     /// 「移除廣告」商品（載入後才有價格）。
     private(set) var removeAdsProduct: Product?

@@ -2,6 +2,9 @@ import SwiftUI
 
 struct SettingsView: View {
     let viewModel: SettingsViewModel
+    // 並排嵌在首頁旁（iPhone Duo，見 HomeRootView）時不設標題：同一條導覽列上，
+    // 嵌入的這欄若也設 navigationTitle，會蓋掉首頁的標題（實測，外層再指定也蓋不回）。
+    var isEmbedded = false
 
     var body: some View {
         @Bindable var bVM = viewModel
@@ -25,9 +28,17 @@ struct SettingsView: View {
                 send: handleAboutAction
             )
         }
-        .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.inline)
+        .modifier(SettingsTitle(isEmbedded: isEmbedded))
         .onAppear {
+            Task { await viewModel.doAction(.view(.onAppear)) }
+        }
+        // 從系統設定改完通知權限回來時要重讀狀態。設定頁並排常駐時（iPhone Duo）
+        // 不會消失再出現，.onAppear 不會再觸發；scenePhase 在 UIKit 生命週期收不到。
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            Task { await viewModel.doAction(.view(.onAppear)) }
+        }
+        // 退款、他機購買經 Transaction.updates 在背景改變 entitlement 時同步顯示。
+        .onReceive(NotificationCenter.default.publisher(for: StoreManager.didChangeNotification)) { _ in
             Task { await viewModel.doAction(.view(.onAppear)) }
         }
         .alert("Setting changed", isPresented: $bVM.state.showRestartNotice) {
@@ -190,3 +201,17 @@ private extension SettingsView {
     SettingsView(viewModel: SettingsViewModel(store: StoreManager()))
 }
 #endif
+
+private struct SettingsTitle: ViewModifier {
+    let isEmbedded: Bool
+
+    func body(content: Content) -> some View {
+        if isEmbedded {
+            content
+        } else {
+            content
+                .navigationTitle("Settings")
+                .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}

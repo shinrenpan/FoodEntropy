@@ -2,9 +2,11 @@ import SwiftUI
 import UIKit
 
 @MainActor
-final class HomeHostController: UIHostingController<HomeView> {
+final class HomeHostController: UIHostingController<HomeRootView> {
 
     private let viewModel: HomeViewModel
+    // iPhone Duo 內螢幕橫向時並排顯示的設定頁（見 HomeRootView）。
+    private let settingsViewModel: SettingsViewModel
     private let manager: SwiftDataManager
     // 設定頁改由首頁建構並推入（見 home-ui），故需保留 store。
     private let store: StoreManager
@@ -13,7 +15,8 @@ final class HomeHostController: UIHostingController<HomeView> {
         self.manager = manager
         self.store = store
         self.viewModel = HomeViewModel(manager: manager, store: store)
-        super.init(rootView: HomeView(viewModel: viewModel))
+        self.settingsViewModel = SettingsViewModel(store: store)
+        super.init(rootView: HomeRootView(homeViewModel: viewModel, settingsViewModel: settingsViewModel))
     }
 
     @available(*, unavailable)
@@ -25,6 +28,10 @@ final class HomeHostController: UIHostingController<HomeView> {
         super.viewDidLoad()
         viewModel.onRoute = { [weak self] router in
             self?.handleRouter(router)
+        }
+        settingsViewModel.onRoute = { [weak self] router in
+            guard let self else { return }
+            SettingsHostController.handle(router, from: self)
         }
     }
 }
