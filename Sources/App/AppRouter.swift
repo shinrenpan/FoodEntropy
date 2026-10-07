@@ -79,7 +79,24 @@ final class AppRouter: NSObject {
         }
         attach(to: nav)
         destination.appTransitionStyle = style
-        nav.setViewControllers([root, destination], animated: animated)
+        dismissPresented(above: nav) {
+            nav.setViewControllers([root, destination], animated: animated)
+        }
+    }
+
+    /// 根堆疊之上若有 present 出來的畫面（分桶清單、隱私權政策等 sheet），先不帶動畫
+    /// 收掉，在 dismiss 完成後才執行 `then`；沒有就直接執行。
+    ///
+    /// 只改根堆疊而不收 modal，目標會被推到 sheet 底下、使用者看不到
+    /// （見 fix-deeplink-under-presented-sheet）。不在同一個 runloop 內連續 dismiss 與
+    /// 設定堆疊：UIKit 會丟棄前一次導航尚未落定期間的下一次導航（見 fix-deeplink-dropped-push），
+    /// completion 是 dismiss 落定的時點。由根導覽控制器 dismiss，會一併收掉整條 presentation 鏈。
+    private func dismissPresented(above nav: UINavigationController, then: @escaping @MainActor () -> Void) {
+        guard nav.presentedViewController != nil else {
+            then()
+            return
+        }
+        nav.dismiss(animated: false) { then() }
     }
 
     /// 轉場與返回手勢的接管設定。`to` 與 `resetTo` 共用，
@@ -131,12 +148,17 @@ final class AppRouter: NSObject {
         nav.popToViewController(destination, animated: animated)
     }
 
+    /// 回到 stack 根部，**含收掉根堆疊之上 present 的畫面**（分桶清單等 sheet）。
+    /// 目前只有 deeplink 使用（首頁目的地、目標已不在）：「停在首頁」指的是使用者
+    /// 看到的是首頁，不是首頁藏在 sheet 底下（見 fix-deeplink-under-presented-sheet）。
     func backToRoot(from source: UIViewController, animated: Bool = true) {
         guard let nav = source.navigationController else {
             assertionFailure("AppRouter.backToRoot(): source VC 沒有 navigationController")
             return
         }
-        nav.popToRootViewController(animated: animated)
+        dismissPresented(above: nav) {
+            nav.popToRootViewController(animated: animated)
+        }
     }
 
     func sheet(

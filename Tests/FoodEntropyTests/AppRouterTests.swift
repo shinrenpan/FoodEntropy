@@ -113,4 +113,83 @@ struct AppRouterTests {
         AppRouter.shared.back(from: root, animated: false)
         #expect(nav.viewControllers.count == 1)
     }
+
+    // MARK: - deeplink 時有 modal 開著（fix-deeplink-under-presented-sheet）
+
+    // 分桶清單、隱私權政策都是 present 在首頁之上的 modal，不在根堆疊裡。
+    // deeplink 只改根堆疊的話，目標被推到 sheet 底下、使用者看不到（2026-10-07 實測）。
+    // 真的 present 需要 window，所以掛到 host app 的 window scene 上。
+    private func makePresentedNav(depth: Int) throws -> (UIWindow, UINavigationController, UIViewController, UIViewController) {
+        let scene = try #require(
+            UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first,
+            "測試需在 host app 中執行才有 window scene"
+        )
+        let window = UIWindow(windowScene: scene)
+        let (nav, root) = makeNav(depth: depth)
+        window.rootViewController = nav
+        window.makeKeyAndVisible()
+        let sheet = UINavigationController(rootViewController: UIViewController())
+        nav.present(sheet, animated: false)
+        return (window, nav, root, sheet)
+    }
+
+    /// dismiss 的 completion 不保證同步，輪詢等到 modal 收掉（最多約 2 秒）。
+    private func waitUntilDismissed(_ nav: UINavigationController) async {
+        for _ in 0..<100 where nav.presentedViewController != nil {
+            try? await Task.sleep(for: .milliseconds(20))
+        }
+        await Task.yield()
+    }
+
+    @Test
+    func `有 sheet 開著時 resetTo 先收掉 sheet 再設成根部與目標`() async throws {
+        let (window, nav, root, _) = try makePresentedNav(depth: 1)
+        defer { window.isHidden = true }
+        #expect(nav.presentedViewController != nil)
+
+        let destination = UIViewController()
+        AppRouter.shared.resetTo(destination, from: root, animated: false)
+        await waitUntilDismissed(nav)
+
+        #expect(nav.presentedViewController == nil)
+        #expect(nav.viewControllers.count == 2)
+        #expect(nav.viewControllers.first === root)
+        #expect(nav.viewControllers.last === destination)
+    }
+
+    @Test
+    func `sheet 開著且根堆疊已推一層時 resetTo 結果仍是根部與目標`() async throws {
+        let (window, nav, root, _) = try makePresentedNav(depth: 2)
+        defer { window.isHidden = true }
+
+        let destination = UIViewController()
+        AppRouter.shared.resetTo(destination, from: root, animated: false)
+        await waitUntilDismissed(nav)
+
+        #expect(nav.presentedViewController == nil)
+        #expect(nav.viewControllers.count == 2)
+        #expect(nav.viewControllers.last === destination)
+    }
+
+    // foodentropy://home、通知點擊與「目標已不在」走 backToRoot，也要收掉 modal。
+    @Test
+    func `有 sheet 開著時 backToRoot 先收掉 sheet 再回到根部`() async throws {
+        let (window, nav, root, _) = try makePresentedNav(depth: 2)
+        defer { window.isHidden = true }
+
+        AppRouter.shared.backToRoot(from: root, animated: false)
+        await waitUntilDismissed(nav)
+
+        #expect(nav.presentedViewController == nil)
+        #expect(nav.viewControllers.count == 1)
+        #expect(nav.viewControllers.first === root)
+    }
+
+    @Test
+    func `沒有 sheet 時 backToRoot 照舊回到根部`() async throws {
+        let (nav, root) = makeNav(depth: 3)
+        AppRouter.shared.backToRoot(from: root, animated: false)
+        #expect(nav.viewControllers.count == 1)
+        #expect(nav.viewControllers.first === root)
+    }
 }
