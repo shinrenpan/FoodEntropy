@@ -21,7 +21,7 @@ settings:
 packages:
   GoogleMobileAds:                       # 唯一第三方（00-constitution）；classic SDK，iOS 尚無 Next-Gen
     url: https://github.com/googleads/swift-package-manager-google-mobile-ads.git
-    from: "13.0.0"
+    from: "13.11.0"   # 13.10.0 支援 iOS 27、13.11.0 正式支援 iPhone Duo（官方 release notes）
 
 targets:
   FoodEntropy:

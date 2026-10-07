@@ -6,6 +6,12 @@ import StoreKit
 final class StoreManager {
     static let removeAdsProductID = "com.shinrenpan.FoodEntropy.removeads"
 
+    /// `adsRemoved` 實際改變時發出（見 iap-remove-ads〈Entitlement changes reach every
+    /// visible screen〉）。首頁與設定頁可能同時在畫面上（iPhone Duo 並排），entitlement
+    /// 也可能由 `Transaction.updates`（退款、他機購買）在背景改變，讀取端不能只靠自己
+    /// 的出現時機重讀。比照 `SwiftDataManager.didChangeNotification`。
+    static let didChangeNotification = Notification.Name("StoreManager.didChange")
+
     /// 是否已持有「移除廣告」entitlement（退款 / 撤銷會反映）。
     private(set) var adsRemoved: Bool
 
@@ -39,7 +45,14 @@ final class StoreManager {
                 owned = true
             }
         }
+        applyOwnership(owned)
+    }
+
+    /// 套用對帳結果；值不變時不廣播，避免每次對帳都讓所有畫面重讀。
+    func applyOwnership(_ owned: Bool) {
+        guard owned != adsRemoved else { return }
         adsRemoved = owned
+        NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
     }
 
     /// 發起購買。回傳購買後是否已持有。

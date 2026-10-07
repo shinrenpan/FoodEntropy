@@ -53,6 +53,10 @@ state what is decided, what is not, and what unblocks it. This keeps everything 
 ## Non-negotiable rules (from the constitution)
 
 - Platform: **iPhone only**, **iOS 26+**, portrait-locked, dark mode supported.
+  Exception: the **iPhone Duo inner display ignores the portrait declaration** (the outer
+  display honours it, measured). There, lay out from the space given — wider than tall
+  shows settings beside the home screen — never from device orientation. Keep the
+  portrait declaration: regular iPhones and the outer display depend on it.
 - Architecture: **MVVMC**. Layering: `@Model` (persistence DTO) → `SwiftDataManager` (`toDomain()`)
   → ViewModel → State → View.
 - ViewModel / State **never hold SwiftData `@Model`** — only Domain Models.

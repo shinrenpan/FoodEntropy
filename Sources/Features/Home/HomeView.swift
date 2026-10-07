@@ -9,6 +9,9 @@ import UIKit
 // 由分桶卡的第二次點擊開啟。
 struct HomeView: View {
     let viewModel: HomeViewModel
+    // 設定已並排在左欄時不放設定按鈕（見 home-ui〈Settings is reached from the home
+    // screen's navigation bar〉），由 HomeRootView 決定。
+    var showsSettingsButton: Bool = true
 
     var body: some View {
         @Bindable var bVM = viewModel
@@ -33,11 +36,13 @@ struct HomeView: View {
         .toolbar {
             // 設定不再是並列的 tab，改為從這裡推入（見 home-ui）。
             // 走 ViewAction → Router → HostController，不在 HostController 直接掛 bar button。
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    Task { await viewModel.doAction(.view(.settingsDidTap)) }
-                } label: {
-                    Label("Settings", systemImage: "gearshape")
+            if showsSettingsButton {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        Task { await viewModel.doAction(.view(.settingsDidTap)) }
+                    } label: {
+                        Label("Settings", systemImage: "gearshape")
+                    }
                 }
             }
         }
@@ -67,6 +72,12 @@ struct HomeView: View {
         // 沒有生命週期轉換可依附，改聽資料層的變動廣播。這也是清單關閉後首頁
         // 卡片會同步的機制——首頁不需要知道清單何時關閉。
         .onReceive(NotificationCenter.default.publisher(for: SwiftDataManager.didChangeNotification)) { _ in
+            Task { await viewModel.doAction(.view(.onAppear)) }
+        }
+        // 移除廣告的 entitlement 改變時重讀，廣告位隨之出現或消失（見 iap-remove-ads）。
+        // 設定並排在旁（iPhone Duo）時首頁不會經過返回而重讀；退款與他機購買也可能
+        // 在背景經 Transaction.updates 發生。
+        .onReceive(NotificationCenter.default.publisher(for: StoreManager.didChangeNotification)) { _ in
             Task { await viewModel.doAction(.view(.onAppear)) }
         }
         .alert("Clear history?", isPresented: $bVM.state.showClearHistoryConfirm) {

@@ -25,7 +25,9 @@ context: |
 
   Project decisions: entry point is AppDelegate + SceneDelegate (UIKit lifecycle)
   hosting SwiftUI via UIHostingController, NOT a SwiftUI @main App.
-  iPhone only, portrait-locked, dark mode supported.
+  iPhone only, portrait-locked, dark mode supported. Exception: the iPhone Duo inner
+  display ignores declared orientations, so there the layout follows the space given
+  (wider than tall: settings beside the home screen) rather than the orientation.
   Food status has two axes: a stored RecordStatus (active/consumed/wasted) and a
   computed ExpiryStatus (fresh / nearExpiry 0-3d / expired). ExpiryStatus is derived
   on read and never persisted — do not add it to any @Model.
