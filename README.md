@@ -60,7 +60,7 @@ original pre-Spectra design documents remain available in the git history.
 
 ## Status
 
-**v1.4.0 on the App Store.**
+**v1.5.0 on the App Store.**
 
 - [x] Data layer (SwiftData model + manager, CloudKit-safe schema)
 - [x] Core screens (Home with statistics / Form / Settings)
@@ -73,6 +73,8 @@ original pre-Spectra design documents remain available in the git history.
 - [x] Capability specs (15 capabilities; the original 13 backfilled from v1.0.0)
 - [x] Home screen rebuilt as a stack of five cards, Settings moved into its navigation
       bar, and each bucket's working list opened from its own card (v1.4.0)
+- [x] iPhone Duo: with the inner display held sideways, Settings sits beside the home
+      cards; everywhere else the app looks as before (v1.5.0)
 
 Pending work lives in [`openspec/changes/`](./openspec/changes/) as change proposals —
 each one states what is decided, what is not, and what unblocks it.
